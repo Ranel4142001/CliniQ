@@ -23,6 +23,8 @@ export interface Paginated<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+  /** Index signature required for assignability to ApiResponse.meta */
+  [key: string]: unknown;
 }
 
 export interface PaginationParams {
