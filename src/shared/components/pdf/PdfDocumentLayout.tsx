@@ -1,0 +1,103 @@
+import React, { ReactNode } from "react";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+} from "@react-pdf/renderer";
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 36,
+    fontSize: 10,
+    fontFamily: "Helvetica",
+    color: "#1e293b",
+    lineHeight: 1.4,
+  },
+  watermark: {
+    position: "absolute",
+    top: 340,
+    left: 40,
+    right: 40,
+    textAlign: "center",
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#e2e8f0",
+    letterSpacing: 2,
+    opacity: 0.6,
+    transform: "rotate(-25deg)",
+  },
+  header: {
+    marginBottom: 20,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#cbd5e1",
+  },
+  clinicName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#0f172a",
+  },
+  clinicSub: {
+    fontSize: 9,
+    color: "#64748b",
+    marginTop: 2,
+  },
+  content: {
+    flexGrow: 1,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 24,
+    left: 36,
+    right: 36,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+    paddingTop: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    fontSize: 8,
+    color: "#94a3b8",
+  },
+});
+
+interface PdfDocumentLayoutProps {
+  title?: string;
+  subtitle?: string;
+  children: ReactNode;
+}
+
+export function PdfDocumentLayout({
+  title = "CliniQ Community Health Center",
+  subtitle = "Community Medical & Clinical Services • Manila, Philippines",
+  children,
+}: PdfDocumentLayoutProps) {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Demonstration Watermark */}
+        <Text style={styles.watermark} fixed>
+          SAMPLE - FOR DEMONSTRATION ONLY
+        </Text>
+
+        {/* Clinic Header */}
+        <View style={styles.header} fixed>
+          <Text style={styles.clinicName}>{title}</Text>
+          <Text style={styles.clinicSub}>{subtitle}</Text>
+        </View>
+
+        {/* Main Document Content */}
+        <View style={styles.content}>{children}</View>
+
+        {/* Footer */}
+        <View style={styles.footer} fixed>
+          <Text>This document is generated for demonstration and academic thesis purposes only.</Text>
+          <Text
+            render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
+          />
+        </View>
+      </Page>
+    </Document>
+  );
+}

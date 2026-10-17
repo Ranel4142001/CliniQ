@@ -1,0 +1,15 @@
+export const ROUTES = {
+  HOME: "/",
+  LOGIN: "/login",
+  REGISTER: "/register",
+  ONBOARDING: "/onboarding",
+  DASHBOARD: "/dashboard",
+  PATIENTS: "/patients",
+  PATIENT_DETAILS: (id: string) => `/patients/${id}`,
+  APPOINTMENTS: "/appointments",
+  CONSULTATION: (appointmentId: string) => `/consultations/${appointmentId}`,
+  MEDICINES: "/medicines",
+  PRESCRIPTIONS: "/prescriptions",
+  REPORTS: "/reports",
+  USERS: "/users",
+} as const;
