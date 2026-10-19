@@ -1,9 +1,11 @@
 import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { withApiHandler } from "@/shared/lib/api-handler";
 import { createClient } from "@/shared/lib/supabase/server";
 import { authService } from "@/features/auth/services/auth.service";
 import { loginSchema } from "@/features/auth/schemas/auth.schema";
 import { UnauthorizedError, ForbiddenError } from "@/shared/lib/errors";
+import { isDemoMode } from "@/shared/lib/supabase/demo-mode";
 
 export const POST = withApiHandler(async (req: NextRequest) => {
   const body = await req.json();
@@ -15,11 +17,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     password,
   });
 
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const isDemoMode = supabaseKey === "demo-anon-key" || supabaseKey === "dummy-anon-key";
-
   if (error || !data.user) {
-    if (isDemoMode) {
+    if (isDemoMode()) {
       console.warn("Supabase auth unavailable (demo mode), signing in with simulated profile");
       const demoUser = {
         id: `demo-${email.replace(/[^a-zA-Z0-9]/g, "-")}`,
@@ -27,6 +26,12 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         user_metadata: { full_name: email.split("@")[0] },
       };
       const profile = await authService.ensureProfile(demoUser);
+      // Persist session cookie for demo mode
+      cookies().set("cliniq_demo_user", JSON.stringify(profile), {
+        path: "/",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
       return { data: profile };
     }
     throw new UnauthorizedError("Invalid email or password");

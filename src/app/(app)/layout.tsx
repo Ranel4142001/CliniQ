@@ -5,6 +5,7 @@ import { createServerClient } from "@supabase/ssr";
 import { AppShellClient } from "./AppShellClient";
 import { ROUTES } from "@/shared/constants/routes";
 import { authRepository } from "@/features/auth/repositories/auth.repository";
+import { isDemoMode } from "@/shared/lib/supabase/demo-mode";
 
 /**
  * Server component layout for the authenticated app shell.
@@ -27,13 +28,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     },
   });
 
-  // In demo/dev mode (dummy keys) – skip auth check
-  const isDemoMode =
-    supabaseAnonKey === "dummy-anon-key" || supabaseAnonKey === "demo-anon-key";
-
   let userProps: { fullName: string; email: string; role: string } | null = null;
 
-  if (!isDemoMode) {
+  if (!isDemoMode()) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -53,8 +50,22 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       role: profile.role,
     };
   } else {
-    // Demo mode – show placeholder user
-    userProps = { fullName: "Demo User", email: "demo@cliniq.local", role: "ADMIN" };
+    // Demo mode – check if a demo user is logged in via cookie
+    const demoCookie = cookieStore.get("cliniq_demo_user")?.value;
+    if (demoCookie) {
+      try {
+        const parsed = JSON.parse(demoCookie);
+        userProps = {
+          fullName: parsed.fullName || "Ranel Dahil",
+          email: parsed.email || "raneldahil@gmail.com",
+          role: parsed.role || "PATIENT",
+        };
+      } catch {
+        userProps = { fullName: "Demo User", email: "demo@cliniq.local", role: "ADMIN" };
+      }
+    } else {
+      userProps = { fullName: "Demo User", email: "demo@cliniq.local", role: "ADMIN" };
+    }
   }
 
   return <AppShellClient user={userProps}>{children}</AppShellClient>;

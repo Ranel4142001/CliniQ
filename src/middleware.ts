@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { isDemoMode } from "@/shared/lib/supabase/demo-mode";
 
 const PUBLIC_ROUTES = ["/login", "/register", "/sample", "/", "/api/auth/login", "/api/auth/register"];
 
@@ -19,6 +20,11 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/favicon.ico") ||
     pathname.includes(".")
   ) {
+    return response;
+  }
+
+  // Allow development/bypass mode if using dummy keys or demo mode
+  if (isDemoMode()) {
     return response;
   }
 
@@ -50,11 +56,6 @@ export async function middleware(request: NextRequest) {
       },
     },
   });
-
-  // Allow development/bypass mode if using dummy keys
-  if (supabaseKey === "demo-anon-key" || supabaseKey === "dummy-anon-key") {
-    return response;
-  }
 
   const {
     data: { user },

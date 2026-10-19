@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { withApiHandler } from "@/shared/lib/api-handler";
 import { createClient } from "@/shared/lib/supabase/server";
 import { authService } from "@/features/auth/services/auth.service";
@@ -44,6 +45,11 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       user_metadata: { full_name: fullName },
     };
     const profile = await authService.ensureProfile(simulatedUser);
+    cookies().set("cliniq_demo_user", JSON.stringify(profile), {
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
     return { data: profile };
   }
 
