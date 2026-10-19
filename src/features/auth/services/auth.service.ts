@@ -13,13 +13,22 @@ import { UserProfile } from "../types/auth.types";
 import { Role } from "@prisma/client";
 
 export const authService = {
-  async ensureProfile(authUser: {
-    id: string;
-    email?: string | null;
-    user_metadata?: { full_name?: string };
-  }): Promise<UserProfile> {
+  async ensureProfile(
+    authUser: {
+      id: string;
+      email?: string | null;
+      user_metadata?: { full_name?: string };
+    },
+    assignedRole?: Role
+  ): Promise<UserProfile> {
     const email = authUser.email || `user-${authUser.id}@cliniq.local`;
-    const fullName = authUser.user_metadata?.full_name || email.split("@")[0] || "User";
+    const defaultName = email.toLowerCase().includes("admin")
+      ? "System Administrator"
+      : email.split("@")[0] || "User";
+    const fullName = authUser.user_metadata?.full_name || defaultName;
+    const role: Role =
+      assignedRole ||
+      (email.toLowerCase().includes("admin") ? "ADMIN" : "PATIENT");
 
     try {
       const existing = await authRepository.findByAuthId(authUser.id);
@@ -29,7 +38,7 @@ export const authService = {
         authId: authUser.id,
         email,
         fullName,
-        role: "PATIENT",
+        role,
         isActive: true,
       });
     } catch (dbErr) {
@@ -39,7 +48,7 @@ export const authService = {
         authId: authUser.id,
         email,
         fullName,
-        role: "PATIENT",
+        role,
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),

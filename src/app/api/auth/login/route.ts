@@ -20,12 +20,20 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   if (error || !data.user) {
     if (isDemoMode()) {
       console.warn("Supabase auth unavailable (demo mode), signing in with simulated profile");
+      const isAdmin = email.toLowerCase().includes("admin");
+      const fullName = email.toLowerCase() === "admin@gmail.com"
+        ? "System Administrator"
+        : (email.split("@")[0] || "User");
+
       const demoUser = {
         id: `demo-${email.replace(/[^a-zA-Z0-9]/g, "-")}`,
         email,
-        user_metadata: { full_name: email.split("@")[0] },
+        user_metadata: { full_name: fullName },
       };
-      const profile = await authService.ensureProfile(demoUser);
+      const profile = await authService.ensureProfile(
+        demoUser,
+        isAdmin ? "ADMIN" : "PATIENT"
+      );
       // Persist session cookie for demo mode
       cookies().set("cliniq_demo_user", JSON.stringify(profile), {
         path: "/",
