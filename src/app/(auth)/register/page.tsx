@@ -46,8 +46,8 @@ export default function RegisterPage() {
         email: values.email,
         password: values.password,
       });
-      notify.success("Account created! Welcome to CliniQ.");
-      router.push(ROUTES.DASHBOARD);
+      notify.success("Account created! Please complete your patient profile.");
+      router.push(ROUTES.ONBOARDING);
       router.refresh();
     } catch (err: unknown) {
       const msg =

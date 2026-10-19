@@ -22,3 +22,31 @@ export function parseSequenceNumber(
 
   return { prefix, year, sequence };
 }
+
+export interface CounterClient {
+  counter: {
+    upsert: (args: {
+      where: { key: string };
+      create: { key: string; value: number };
+      update: { value: { increment: number } };
+    }) => Promise<{ key: string; value: number }>;
+  };
+}
+
+export async function nextSequenceNumber(
+  client: CounterClient,
+  key: string,
+  padLength = 4
+): Promise<string> {
+  const counter = await client.counter.upsert({
+    where: { key },
+    create: { key, value: 1 },
+    update: { value: { increment: 1 } },
+  });
+
+  const [prefix, yearStr] = key.split("-");
+  const year = parseInt(yearStr, 10);
+  return formatSequenceNumber(prefix, year, counter.value, padLength);
+}
+
+

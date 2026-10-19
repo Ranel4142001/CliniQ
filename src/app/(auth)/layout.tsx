@@ -17,7 +17,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Card container */}
-      <div className="w-full max-w-md rounded-2xl border bg-background p-8 shadow-sm">
+      <div className="w-full max-w-md has-[[data-wide='true']]:max-w-3xl rounded-2xl border bg-background p-6 sm:p-8 shadow-sm transition-all duration-200">
         {children}
       </div>
 

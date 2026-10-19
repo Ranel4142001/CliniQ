@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatSequenceNumber, parseSequenceNumber } from "@/shared/lib/sequence";
+import { formatSequenceNumber, parseSequenceNumber, nextSequenceNumber } from "@/shared/lib/sequence";
 
 describe("Sequence Number Utilities", () => {
   it("formats patient sequence numbers with default 4-digit padding", () => {
@@ -24,5 +24,23 @@ describe("Sequence Number Utilities", () => {
   it("returns null for malformed sequence numbers", () => {
     expect(parseSequenceNumber("INVALID")).toBeNull();
     expect(parseSequenceNumber("PT-INVALID-001")).toBeNull();
+  });
+
+  it("increments and generates next sequence number atomically", async () => {
+    let mockValue = 0;
+    const mockClient = {
+      counter: {
+        upsert: async () => {
+          mockValue += 1;
+          return { key: "PT-2026", value: mockValue };
+        },
+      },
+    };
+
+    const first = await nextSequenceNumber(mockClient, "PT-2026");
+    expect(first).toBe("PT-2026-0001");
+
+    const second = await nextSequenceNumber(mockClient, "PT-2026");
+    expect(second).toBe("PT-2026-0002");
   });
 });
