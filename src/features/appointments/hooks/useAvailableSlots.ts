@@ -1,0 +1,23 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/shared/lib/api-client";
+import { QUERY_KEYS } from "@/shared/constants/query-keys";
+import type { AppointmentSlot } from "../utils/generate-slots";
+
+export function useAvailableSlots(clinicianId?: string, date?: string) {
+  return useQuery({
+    queryKey: QUERY_KEYS.APPOINTMENTS.slots(clinicianId ?? "", date ?? ""),
+    queryFn: async () => {
+      const searchParams = new URLSearchParams({
+        clinicianId: clinicianId!,
+        date: date!,
+      });
+      const res = await apiClient.get<AppointmentSlot[]>(
+        `/api/appointments/slots?${searchParams.toString()}`
+      );
+      return res.data;
+    },
+    enabled: !!clinicianId && !!date,
+  });
+}

@@ -103,4 +103,12 @@ export const authRepository = {
       },
     });
   },
+
+  async listActiveClinicians() {
+    return prisma.profile.findMany({
+      where: { role: "CLINICIAN", isActive: true },
+      select: { id: true, fullName: true, email: true },
+      orderBy: { fullName: "asc" },
+    });
+  },
 };
