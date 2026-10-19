@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check, X, CalendarClock, UserX, Video } from "lucide-react";
+import Link from "next/link";
+import { Check, X, CalendarClock, UserX, Video, Stethoscope } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -93,6 +94,18 @@ export function AppointmentActions({
             <X className="h-3.5 w-3.5" /> Cancel
           </Button>
         </>
+      )}
+
+      {isConfirmed && (
+        <Link href={`/consultations/${appointment.id}`}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs gap-1 border-primary text-primary hover:bg-primary/10"
+          >
+            <Stethoscope className="h-3.5 w-3.5" /> Consult
+          </Button>
+        </Link>
       )}
 
       {isConfirmed && onComplete && (userRole === "CLINICIAN" || isStaffOrAdmin) && (
