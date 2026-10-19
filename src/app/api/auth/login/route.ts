@@ -15,7 +15,20 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     password,
   });
 
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const isDemoMode = supabaseKey === "demo-anon-key" || supabaseKey === "dummy-anon-key";
+
   if (error || !data.user) {
+    if (isDemoMode) {
+      console.warn("Supabase auth unavailable (demo mode), signing in with simulated profile");
+      const demoUser = {
+        id: `demo-${email.replace(/[^a-zA-Z0-9]/g, "-")}`,
+        email,
+        user_metadata: { full_name: email.split("@")[0] },
+      };
+      const profile = await authService.ensureProfile(demoUser);
+      return { data: profile };
+    }
     throw new UnauthorizedError("Invalid email or password");
   }
 

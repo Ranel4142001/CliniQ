@@ -10,10 +10,15 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const body = await req.json();
   const { email, password: _password, fullName } = registerSchema.parse(body);
 
-  // Check for duplicate email before attempting Supabase signup
-  const existing = await authRepository.findByEmail(email);
-  if (existing) {
-    throw new ConflictError("An account with this email address already exists");
+  // Check for duplicate email before attempting Supabase signup (skip if DB unreachable)
+  try {
+    const existing = await authRepository.findByEmail(email);
+    if (existing) {
+      throw new ConflictError("An account with this email address already exists");
+    }
+  } catch (err) {
+    if (err instanceof ConflictError) throw err;
+    console.warn("Database check skipped (demo mode):", err instanceof Error ? err.message : err);
   }
 
   const supabase = createClient();

@@ -12,6 +12,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { notify } from "@/shared/lib/notify";
 import { apiClient } from "@/shared/lib/api-client";
+import { ValidationError } from "@/shared/lib/errors";
 import { ROUTES } from "@/shared/constants/routes";
 
 const registerSchema = z
@@ -49,11 +50,22 @@ export default function RegisterPage() {
         fullName: values.fullName,
         email: values.email,
         password: values.password,
+        confirmPassword: values.confirmPassword,
       });
       notify.success("Account created! Please complete your patient profile.");
       router.push(ROUTES.ONBOARDING);
       router.refresh();
     } catch (err: unknown) {
+      if (err instanceof ValidationError && err.details) {
+        const fieldErrors = (err.details as { fieldErrors?: Record<string, string[]> })?.fieldErrors;
+        if (fieldErrors) {
+          const firstErr = Object.values(fieldErrors).flat()[0];
+          if (firstErr) {
+            notify.error(firstErr);
+            return;
+          }
+        }
+      }
       const msg =
         err instanceof Error ? err.message : "Registration failed. Please try again.";
       notify.error(msg);

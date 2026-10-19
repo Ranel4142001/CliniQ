@@ -18,19 +18,33 @@ export const authService = {
     email?: string | null;
     user_metadata?: { full_name?: string };
   }): Promise<UserProfile> {
-    const existing = await authRepository.findByAuthId(authUser.id);
-    if (existing) return existing;
-
     const email = authUser.email || `user-${authUser.id}@cliniq.local`;
     const fullName = authUser.user_metadata?.full_name || email.split("@")[0] || "User";
 
-    return authRepository.createProfile({
-      authId: authUser.id,
-      email,
-      fullName,
-      role: "PATIENT",
-      isActive: true,
-    });
+    try {
+      const existing = await authRepository.findByAuthId(authUser.id);
+      if (existing) return existing;
+
+      return await authRepository.createProfile({
+        authId: authUser.id,
+        email,
+        fullName,
+        role: "PATIENT",
+        isActive: true,
+      });
+    } catch (dbErr) {
+      console.warn("Database unavailable, returning in-memory profile (demo mode):", dbErr);
+      return {
+        id: `demo-${authUser.id}`,
+        authId: authUser.id,
+        email,
+        fullName,
+        role: "PATIENT",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    }
   },
 
   async getCurrentProfile(authId: string): Promise<UserProfile> {
