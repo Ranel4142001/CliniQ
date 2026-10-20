@@ -35,3 +35,35 @@ export interface AppointmentListItem {
   meetingUrl: string | null;
   hasConsultation: boolean;
 }
+
+export interface RepositoryAppointmentRow {
+  id: string;
+  patientId: string;
+  clinicianId: string;
+  scheduledAt: Date;
+  endsAt: Date;
+  type: AppointmentType;
+  status: AppointmentStatus;
+  reason: string;
+  meetingUrl: string | null;
+  cancelReason: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  patient: {
+    id: string;
+    patientNo: string;
+    firstName: string;
+    middleName: string | null;
+    lastName: string;
+    contactNumber: string;
+    profileId: string | null;
+  };
+  clinician: {
+    id: string;
+    fullName: string;
+    email: string;
+  };
+  consultation: {
+    id: string;
+  } | null;
+}

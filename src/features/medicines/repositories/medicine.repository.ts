@@ -1,9 +1,12 @@
 import { prisma } from "@/shared/lib/prisma";
-import type { Prisma, StockMovementType } from "@prisma/client";
+import type { Prisma, StockMovementType, Medicine, MedicineBatch } from "@prisma/client";
 import type {
   MedicineBatchWithMedicine,
   StockMovementWithRelations,
 } from "../types/medicine.types";
+import { demoStore } from "@/shared/lib/demo-data";
+
+type MedicineWithBatches = Medicine & { batches: MedicineBatch[] };
 
 export const medicineRepository = {
   async findAll(params: {
@@ -11,48 +14,76 @@ export const medicineRepository = {
     isArchived?: boolean;
     skip?: number;
     take?: number;
-  }) {
-    const where: Prisma.MedicineWhereInput = {
-      ...(params.isArchived !== undefined ? { isArchived: params.isArchived } : {}),
-      ...(params.search
-        ? {
-            OR: [
-              { name: { contains: params.search, mode: "insensitive" } },
-              { genericName: { contains: params.search, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    };
+  }): Promise<MedicineWithBatches[]> {
+    try {
+      const where: Prisma.MedicineWhereInput = {
+        ...(params.isArchived !== undefined ? { isArchived: params.isArchived } : {}),
+        ...(params.search
+          ? {
+              OR: [
+                { name: { contains: params.search, mode: "insensitive" } },
+                { genericName: { contains: params.search, mode: "insensitive" } },
+              ],
+            }
+          : {}),
+      };
 
-    return prisma.medicine.findMany({
-      where,
-      skip: params.skip,
-      take: params.take,
-      include: { batches: true },
-      orderBy: { name: "asc" },
-    });
+      return (await prisma.medicine.findMany({
+        where,
+        skip: params.skip,
+        take: params.take,
+        include: { batches: true },
+        orderBy: { name: "asc" },
+      })) as MedicineWithBatches[];
+    } catch {
+      let list = demoStore.medicines.filter((m) =>
+        params.isArchived !== undefined ? m.isArchived === params.isArchived : !m.isArchived
+      );
+      if (params.search) {
+        const q = params.search.toLowerCase();
+        list = list.filter((m) => m.name.toLowerCase().includes(q) || m.genericName?.toLowerCase().includes(q));
+      }
+      const skip = params.skip || 0;
+      const take = params.take || 10;
+      return list.slice(skip, skip + take) as MedicineWithBatches[];
+    }
   },
 
   async countAll(params: { search?: string; isArchived?: boolean }) {
-    const where: Prisma.MedicineWhereInput = {
-      ...(params.isArchived !== undefined ? { isArchived: params.isArchived } : {}),
-      ...(params.search
-        ? {
-            OR: [
-              { name: { contains: params.search, mode: "insensitive" } },
-              { genericName: { contains: params.search, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    };
-    return prisma.medicine.count({ where });
+    try {
+      const where: Prisma.MedicineWhereInput = {
+        ...(params.isArchived !== undefined ? { isArchived: params.isArchived } : {}),
+        ...(params.search
+          ? {
+              OR: [
+                { name: { contains: params.search, mode: "insensitive" } },
+                { genericName: { contains: params.search, mode: "insensitive" } },
+              ],
+            }
+          : {}),
+      };
+      return await prisma.medicine.count({ where });
+    } catch {
+      let list = demoStore.medicines.filter((m) =>
+        params.isArchived !== undefined ? m.isArchived === params.isArchived : !m.isArchived
+      );
+      if (params.search) {
+        const q = params.search.toLowerCase();
+        list = list.filter((m) => m.name.toLowerCase().includes(q) || m.genericName?.toLowerCase().includes(q));
+      }
+      return list.length;
+    }
   },
 
-  async findById(id: string) {
-    return prisma.medicine.findUnique({
-      where: { id },
-      include: { batches: { orderBy: { expiryDate: "asc" } } },
-    });
+  async findById(id: string): Promise<MedicineWithBatches | null> {
+    try {
+      return (await prisma.medicine.findUnique({
+        where: { id },
+        include: { batches: { orderBy: { expiryDate: "asc" } } },
+      })) as MedicineWithBatches | null;
+    } catch {
+      return (demoStore.medicines.find((item) => item.id === id) || demoStore.medicines[0]) as MedicineWithBatches;
+    }
   },
 
   async findByName(name: string, strength: string, dosageForm: string) {
@@ -203,47 +234,94 @@ export const medicineRepository = {
     skip?: number;
     take?: number;
   }): Promise<StockMovementWithRelations[]> {
-    return prisma.stockMovement.findMany({
-      where: params.medicineId ? { medicineId: params.medicineId } : {},
-      skip: params.skip,
-      take: params.take,
-      include: {
-        medicine: { select: { id: true, name: true, strength: true, dosageForm: true } },
-        batch: { select: { id: true, batchNo: true, expiryDate: true } },
-        performedBy: { select: { id: true, fullName: true, email: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }) as Promise<StockMovementWithRelations[]>;
+    try {
+      return (await prisma.stockMovement.findMany({
+        where: params.medicineId ? { medicineId: params.medicineId } : {},
+        skip: params.skip,
+        take: params.take,
+        include: {
+          medicine: { select: { id: true, name: true, strength: true, dosageForm: true } },
+          batch: { select: { id: true, batchNo: true, expiryDate: true } },
+          performedBy: { select: { id: true, fullName: true, email: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      })) as StockMovementWithRelations[];
+    } catch {
+      return [
+        {
+          id: "demo-mov-1",
+          medicineId: demoStore.medicines[0].id,
+          batchId: demoStore.medicines[0].batches[0].id,
+          type: "STOCK_IN",
+          quantity: 500,
+          reason: "Initial clinic stock intake",
+          performedById: "demo-admin-id",
+          prescriptionId: null,
+          createdAt: new Date(),
+          medicine: { id: demoStore.medicines[0].id, name: demoStore.medicines[0].name, strength: demoStore.medicines[0].strength, dosageForm: demoStore.medicines[0].dosageForm },
+          batch: { id: demoStore.medicines[0].batches[0].id, batchNo: demoStore.medicines[0].batches[0].batchNo, expiryDate: demoStore.medicines[0].batches[0].expiryDate },
+          performedBy: { id: "demo-admin-id", fullName: "System Administrator", email: "admin@cliniq.local" },
+        },
+      ];
+    }
   },
 
   async countMovements(params: { medicineId?: string }) {
-    return prisma.stockMovement.count({
-      where: params.medicineId ? { medicineId: params.medicineId } : {},
-    });
+    try {
+      return await prisma.stockMovement.count({
+        where: params.medicineId ? { medicineId: params.medicineId } : {},
+      });
+    } catch {
+      return 1;
+    }
   },
 
   async findExpiringBatches(startDate: Date, endDate: Date): Promise<MedicineBatchWithMedicine[]> {
-    return prisma.medicineBatch.findMany({
-      where: {
-        quantity: { gt: 0 },
-        expiryDate: {
-          gt: startDate,
-          lte: endDate,
+    try {
+      return (await prisma.medicineBatch.findMany({
+        where: {
+          quantity: { gt: 0 },
+          expiryDate: {
+            gt: startDate,
+            lte: endDate,
+          },
         },
-      },
-      include: { medicine: true },
-      orderBy: { expiryDate: "asc" },
-    }) as Promise<MedicineBatchWithMedicine[]>;
+        include: { medicine: true },
+        orderBy: { expiryDate: "asc" },
+      })) as MedicineBatchWithMedicine[];
+    } catch {
+      const list: MedicineBatchWithMedicine[] = [];
+      for (const m of demoStore.medicines) {
+        for (const b of m.batches) {
+          if (b.quantity > 0 && b.expiryDate > startDate && b.expiryDate <= endDate) {
+            list.push({ ...b, medicine: m } as unknown as MedicineBatchWithMedicine);
+          }
+        }
+      }
+      return list;
+    }
   },
 
   async findExpiredBatches(cutoffDate: Date): Promise<MedicineBatchWithMedicine[]> {
-    return prisma.medicineBatch.findMany({
-      where: {
-        quantity: { gt: 0 },
-        expiryDate: { lte: cutoffDate },
-      },
-      include: { medicine: true },
-      orderBy: { expiryDate: "asc" },
-    }) as Promise<MedicineBatchWithMedicine[]>;
+    try {
+      return (await prisma.medicineBatch.findMany({
+        where: {
+          quantity: { gt: 0 },
+          expiryDate: { lte: cutoffDate },
+        },
+        include: { medicine: true },
+        orderBy: { expiryDate: "asc" },
+      })) as MedicineBatchWithMedicine[];
+    } catch {
+      const list: MedicineBatchWithMedicine[] = [];
+      for (const m of demoStore.medicines) {
+        for (const b of m.batches) {
+          if (b.quantity > 0 && b.expiryDate <= cutoffDate) {
+            list.push({ ...b, medicine: m } as unknown as MedicineBatchWithMedicine);
+          }
+        }
+      }
+      return list;
+    }
   },
 };

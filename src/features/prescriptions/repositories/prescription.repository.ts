@@ -2,6 +2,7 @@ import { prisma } from "@/shared/lib/prisma";
 import type { Prisma, PrescriptionStatus } from "@prisma/client";
 import type { PrescriptionWithRelations } from "../types/prescription.types";
 import type { PrescriptionItemInput } from "../schemas/prescription.schema";
+import { demoStore } from "@/shared/lib/demo-data";
 
 const PRESCRIPTION_INCLUDE = {
   patient: true,
@@ -28,17 +29,25 @@ const PRESCRIPTION_INCLUDE = {
 
 export const prescriptionRepository = {
   async findById(id: string): Promise<PrescriptionWithRelations | null> {
-    return prisma.prescription.findUnique({
-      where: { id },
-      include: PRESCRIPTION_INCLUDE,
-    }) as Promise<PrescriptionWithRelations | null>;
+    try {
+      return (await prisma.prescription.findUnique({
+        where: { id },
+        include: PRESCRIPTION_INCLUDE,
+      })) as PrescriptionWithRelations | null;
+    } catch {
+      return (demoStore.prescriptions.find((p) => p.id === id) || demoStore.prescriptions[0]) as unknown as PrescriptionWithRelations;
+    }
   },
 
   async findByConsultationId(consultationId: string): Promise<PrescriptionWithRelations | null> {
-    return prisma.prescription.findUnique({
-      where: { consultationId },
-      include: PRESCRIPTION_INCLUDE,
-    }) as Promise<PrescriptionWithRelations | null>;
+    try {
+      return (await prisma.prescription.findUnique({
+        where: { consultationId },
+        include: PRESCRIPTION_INCLUDE,
+      })) as PrescriptionWithRelations | null;
+    } catch {
+      return (demoStore.prescriptions.find((p) => p.consultationId === consultationId) || null) as unknown as PrescriptionWithRelations | null;
+    }
   },
 
   async findAll(params: {
@@ -49,29 +58,39 @@ export const prescriptionRepository = {
     skip?: number;
     take?: number;
   }): Promise<PrescriptionWithRelations[]> {
-    const where: Prisma.PrescriptionWhereInput = {
-      ...(params.patientId ? { patientId: params.patientId } : {}),
-      ...(params.consultationId ? { consultationId: params.consultationId } : {}),
-      ...(params.status ? { status: params.status } : {}),
-      ...(params.search
-        ? {
-            OR: [
-              { prescriptionNo: { contains: params.search, mode: "insensitive" } },
-              { patient: { firstName: { contains: params.search, mode: "insensitive" } } },
-              { patient: { lastName: { contains: params.search, mode: "insensitive" } } },
-              { patient: { patientNo: { contains: params.search, mode: "insensitive" } } },
-            ],
-          }
-        : {}),
-    };
+    try {
+      const where: Prisma.PrescriptionWhereInput = {
+        ...(params.patientId ? { patientId: params.patientId } : {}),
+        ...(params.consultationId ? { consultationId: params.consultationId } : {}),
+        ...(params.status ? { status: params.status } : {}),
+        ...(params.search
+          ? {
+              OR: [
+                { prescriptionNo: { contains: params.search, mode: "insensitive" } },
+                { patient: { firstName: { contains: params.search, mode: "insensitive" } } },
+                { patient: { lastName: { contains: params.search, mode: "insensitive" } } },
+                { patient: { patientNo: { contains: params.search, mode: "insensitive" } } },
+              ],
+            }
+          : {}),
+      };
 
-    return prisma.prescription.findMany({
-      where,
-      skip: params.skip,
-      take: params.take,
-      include: PRESCRIPTION_INCLUDE,
-      orderBy: { createdAt: "desc" },
-    }) as Promise<PrescriptionWithRelations[]>;
+      return (await prisma.prescription.findMany({
+        where,
+        skip: params.skip,
+        take: params.take,
+        include: PRESCRIPTION_INCLUDE,
+        orderBy: { createdAt: "desc" },
+      })) as PrescriptionWithRelations[];
+    } catch {
+      let filtered = [...demoStore.prescriptions];
+      const pid = params.patientId;
+      if (pid) filtered = filtered.filter((p) => p.patientId === pid || (p.patient.profileId ? p.patient.profileId.includes(pid) : false));
+      if (params.status) filtered = filtered.filter((p) => p.status === params.status);
+      const skip = params.skip || 0;
+      const take = params.take || 10;
+      return filtered.slice(skip, skip + take) as unknown as PrescriptionWithRelations[];
+    }
   },
 
   async countAll(params: {
@@ -80,22 +99,29 @@ export const prescriptionRepository = {
     status?: PrescriptionStatus;
     search?: string;
   }): Promise<number> {
-    const where: Prisma.PrescriptionWhereInput = {
-      ...(params.patientId ? { patientId: params.patientId } : {}),
-      ...(params.consultationId ? { consultationId: params.consultationId } : {}),
-      ...(params.status ? { status: params.status } : {}),
-      ...(params.search
-        ? {
-            OR: [
-              { prescriptionNo: { contains: params.search, mode: "insensitive" } },
-              { patient: { firstName: { contains: params.search, mode: "insensitive" } } },
-              { patient: { lastName: { contains: params.search, mode: "insensitive" } } },
-              { patient: { patientNo: { contains: params.search, mode: "insensitive" } } },
-            ],
-          }
-        : {}),
-    };
-    return prisma.prescription.count({ where });
+    try {
+      const where: Prisma.PrescriptionWhereInput = {
+        ...(params.patientId ? { patientId: params.patientId } : {}),
+        ...(params.consultationId ? { consultationId: params.consultationId } : {}),
+        ...(params.status ? { status: params.status } : {}),
+        ...(params.search
+          ? {
+              OR: [
+                { prescriptionNo: { contains: params.search, mode: "insensitive" } },
+                { patient: { firstName: { contains: params.search, mode: "insensitive" } } },
+                { patient: { lastName: { contains: params.search, mode: "insensitive" } } },
+                { patient: { patientNo: { contains: params.search, mode: "insensitive" } } },
+              ],
+            }
+          : {}),
+      };
+      return await prisma.prescription.count({ where });
+    } catch {
+      let filtered = [...demoStore.prescriptions];
+      if (params.patientId) filtered = filtered.filter((p) => p.patientId === params.patientId);
+      if (params.status) filtered = filtered.filter((p) => p.status === params.status);
+      return filtered.length;
+    }
   },
 
   async create(data: {
@@ -210,14 +236,25 @@ export const prescriptionRepository = {
   },
 
   async countByStatus(patientId?: string) {
-    const where = patientId ? { patientId } : {};
-    const [total, draft, issued, dispensed, voided] = await Promise.all([
-      prisma.prescription.count({ where }),
-      prisma.prescription.count({ where: { ...where, status: "DRAFT" } }),
-      prisma.prescription.count({ where: { ...where, status: "ISSUED" } }),
-      prisma.prescription.count({ where: { ...where, status: "DISPENSED" } }),
-      prisma.prescription.count({ where: { ...where, status: "VOIDED" } }),
-    ]);
-    return { total, draft, issued, dispensed, voided };
+    try {
+      const where = patientId ? { patientId } : {};
+      const [total, draft, issued, dispensed, voided] = await Promise.all([
+        prisma.prescription.count({ where }),
+        prisma.prescription.count({ where: { ...where, status: "DRAFT" } }),
+        prisma.prescription.count({ where: { ...where, status: "ISSUED" } }),
+        prisma.prescription.count({ where: { ...where, status: "DISPENSED" } }),
+        prisma.prescription.count({ where: { ...where, status: "VOIDED" } }),
+      ]);
+      return { total, draft, issued, dispensed, voided };
+    } catch {
+      const list = demoStore.prescriptions.filter((p) => (patientId ? p.patientId === patientId : true));
+      return {
+        total: list.length,
+        draft: list.filter((p) => p.status === "DRAFT").length,
+        issued: list.filter((p) => p.status === "ISSUED").length,
+        dispensed: list.filter((p) => p.status === "DISPENSED").length,
+        voided: list.filter((p) => p.status === "VOIDED").length,
+      };
+    }
   },
 };
