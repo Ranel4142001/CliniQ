@@ -34,6 +34,11 @@ export const authService = {
       const existing = await authRepository.findByAuthId(authUser.id);
       if (existing) return existing;
 
+      if (email) {
+        const existingByEmail = await authRepository.findByEmail(email);
+        if (existingByEmail) return existingByEmail;
+      }
+
       return await authRepository.createProfile({
         authId: authUser.id,
         email,

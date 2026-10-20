@@ -28,6 +28,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
 
@@ -111,6 +112,60 @@ export default function LoginPage() {
           Create account
         </Link>
       </p>
+
+      <div className="mt-6 rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
+        <p className="font-semibold text-foreground mb-1.5">User Testing Quick Access:</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-7 text-[11px] justify-start px-2 font-normal"
+            onClick={() => {
+              setValue("email", "admin@cliniq.local");
+              setValue("password", "Admin@CliniQ2025!");
+            }}
+          >
+            Admin (Full Access)
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-7 text-[11px] justify-start px-2 font-normal"
+            onClick={() => {
+              setValue("email", "dr.cruz@cliniq.local");
+              setValue("password", "Doctor@2026!");
+            }}
+          >
+            Clinician (Doctor)
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-7 text-[11px] justify-start px-2 font-normal"
+            onClick={() => {
+              setValue("email", "staff.ana@cliniq.local");
+              setValue("password", "Staff@2026!");
+            }}
+          >
+            Staff (Reception)
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-7 text-[11px] justify-start px-2 font-normal"
+            onClick={() => {
+              setValue("email", "juan.delacruz@example.com");
+              setValue("password", "Patient@2026!");
+            }}
+          >
+            Patient Account
+          </Button>
+        </div>
+      </div>
     </>
   );
 }

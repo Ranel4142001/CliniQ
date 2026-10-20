@@ -6,7 +6,6 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { DataTable, type DataTableColumn } from "@/shared/components/data-table/DataTable";
 import { exportToCsv } from "@/shared/lib/csv";
-import { pdf } from "@react-pdf/renderer";
 import { Download, FileText, Loader2 } from "lucide-react";
 import { useReport } from "../hooks/use-reports";
 import { ReportPdfDocument } from "./ReportPdfDocument";
@@ -39,6 +38,7 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
   const handleExportPdf = async () => {
     try {
       setIsPdfLoading(true);
+      const { pdf } = await import("@react-pdf/renderer");
       const rows = filteredData.map((item) => config.pdfRowMapper(item));
       const blob = await pdf(
         <ReportPdfDocument

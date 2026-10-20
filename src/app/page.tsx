@@ -50,19 +50,19 @@ export default function Home() {
       <div className="mt-12 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-2 text-left">
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
           <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="text-muted-foreground">Feature-based architecture & strict typing</span>
+          <span className="text-muted-foreground">Comprehensive patient records & consultation history</span>
         </div>
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
           <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="text-muted-foreground">Reusable building blocks: DataTable & FormDialog</span>
+          <span className="text-muted-foreground">In-person & online appointment scheduling</span>
         </div>
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
           <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="text-muted-foreground">Integrated feedback states & error mapping</span>
+          <span className="text-muted-foreground">FEFO medicine stock tracking & reorder alerts</span>
         </div>
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
           <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="text-muted-foreground">Role-based navigation & permissions</span>
+          <span className="text-muted-foreground">Role-based security for doctors, staff & patients</span>
         </div>
       </div>
     </div>

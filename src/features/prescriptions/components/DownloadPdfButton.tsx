@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
-import { pdf } from "@react-pdf/renderer";
 import { PrescriptionPdf } from "./PrescriptionPdf";
 import type { PrescriptionWithRelations } from "../types/prescription.types";
 
@@ -25,6 +24,7 @@ export function DownloadPdfButton({
   const handleDownload = async () => {
     try {
       setLoading(true);
+      const { pdf } = await import("@react-pdf/renderer");
       const blob = await pdf(<PrescriptionPdf prescription={prescription} />).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
