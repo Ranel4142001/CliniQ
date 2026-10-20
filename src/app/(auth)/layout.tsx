@@ -10,10 +10,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 px-4">
       {/* Brand mark */}
       <div className="mb-6 flex flex-col items-center gap-2">
-        <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-          Demo system: fictional data only
-        </div>
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow">
           <Stethoscope className="h-6 w-6" />
         </div>

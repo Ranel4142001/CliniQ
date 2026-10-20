@@ -37,7 +37,7 @@ export default function NotFound() {
       </div>
 
       <p className="mt-12 text-xs text-muted-foreground">
-        CliniQ · Demo system: fictional data only
+        CliniQ · Secure Healthcare Management
       </p>
     </div>
   );

@@ -324,7 +324,7 @@ async function main() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   let supabaseAdmin: ReturnType<typeof createClient> | null = null;
-  if (supabaseUrl && serviceRoleKey) {
+  if (supabaseUrl && serviceRoleKey && !supabaseUrl.includes("example.supabase.co")) {
     supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });

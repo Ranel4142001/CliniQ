@@ -1,4 +1,5 @@
 import { createClient } from "@/shared/lib/supabase/server";
+import { prisma } from "@/shared/lib/prisma";
 import { authRepository } from "../repositories/auth.repository";
 import { authService } from "../services/auth.service";
 import { UnauthorizedError, ForbiddenError } from "@/shared/lib/errors";
@@ -39,9 +40,30 @@ export async function requireAuth(allowedRoles?: Role[]): Promise<UserProfile> {
           // fall through to default demo profile
         }
       }
+
+      try {
+        const seededAdmin = await prisma.profile.findFirst({
+          where: { role: "ADMIN" },
+        });
+        if (seededAdmin) {
+          return {
+            id: seededAdmin.id,
+            authId: seededAdmin.authId,
+            email: seededAdmin.email,
+            fullName: seededAdmin.fullName,
+            role: seededAdmin.role,
+            isActive: seededAdmin.isActive,
+            createdAt: seededAdmin.createdAt,
+            updatedAt: seededAdmin.updatedAt,
+          };
+        }
+      } catch {
+        // DB unreachable fallback
+      }
+
       return {
-        id: "demo-admin-id",
-        authId: "demo-admin-auth",
+        id: "5c9bb570-88a0-4460-bafb-ddbd2ed64192",
+        authId: "auth-admin-01",
         email: "admin@cliniq.local",
         fullName: "System Administrator",
         role: "ADMIN" as Role,

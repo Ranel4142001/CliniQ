@@ -41,8 +41,8 @@ export function Topbar({ onOpenMobileMenu, user, onLogout }: TopbarProps) {
           <span className="hidden sm:inline-block font-semibold text-sm text-foreground">
             CliniQ Care
           </span>
-          <Badge variant="outline" className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            Demo Mode
+          <Badge variant="outline" className="text-[10px] tracking-wider text-primary border-primary/30 bg-primary/5">
+            Active System
           </Badge>
         </div>
       </div>

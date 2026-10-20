@@ -57,7 +57,7 @@ export function Sidebar({ role, className = "", onNavigate }: SidebarProps) {
       <div className="border-t p-4">
         <div className="rounded-md bg-muted/60 p-3 text-center">
           <p className="text-[11px] font-medium text-muted-foreground">CliniQ Management</p>
-          <p className="text-[10px] text-muted-foreground/80 mt-0.5">Demo & Testing System</p>
+          <p className="text-[10px] text-muted-foreground/80 mt-0.5">Clinic Management System</p>
         </div>
       </div>
     </aside>

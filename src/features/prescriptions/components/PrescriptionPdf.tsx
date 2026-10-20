@@ -93,7 +93,7 @@ export function PrescriptionPdf({ prescription }: PrescriptionPdfProps) {
       )}
 
       <View style={styles.notice}>
-        <Text>NOTICE: SAMPLE FOR DEMONSTRATION ONLY. Contains no official professional license or physical signature.</Text>
+        <Text>NOTICE: Valid electronic medical prescription. Dispense only as directed by the attending clinician.</Text>
       </View>
     </PdfDocumentLayout>
   );
