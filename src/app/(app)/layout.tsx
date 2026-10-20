@@ -61,10 +61,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           role: parsed.role || "PATIENT",
         };
       } catch {
-        userProps = { fullName: "Demo User", email: "demo@cliniq.local", role: "ADMIN" };
+        redirect(ROUTES.LOGIN);
       }
     } else {
-      userProps = { fullName: "Demo User", email: "demo@cliniq.local", role: "ADMIN" };
+      redirect(ROUTES.LOGIN);
     }
   }
 

@@ -1,10 +1,21 @@
 import Link from "next/link";
-import { Stethoscope, CheckCircle2, ArrowRight } from "lucide-react";
+import { cookies } from "next/headers";
+import { Stethoscope, CheckCircle2, LogIn, UserPlus, LayoutDashboard } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { ROUTES } from "@/shared/constants/routes";
 
 export default function Home() {
+  const cookieStore = cookies();
+  const isLoggedIn = !!cookieStore.get("cliniq_demo_user")?.value;
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12 text-center sm:px-6 lg:px-8">
+      {/* Demo system indicator */}
+      <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+        <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+        Demo system: fictional data only
+      </div>
+
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg mb-6">
         <Stethoscope className="h-8 w-8" />
       </div>
@@ -17,11 +28,29 @@ export default function Home() {
       </p>
 
       <div className="mt-8 flex flex-col sm:flex-row gap-3">
-        <Button asChild size="lg" className="gap-2">
-          <Link href="/sample">
-            Explore Foundation Demo <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
+        {isLoggedIn ? (
+          <Button asChild size="lg" className="gap-2">
+            <Link href={ROUTES.DASHBOARD}>
+              <LayoutDashboard className="h-4 w-4" />
+              Go to Dashboard
+            </Link>
+          </Button>
+        ) : (
+          <>
+            <Button asChild size="lg" className="gap-2">
+              <Link href={ROUTES.LOGIN}>
+                <LogIn className="h-4 w-4" />
+                Sign In to CliniQ
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="gap-2">
+              <Link href={ROUTES.REGISTER}>
+                <UserPlus className="h-4 w-4" />
+                Register as Patient
+              </Link>
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="mt-12 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-2 text-left">

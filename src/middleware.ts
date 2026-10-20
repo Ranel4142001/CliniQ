@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { isDemoMode } from "@/shared/lib/supabase/demo-mode";
 
-const PUBLIC_ROUTES = ["/login", "/register", "/sample", "/", "/api/auth/login", "/api/auth/register"];
+const PUBLIC_ROUTES = ["/login", "/register", "/", "/api/auth/login", "/api/auth/register"];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -23,8 +23,25 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Allow development/bypass mode if using dummy keys or demo mode
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith("/api/"));
+
+  // In demo mode without active Supabase, enforce authentication via session cookie
   if (isDemoMode()) {
+    const demoCookie = request.cookies.get("cliniq_demo_user")?.value;
+
+    if (!demoCookie && !isPublicRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("redirectTo", pathname);
+      return NextResponse.redirect(url);
+    }
+
+    if (demoCookie && (pathname === "/login" || pathname === "/register")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+
     return response;
   }
 
@@ -60,8 +77,6 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith("/api/"));
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
