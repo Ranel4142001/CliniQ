@@ -39,6 +39,11 @@ export function AppShell({ children, user, onLogout }: AppShellProps) {
 
       {/* Main app body */}
       <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Visible Demo System Banner */}
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-1 text-center text-xs font-medium text-amber-800 dark:text-amber-300 flex items-center justify-center gap-2 shrink-0">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+          <span>Demo system: fictional data only</span>
+        </div>
         <Topbar
           onOpenMobileMenu={() => setMobileOpen(true)}
           user={user}
