@@ -166,7 +166,7 @@ export default function ConsultationPage({
         <div className="flex items-center gap-2">
           <StatusBadge status={statusKey} statusMap={CONSULTATION_STATUS_MAP} />
           {isCompleted && (
-            <Link href={`/prescriptions/new?consultationId=${consultation?.id}`}>
+            <Link href={`/prescriptions?newFor=${consultation?.id}`}>
               <Button size="sm" variant="default" className="gap-1.5">
                 <FilePlus className="h-4 w-4" />
                 <span>Create Prescription</span>

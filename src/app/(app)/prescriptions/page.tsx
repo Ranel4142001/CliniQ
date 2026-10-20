@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/shared/components/layout/PageHeader";
 import { Button } from "@/shared/components/ui/button";
 import { Plus } from "lucide-react";
@@ -18,12 +19,25 @@ import { PrescriptionStats } from "@/features/prescriptions/components/Prescript
 import type { PrescriptionWithRelations } from "@/features/prescriptions/types/prescription.types";
 
 export default function PrescriptionsPage() {
+  const searchParams = useSearchParams();
+  const newForConsultationId = searchParams.get("newFor");
+
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isVoidOpen, setIsVoidOpen] = useState(false);
+  const [formConsultationId, setFormConsultationId] = useState<string | undefined>(undefined);
   const [selectedRx, setSelectedRx] = useState<PrescriptionWithRelations | null>(null);
+
+  // If navigated from consultation page with ?newFor=<consultationId>, open form immediately
+  useEffect(() => {
+    if (newForConsultationId) {
+      setFormConsultationId(newForConsultationId);
+      setSelectedRx(null);
+      setIsFormOpen(true);
+    }
+  }, [newForConsultationId]);
 
   const { data, isLoading, error, refetch } = usePrescriptions({ search, page, pageSize: 10 });
   const { data: stats } = usePrescriptionStats();
@@ -34,10 +48,16 @@ export default function PrescriptionsPage() {
   const handleOpenAction = (rx: PrescriptionWithRelations, action: "view" | "edit" | "issue" | "dispense" | "void") => {
     setSelectedRx(rx);
     if (action === "view") setIsDetailOpen(true);
-    if (action === "edit") setIsFormOpen(true);
+    if (action === "edit") { setFormConsultationId(undefined); setIsFormOpen(true); }
     if (action === "issue") issueMutation.mutate();
     if (action === "dispense") dispenseMutation.mutate();
     if (action === "void") setIsVoidOpen(true);
+  };
+
+  const handleNewPrescription = () => {
+    setSelectedRx(null);
+    setFormConsultationId(undefined);
+    setIsFormOpen(true);
   };
 
   return (
@@ -47,7 +67,7 @@ export default function PrescriptionsPage() {
         description="Prescription lifecycle (Draft ➔ Issued ➔ Dispensed), PDF generation, and FEFO stock integration"
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Prescriptions" }]}
         actions={
-          <Button onClick={() => { setSelectedRx(null); setIsFormOpen(true); }}>
+          <Button onClick={handleNewPrescription}>
             <Plus className="mr-2 h-4 w-4" /> New Prescription
           </Button>
         }
@@ -78,8 +98,12 @@ export default function PrescriptionsPage() {
 
       <PrescriptionForm
         open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        prescription={selectedRx}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) setFormConsultationId(undefined);
+        }}
+        consultationId={formConsultationId}
+        prescription={selectedRx && !formConsultationId ? selectedRx : null}
       />
 
       <PrescriptionDetail
