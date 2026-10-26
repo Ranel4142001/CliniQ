@@ -1,6 +1,7 @@
 import { authRepository } from "../repositories/auth.repository";
 import { can } from "../permissions";
 import { createAdminClient } from "@/shared/lib/supabase/admin";
+import { isDemoMode } from "@/shared/lib/supabase/demo-mode";
 import {
   NotFoundError,
   ForbiddenError,
@@ -104,20 +105,25 @@ export const authService = {
       throw new ConflictError("A user with this email address already exists");
     }
 
-    const supabaseAdmin = createAdminClient();
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      email: input.email,
-      password: input.password,
-      email_confirm: true,
-      user_metadata: { full_name: input.fullName },
-    });
-
-    if (error || !data.user) {
-      // In development/demo mode without live Supabase, generate demo auth ID
-      console.warn("Supabase Admin API unavailable, using simulated auth account:", error?.message);
+    let authId = `simulated-${Date.now()}`;
+    if (!isDemoMode()) {
+      try {
+        const supabaseAdmin = createAdminClient();
+        const { data, error } = await supabaseAdmin.auth.admin.createUser({
+          email: input.email,
+          password: input.password,
+          email_confirm: true,
+          user_metadata: { full_name: input.fullName },
+        });
+        if (data?.user) {
+          authId = data.user.id;
+        } else if (error) {
+          console.warn("Supabase Admin API error:", error.message);
+        }
+      } catch (err) {
+        console.warn("Supabase Admin error:", err);
+      }
     }
-
-    const authId = data.user?.id || `simulated-${Date.now()}`;
 
     return authRepository.createProfile({
       authId,

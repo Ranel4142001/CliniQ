@@ -6,12 +6,13 @@ import { authService } from "@/features/auth/services/auth.service";
 import { registerSchema } from "@/features/auth/schemas/auth.schema";
 import { ConflictError } from "@/shared/lib/errors";
 import { authRepository } from "@/features/auth/repositories/auth.repository";
+import { isDemoMode } from "@/shared/lib/supabase/demo-mode";
 
 export const POST = withApiHandler(async (req: NextRequest) => {
   const body = await req.json();
   const { email, password: _password, fullName } = registerSchema.parse(body);
 
-  // Check for duplicate email before attempting Supabase signup (skip if DB unreachable)
+  // Check for duplicate email before attempting signup
   try {
     const existing = await authRepository.findByEmail(email);
     if (existing) {
@@ -22,23 +23,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     console.warn("Database check skipped (demo mode):", err instanceof Error ? err.message : err);
   }
 
-  const supabase = createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    options: {
-      data: { full_name: fullName },
-    },
-    password: _password,
-  });
-
-  // In dev/demo mode the Supabase URL is a placeholder, so signUp may fail.
-  // Fall back to a simulated authId so the app remains functional without a
-  // live Supabase project.
-  if (error || !data.user) {
-    console.warn(
-      "Supabase signUp unavailable (demo mode), using simulated auth account:",
-      error?.message,
-    );
+  // In demo mode: skip external Supabase call completely for instant response
+  if (isDemoMode()) {
     const simulatedUser = {
       id: `simulated-${Date.now()}`,
       email,
@@ -51,6 +37,19 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       maxAge: 60 * 60 * 24 * 7,
     });
     return { data: profile };
+  }
+
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    options: {
+      data: { full_name: fullName },
+    },
+    password: _password,
+  });
+
+  if (error || !data.user) {
+    throw new ConflictError(error?.message || "Registration failed");
   }
 
   const profile = await authService.ensureProfile(data.user);
