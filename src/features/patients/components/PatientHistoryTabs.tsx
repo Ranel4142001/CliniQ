@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Calendar, Stethoscope } from "lucide-react";
 import { DataTable, DataTableColumn } from "@/shared/components/data-table/DataTable";
 import { StatusBadge, StatusMap } from "@/shared/components/feedback/StatusBadge";
@@ -21,7 +21,15 @@ const APPT_STATUS_MAP: StatusMap<string> = {
 
 export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
   const [activeTab, setActiveTab] = useState<"appointments" | "consultations">("appointments");
+  const [apptPage, setApptPage] = useState(1);
+  const [consPage, setConsPage] = useState(1);
+  const pageSize = 10;
   const { data = [], isLoading, error, refetch } = usePatientHistory(patientId);
+
+  const paginatedAppointments = useMemo(() => {
+    const start = (apptPage - 1) * pageSize;
+    return (data as unknown as Record<string, unknown>[]).slice(start, start + pageSize);
+  }, [data, apptPage]);
 
   const appointmentsColumns: DataTableColumn<PatientHistoryRecord>[] = [
     {
@@ -53,14 +61,21 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
     },
   ];
 
-  const consultationsData = data
-    .filter((a) => a.consultation)
-    .map((a) => ({
-      id: a.consultation!.id,
-      date: a.scheduledAt,
-      chiefComplaint: a.consultation!.chiefComplaint,
-      diagnosis: a.consultation!.diagnosis ?? "No diagnosis entered",
-    }));
+  const consultationsData = useMemo(() => {
+    return data
+      .filter((a) => a.consultation)
+      .map((a) => ({
+        id: a.consultation!.id,
+        date: a.scheduledAt,
+        chiefComplaint: a.consultation!.chiefComplaint,
+        diagnosis: a.consultation!.diagnosis ?? "No diagnosis entered",
+      }));
+  }, [data]);
+
+  const paginatedConsultations = useMemo(() => {
+    const start = (consPage - 1) * pageSize;
+    return (consultationsData as unknown as Record<string, unknown>[]).slice(start, start + pageSize);
+  }, [consultationsData, consPage]);
 
   const consultationColumns: DataTableColumn<(typeof consultationsData)[0]>[] = [
     {
@@ -110,23 +125,37 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
 
       {activeTab === "appointments" ? (
         <DataTable
-          data={data as unknown as Record<string, unknown>[]}
+          data={paginatedAppointments}
           columns={appointmentsColumns as unknown as DataTableColumn<Record<string, unknown>>[]}
           isLoading={isLoading}
           error={error}
           onRetry={refetch}
           emptyTitle="No appointment history"
           emptyMessage="This patient has no recorded appointments."
+          pagination={{
+            page: apptPage,
+            pageSize,
+            total: data.length,
+            totalPages: Math.max(1, Math.ceil(data.length / pageSize)),
+            onPageChange: setApptPage,
+          }}
         />
       ) : (
         <DataTable
-          data={consultationsData as unknown as Record<string, unknown>[]}
+          data={paginatedConsultations}
           columns={consultationColumns as unknown as DataTableColumn<Record<string, unknown>>[]}
           isLoading={isLoading}
           error={error}
           onRetry={refetch}
           emptyTitle="No consultation records"
           emptyMessage="No completed clinical consultations found for this patient."
+          pagination={{
+            page: consPage,
+            pageSize,
+            total: consultationsData.length,
+            totalPages: Math.max(1, Math.ceil(consultationsData.length / pageSize)),
+            onPageChange: setConsPage,
+          }}
         />
       )}
     </div>

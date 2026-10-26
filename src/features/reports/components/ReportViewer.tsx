@@ -23,6 +23,13 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
 
   const { data = [], isLoading, error, refetch } = useReport<T>(config.key, { from, to, search });
 
+  const [page, setPage] = useState<number>(1);
+  const pageSize = 10;
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [from, to, search, config.key]);
+
   const filteredData = useMemo(() => {
     if (!search.trim()) return data;
     const q = search.toLowerCase();
@@ -30,6 +37,13 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
       Object.values(item).some((val) => String(val ?? "").toLowerCase().includes(q))
     );
   }, [data, search]);
+
+  const paginatedData = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredData.slice(start, start + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
 
   const handleExportCsv = () => {
     exportToCsv(filteredData, config.csvColumns, `${config.key}-report-${new Date().toISOString().slice(0, 10)}.csv`);
@@ -103,7 +117,7 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
       </div>
 
       <DataTable
-        data={filteredData as unknown as Record<string, unknown>[]}
+        data={paginatedData as unknown as Record<string, unknown>[]}
         columns={config.columns as unknown as DataTableColumn<Record<string, unknown>>[]}
         isLoading={isLoading}
         error={error as Error}
@@ -113,6 +127,13 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
         searchPlaceholder={`Search ${config.title.toLowerCase()}...`}
         emptyTitle={`No records found`}
         emptyMessage={`No data matches the selected criteria for ${config.title}.`}
+        pagination={{
+          page,
+          pageSize,
+          total: filteredData.length,
+          totalPages,
+          onPageChange: setPage,
+        }}
       />
     </div>
   );
