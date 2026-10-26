@@ -4,8 +4,8 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
 
-  // Optimize output
-  output: undefined, // keep default (not standalone yet)
+  // Optimize output: standalone mode for Docker/container deployments
+  output: process.env.STANDALONE === "true" ? "standalone" : undefined,
 
   // Experimental performance features
   experimental: {

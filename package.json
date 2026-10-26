@@ -9,8 +9,12 @@
     "lint": "next lint",
     "test": "vitest run",
     "format": "prettier --write .",
+    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
-    "db:seed": "ts-node --project tsconfig.json --transpile-only prisma/seed.ts"
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "ts-node --project tsconfig.json --transpile-only prisma/seed.ts",
+    "deploy:build": "prisma generate && next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
