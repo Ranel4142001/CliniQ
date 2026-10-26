@@ -72,7 +72,10 @@ export function useMedicineAlerts() {
   });
 }
 
-export function useStockMovements(params: Partial<ListMovementsInput> = {}) {
+export function useStockMovements(
+  params: Partial<ListMovementsInput> = {},
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: MEDICINE_KEYS.movements(params),
     queryFn: async () => {
@@ -88,6 +91,9 @@ export function useStockMovements(params: Partial<ListMovementsInput> = {}) {
         meta: res.meta,
       };
     },
+    enabled: options?.enabled ?? Boolean(params.medicineId),
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
   });
 }
 

@@ -28,11 +28,14 @@ export function MovementHistoryTable({
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const { data, isLoading, error, refetch } = useStockMovements({
-    medicineId,
-    page,
-    pageSize,
-  });
+  const { data, isLoading, error, refetch } = useStockMovements(
+    {
+      medicineId,
+      page,
+      pageSize,
+    },
+    { enabled: open && Boolean(medicineId) }
+  );
 
   const columns: DataTableColumn<StockMovementWithRelations>[] = [
     {

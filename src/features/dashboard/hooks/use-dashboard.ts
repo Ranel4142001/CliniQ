@@ -16,6 +16,8 @@ export function useDashboard() {
       const res = await apiClient.get<DashboardResponse>("/api/dashboard");
       return res.data;
     },
+    staleTime: 1000 * 30, // 30s fresh
+    gcTime: 1000 * 60 * 5, // 5m in memory cache
     refetchInterval: 60 * 1000, // Refresh every minute
   });
 }

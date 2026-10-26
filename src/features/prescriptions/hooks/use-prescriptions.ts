@@ -42,6 +42,9 @@ export function usePrescriptions(params: Partial<ListPrescriptionsInput> = {}) {
         meta: res.meta,
       };
     },
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -53,6 +56,7 @@ export function usePrescription(id?: string) {
       return res.data;
     },
     enabled: Boolean(id),
+    staleTime: 1000 * 60,
   });
 }
 
@@ -63,6 +67,8 @@ export function usePrescriptionStats() {
       const res = await apiClient.get<PrescriptionStatsDTO>("/api/prescriptions/stats");
       return res.data;
     },
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
   });
 }
 

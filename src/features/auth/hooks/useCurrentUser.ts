@@ -13,6 +13,8 @@ export function useCurrentUser() {
       return res.data;
     },
     retry: false,
+    staleTime: 1000 * 60 * 10, // 10 minutes - user profile is stable
+    gcTime: 1000 * 60 * 30, // 30 minutes in memory cache
   });
 
   return {
