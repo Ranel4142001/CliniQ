@@ -75,9 +75,9 @@ export default function RegisterPage() {
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Create Patient Account</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Get started with CliniQ today
+          Register to book clinic consultations and access prescriptions
         </p>
       </div>
 
@@ -137,8 +137,10 @@ export default function RegisterPage() {
               )}
             </button>
           </div>
-          {errors.password && (
+          {errors.password ? (
             <p className="text-xs text-destructive">{errors.password.message}</p>
+          ) : (
+            <p className="text-[11px] text-muted-foreground">Minimum 8 characters with at least 1 uppercase letter and 1 number.</p>
           )}
         </div>
 

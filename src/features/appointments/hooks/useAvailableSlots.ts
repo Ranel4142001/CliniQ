@@ -19,5 +19,7 @@ export function useAvailableSlots(clinicianId?: string, date?: string) {
       return res.data;
     },
     enabled: !!clinicianId && !!date,
+    staleTime: 1000 * 60, // 60s — slots don't change that fast
+    gcTime: 1000 * 60 * 10,
   });
 }

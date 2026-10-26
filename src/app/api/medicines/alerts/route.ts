@@ -11,4 +11,4 @@ export const GET = withApiHandler(async () => {
   const alerts = await medicineService.getAlerts();
 
   return { data: alerts };
-});
+}, { cacheSeconds: 30 });

@@ -8,4 +8,4 @@ export const GET = withApiHandler(async () => {
   await requireAuth();
   const clinicians = await authRepository.listActiveClinicians();
   return { data: clinicians };
-});
+}, { cacheSeconds: 60 });

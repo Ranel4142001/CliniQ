@@ -45,6 +45,7 @@ export function useMedicines(params: Partial<ListMedicinesInput> = {}) {
         meta: res.meta,
       };
     },
+    placeholderData: (prev) => prev, // no flash on filter/page change
   });
 }
 
@@ -66,6 +67,8 @@ export function useMedicineAlerts() {
       const res = await apiClient.get<AlertsDTO>("/api/medicines/alerts");
       return res.data;
     },
+    staleTime: 1000 * 30, // 30s
+    gcTime: 1000 * 60 * 5,
   });
 }
 

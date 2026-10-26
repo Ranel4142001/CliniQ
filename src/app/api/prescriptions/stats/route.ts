@@ -13,4 +13,4 @@ export const GET = withApiHandler(async () => {
   });
 
   return { data: stats };
-});
+}, { cacheSeconds: 30 });

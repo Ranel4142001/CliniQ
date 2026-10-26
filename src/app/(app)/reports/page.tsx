@@ -37,7 +37,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Analytics & Clinical Reports"
-        description="Standardized reports with date range filtering, CSV, and watermarked PDF export"
+        description="Standardized clinical reports with date range filtering, CSV export, and PDF generation"
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Reports" }]}
       />
 

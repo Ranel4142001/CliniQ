@@ -94,7 +94,7 @@ export function DataTable<T extends Record<string, unknown>>({
         </div>
       )}
 
-      <div className="rounded-md border bg-card">
+      <div className="rounded-xl border border-border/80 bg-card shadow-xs overflow-hidden">
         {error ? (
           <ErrorState message={error.message} onRetry={onRetry} />
         ) : isLoading ? (
@@ -103,15 +103,15 @@ export function DataTable<T extends Record<string, unknown>>({
           <EmptyState title={emptyTitle} description={emptyMessage} />
         ) : (
           <Table>
-            <TableHeader>
-              <TableRow>
+            <TableHeader className="bg-muted/40 border-b border-border/80">
+              <TableRow className="hover:bg-transparent">
                 {columns.map((col, idx) => (
-                  <TableHead key={idx} className={col.className}>
+                  <TableHead key={idx} className={`text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 ${col.className ?? ""}`}>
                     {col.sortable && col.accessorKey && onSortChange ? (
                       <button
                         type="button"
                         onClick={() => handleSort(col.accessorKey)}
-                        className="flex items-center gap-1 font-semibold hover:text-foreground"
+                        className="flex items-center gap-1 font-semibold hover:text-foreground transition-colors"
                       >
                         {col.header}
                         {sortBy === col.accessorKey ? (
@@ -127,15 +127,15 @@ export function DataTable<T extends Record<string, unknown>>({
                 ))}
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="divide-y divide-border/60">
               {data.map((item, rowIdx) => (
                 <TableRow
                   key={rowIdx}
                   onClick={() => onRowClick?.(item)}
-                  className={onRowClick ? "cursor-pointer hover:bg-muted/50" : ""}
+                  className={`transition-colors hover:bg-muted/30 ${onRowClick ? "cursor-pointer" : ""}`}
                 >
                   {columns.map((col, colIdx) => (
-                    <TableCell key={colIdx} className={col.className}>
+                    <TableCell key={colIdx} className={`py-3 ${col.className ?? ""}`}>
                       {col.cell
                         ? col.cell(item)
                         : col.accessorKey

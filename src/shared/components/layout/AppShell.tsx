@@ -23,7 +23,7 @@ export function AppShell({ children, user, onLogout }: AppShellProps) {
     <div className="flex h-screen w-full overflow-hidden bg-background">
       {/* Desktop sidebar */}
       <div className="hidden md:flex md:w-64 md:shrink-0">
-        <Sidebar role={user?.role} className="w-full" />
+        <Sidebar role={user?.role} user={user} className="w-full" />
       </div>
 
       {/* Mobile drawer */}
@@ -31,6 +31,7 @@ export function AppShell({ children, user, onLogout }: AppShellProps) {
         <DialogContent className="p-0 sm:max-w-xs h-full top-0 left-0 translate-x-0 translate-y-0 rounded-none border-r">
           <Sidebar
             role={user?.role}
+            user={user}
             className="w-full h-full border-none"
             onNavigate={() => setMobileOpen(false)}
           />

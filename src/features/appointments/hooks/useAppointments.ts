@@ -41,5 +41,7 @@ export function useAppointments(params: UseAppointmentsParams = {}) {
         meta: res.meta as unknown as Paginated<AppointmentListItem>,
       };
     },
+    staleTime: 1000 * 30, // 30s — appointments change frequently
+    placeholderData: (prev) => prev, // keep previous data while refetching (no flash)
   });
 }

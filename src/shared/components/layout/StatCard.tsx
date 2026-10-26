@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Card, CardContent } from "@/shared/components/ui/card";
 
 interface StatCardProps {
   title: string;
@@ -23,18 +23,24 @@ export function StatCard({
   className = "",
 }: StatCardProps) {
   return (
-    <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        {icon && <div className="h-4 w-4 text-muted-foreground">{icon}</div>}
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold tracking-tight text-foreground">{value}</div>
+    <Card className={`overflow-hidden rounded-xl border border-border/80 bg-card/90 shadow-xs hover:shadow-md transition-all duration-200 ${className}`}>
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">{title}</p>
+            <div className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{value}</div>
+          </div>
+          {icon && (
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-xs">
+              {icon}
+            </div>
+          )}
+        </div>
         {(description || trend) && (
-          <div className="mt-1 flex items-center text-xs text-muted-foreground">
+          <div className="mt-2.5 flex items-center text-xs text-muted-foreground border-t border-border/40 pt-2">
             {trend && (
               <span
-                className={`mr-1.5 font-medium ${
+                className={`mr-1.5 font-semibold ${
                   trend.isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
                 }`}
               >
@@ -42,7 +48,7 @@ export function StatCard({
                 {trend.value}
               </span>
             )}
-            <span>{description || trend?.label}</span>
+            <span className="truncate">{description || trend?.label}</span>
           </div>
         )}
       </CardContent>

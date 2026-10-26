@@ -113,56 +113,63 @@ export default function LoginPage() {
         </Link>
       </p>
 
-      <div className="mt-6 rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-        <p className="font-semibold text-foreground mb-1.5">User Testing Quick Access:</p>
-        <div className="grid grid-cols-2 gap-1.5">
+      <div className="mt-6 rounded-xl border border-border/80 bg-muted/30 p-3 text-xs text-muted-foreground shadow-2xs">
+        <p className="font-semibold text-foreground mb-2 flex items-center justify-between">
+          <span>Quick Sign-In for Testing:</span>
+          <span className="text-[10px] font-normal text-muted-foreground">1-click fill</span>
+        </p>
+        <div className="grid grid-cols-2 gap-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-[11px] justify-start px-2 font-normal"
+            className="h-8 text-[11px] justify-start px-2.5 font-medium gap-1.5 hover:bg-muted/60"
             onClick={() => {
               setValue("email", "admin@cliniq.local");
               setValue("password", "Admin@CliniQ2025!");
             }}
           >
-            Admin (Full Access)
+            <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0" />
+            <span className="truncate">Admin Portal</span>
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-[11px] justify-start px-2 font-normal"
+            className="h-8 text-[11px] justify-start px-2.5 font-medium gap-1.5 hover:bg-muted/60"
             onClick={() => {
               setValue("email", "dr.cruz@cliniq.local");
               setValue("password", "Doctor@2026!");
             }}
           >
-            Clinician (Doctor)
+            <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+            <span className="truncate">Doctor / Clinician</span>
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-[11px] justify-start px-2 font-normal"
+            className="h-8 text-[11px] justify-start px-2.5 font-medium gap-1.5 hover:bg-muted/60"
             onClick={() => {
               setValue("email", "staff.ana@cliniq.local");
               setValue("password", "Staff@2026!");
             }}
           >
-            Staff (Reception)
+            <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
+            <span className="truncate">Clinic Staff</span>
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-[11px] justify-start px-2 font-normal"
+            className="h-8 text-[11px] justify-start px-2.5 font-medium gap-1.5 hover:bg-muted/60"
             onClick={() => {
               setValue("email", "juan.delacruz@example.com");
               setValue("password", "Patient@2026!");
             }}
           >
-            Patient Account
+            <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+            <span className="truncate">Patient Account</span>
           </Button>
         </div>
       </div>

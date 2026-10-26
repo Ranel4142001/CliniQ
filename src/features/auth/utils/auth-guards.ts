@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/shared/lib/supabase/server";
 import { prisma } from "@/shared/lib/prisma";
 import { authRepository } from "../repositories/auth.repository";
@@ -5,11 +6,10 @@ import { authService } from "../services/auth.service";
 import { UnauthorizedError, ForbiddenError } from "@/shared/lib/errors";
 import { UserProfile } from "../types/auth.types";
 import { Role } from "@prisma/client";
-
 import { cookies } from "next/headers";
 import { isDemoMode } from "@/shared/lib/supabase/demo-mode";
 
-export async function requireAuth(allowedRoles?: Role[]): Promise<UserProfile> {
+const getAuthenticatedUser = cache(async (): Promise<UserProfile> => {
   const supabase = createClient();
   const {
     data: { user },
@@ -32,9 +32,6 @@ export async function requireAuth(allowedRoles?: Role[]): Promise<UserProfile> {
             createdAt: new Date(),
             updatedAt: new Date(),
           };
-          if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(demoProfile.role)) {
-            // For smooth development preview, grant role access if needed or enforce
-          }
           return demoProfile;
         } catch {
           // fall through to default demo profile
@@ -44,6 +41,7 @@ export async function requireAuth(allowedRoles?: Role[]): Promise<UserProfile> {
       try {
         const seededAdmin = await prisma.profile.findFirst({
           where: { role: "ADMIN" },
+          select: { id: true, authId: true, email: true, fullName: true, role: true, isActive: true, createdAt: true, updatedAt: true },
         });
         if (seededAdmin) {
           return {
@@ -75,14 +73,11 @@ export async function requireAuth(allowedRoles?: Role[]): Promise<UserProfile> {
     throw new UnauthorizedError("You must be logged in to access this resource");
   }
 
-  // Use explicit UserProfile typing to reconcile the two different Prisma return shapes
-  // (findByAuthId includes patient relation; ensureProfile/createProfile does not).
   let profile: UserProfile | null = await authRepository.findByAuthId(user.id) as UserProfile | null;
   if (!profile) {
     profile = (await authService.ensureProfile(user)) as UserProfile;
   }
 
-  // ensureProfile should always return a profile, but guard defensively
   if (!profile) {
     throw new UnauthorizedError("User profile could not be established");
   }
@@ -90,6 +85,12 @@ export async function requireAuth(allowedRoles?: Role[]): Promise<UserProfile> {
   if (!profile.isActive) {
     throw new ForbiddenError("Your account has been deactivated. Please contact an administrator.");
   }
+
+  return profile;
+});
+
+export async function requireAuth(allowedRoles?: Role[]): Promise<UserProfile> {
+  const profile = await getAuthenticatedUser();
 
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(profile.role)) {
     throw new ForbiddenError("You do not have permission to perform this action");

@@ -11,7 +11,19 @@ export const dashboardRepository = {
       };
       return await prisma.appointment.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          patientId: true,
+          clinicianId: true,
+          scheduledAt: true,
+          endsAt: true,
+          type: true,
+          status: true,
+          reason: true,
+          meetingUrl: true,
+          cancelReason: true,
+          createdAt: true,
+          updatedAt: true,
           patient: { select: { id: true, patientNo: true, firstName: true, lastName: true } },
           clinician: { select: { id: true, fullName: true, email: true } },
         },
@@ -49,7 +61,19 @@ export const dashboardRepository = {
       };
       return await prisma.appointment.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          patientId: true,
+          clinicianId: true,
+          scheduledAt: true,
+          endsAt: true,
+          type: true,
+          status: true,
+          reason: true,
+          meetingUrl: true,
+          cancelReason: true,
+          createdAt: true,
+          updatedAt: true,
           patient: { select: { id: true, patientNo: true, firstName: true, lastName: true } },
           clinician: { select: { id: true, fullName: true, email: true } },
         },
@@ -155,7 +179,19 @@ export const dashboardRepository = {
           scheduledAt: { gte: fromDate },
           status: { in: ["PENDING", "CONFIRMED"] },
         },
-        include: {
+        select: {
+          id: true,
+          scheduledAt: true,
+          endsAt: true,
+          type: true,
+          status: true,
+          reason: true,
+          meetingUrl: true,
+          cancelReason: true,
+          patientId: true,
+          clinicianId: true,
+          createdAt: true,
+          updatedAt: true,
           clinician: { select: { id: true, fullName: true, email: true } },
         },
         orderBy: { scheduledAt: "asc" },
@@ -208,7 +244,15 @@ export const dashboardRepository = {
           patientId,
           status: { in: ["ISSUED", "DISPENSED"] },
         },
-        include: {
+        select: {
+          id: true,
+          prescriptionNo: true,
+          status: true,
+          issuedAt: true,
+          createdAt: true,
+          patientId: true,
+          clinicianId: true,
+          updatedAt: true,
           clinician: { select: { fullName: true } },
           items: true,
         },

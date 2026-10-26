@@ -8,7 +8,12 @@ type ApiHandler<T> = (
   context?: { params?: Record<string, string | string[]> }
 ) => Promise<ApiResponse<T> | NextResponse>;
 
-export function withApiHandler<T>(handler: ApiHandler<T>) {
+interface ApiHandlerOptions {
+  /** Seconds to cache successful GET responses (adds Cache-Control: private, max-age=N) */
+  cacheSeconds?: number;
+}
+
+export function withApiHandler<T>(handler: ApiHandler<T>, options: ApiHandlerOptions = {}) {
   return async (
     req: NextRequest,
     context?: { params?: Record<string, string | string[]> }
@@ -18,7 +23,14 @@ export function withApiHandler<T>(handler: ApiHandler<T>) {
       if (result instanceof NextResponse) {
         return result as NextResponse<ApiResponse<T> | ApiErrorResponse>;
       }
-      return NextResponse.json(result, { status: 200 });
+      const response = NextResponse.json(result, { status: 200 });
+      if (options.cacheSeconds && req.method === "GET") {
+        response.headers.set(
+          "Cache-Control",
+          `private, max-age=${options.cacheSeconds}, stale-while-revalidate=${options.cacheSeconds * 2}`
+        );
+      }
+      return response;
     } catch (err: unknown) {
       if (err instanceof AppError) {
         return NextResponse.json(
