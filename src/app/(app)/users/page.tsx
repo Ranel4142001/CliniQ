@@ -43,15 +43,25 @@ interface CreateUserForm {
   role: "ADMIN" | "CLINICIAN" | "STAFF";
 }
 
-function useUsers(search?: string) {
+function useUsers(search?: string, page = 1) {
   return useQuery({
-    queryKey: ["users", search],
+    queryKey: ["users", search, page],
     queryFn: async () => {
       const res = await apiClient.get<UserProfile[]>("/api/users", {
-        params: { search, pageSize: 50 },
+        params: { search, page, pageSize: 10 },
       });
-      return res.data ?? [];
+      return {
+        items: res.data ?? [],
+        meta: (res.meta ?? { total: 0, page: 1, pageSize: 10, totalPages: 1 }) as {
+          total: number;
+          page: number;
+          pageSize: number;
+          totalPages: number;
+        },
+      };
     },
+    staleTime: 1000 * 30,
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -87,6 +97,7 @@ function useUpdateUser(id: string) {
 
 export default function UsersPage() {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [deactivatingUser, setDeactivatingUser] = useState<UserProfile | null>(null);
@@ -97,7 +108,9 @@ export default function UsersPage() {
     role: "STAFF",
   });
 
-  const { data: users, isLoading, error, refetch } = useUsers(search);
+  const { data, isLoading, error, refetch } = useUsers(search, page);
+  const users = data?.items ?? [];
+  const meta = data?.meta;
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser(editingUser?.id || "");
   const deactivateMutation = useUpdateUser(deactivatingUser?.id || "");
@@ -142,7 +155,10 @@ export default function UsersPage() {
         <Input
           placeholder="Search by name or email…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="max-w-sm"
         />
       </div>
@@ -217,6 +233,38 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
+
+          {/* Pagination Footer */}
+          {meta && meta.totalPages > 1 && (
+            <div className="flex items-center justify-between border-t px-4 py-3 text-xs text-muted-foreground bg-muted/20">
+              <span>
+                Showing {users.length} of {meta.total} users
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="h-8 px-2 text-xs"
+                >
+                  Previous
+                </Button>
+                <span className="font-medium text-foreground">
+                  Page {page} of {meta.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= meta.totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="h-8 px-2 text-xs"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

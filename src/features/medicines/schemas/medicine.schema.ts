@@ -45,13 +45,13 @@ export const listMedicinesSchema = z.object({
     .optional()
     .transform((v) => (v === "true" ? true : v === "false" ? false : undefined)),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
 });
 
 export const listMovementsSchema = z.object({
   medicineId: z.string().uuid().optional(),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
 });
 
 export type CreateMedicineInput = z.infer<typeof createMedicineSchema>;

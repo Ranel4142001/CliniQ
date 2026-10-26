@@ -90,7 +90,7 @@ export type EditPatientInput = z.infer<typeof editPatientSchema>;
 /** Query params for listing patients */
 export const listPatientsSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).default(20),
+  pageSize: z.coerce.number().int().positive().max(100).default(10),
   search: z.string().trim().optional(),
   isArchived: z.coerce.boolean().default(false),
 });

@@ -37,7 +37,7 @@ export default function PatientsPage() {
     refetch,
   } = usePatients({
     page,
-    pageSize: 15,
+    pageSize: 10,
     search: debouncedSearch,
   });
 
@@ -76,7 +76,7 @@ export default function PatientsPage() {
         error={error}
         onRetry={refetch}
         page={page}
-        pageSize={15}
+        pageSize={10}
         total={data?.meta?.total ?? 0}
         totalPages={data?.meta?.totalPages ?? 1}
         onPageChange={setPage}

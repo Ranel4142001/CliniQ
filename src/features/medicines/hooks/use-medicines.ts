@@ -37,7 +37,7 @@ export function useMedicines(params: Partial<ListMedicinesInput> = {}) {
           search: params.search,
           isArchived: params.isArchived,
           page: params.page ?? 1,
-          pageSize: params.pageSize ?? 20,
+          pageSize: params.pageSize ?? 10,
         },
       });
       return {
@@ -83,7 +83,7 @@ export function useStockMovements(
         params: {
           medicineId: params.medicineId,
           page: params.page ?? 1,
-          pageSize: params.pageSize ?? 20,
+          pageSize: params.pageSize ?? 10,
         },
       });
       return {

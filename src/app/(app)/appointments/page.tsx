@@ -31,7 +31,7 @@ export default function AppointmentsPage() {
 
   const { data, isLoading, error, refetch } = useAppointments({
     page,
-    pageSize: 15,
+    pageSize: 10,
     status: statusFilter,
   });
 
@@ -135,7 +135,7 @@ export default function AppointmentsPage() {
           error={error}
           onRetry={refetch}
           page={page}
-          pageSize={15}
+          pageSize={10}
           total={data?.meta?.total ?? 0}
           totalPages={data?.meta?.totalPages ?? 1}
           onPageChange={setPage}

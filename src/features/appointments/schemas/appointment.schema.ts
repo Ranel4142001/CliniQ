@@ -48,7 +48,7 @@ export type QuerySlotsInput = z.infer<typeof querySlotsSchema>;
 
 export const listAppointmentsSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).default(20),
+  pageSize: z.coerce.number().int().positive().max(100).default(10),
   status: z.enum(["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "NO_SHOW"]).optional(),
   type: z.enum(["IN_PERSON", "ONLINE"]).optional(),
   clinicianId: z.string().optional(),

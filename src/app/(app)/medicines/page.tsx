@@ -31,7 +31,7 @@ export default function MedicinesPage() {
   const [movementType, setMovementType] = useState<"STOCK_OUT" | "ADJUSTMENT">("STOCK_OUT");
   const [selectedMed, setSelectedMed] = useState<MedicineWithStock | null>(null);
 
-  const { data, isLoading, error, refetch } = useMedicines({ search, page, pageSize: 15 });
+  const { data, isLoading, error, refetch } = useMedicines({ search, page, pageSize: 10 });
   const { data: alerts } = useMedicineAlerts();
   const updateMutation = useUpdateMedicine(selectedMed?.id || "");
 
@@ -87,7 +87,7 @@ export default function MedicinesPage() {
         onToggleArchive={(m) => handleOpenAction(m, "archive")}
         pagination={{
           page: data?.meta?.page ?? page,
-          pageSize: data?.meta?.pageSize ?? 15,
+          pageSize: data?.meta?.pageSize ?? 10,
           totalPages: data?.meta?.totalPages ?? 1,
           total: data?.meta?.total ?? 0,
           onPageChange: setPage,
