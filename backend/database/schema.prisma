@@ -1,0 +1,271 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  CLINICIAN
+  STAFF
+  PATIENT
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum AppointmentType {
+  IN_PERSON
+  ONLINE
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum StockMovementType {
+  STOCK_IN
+  STOCK_OUT
+  ADJUSTMENT
+}
+
+enum PrescriptionStatus {
+  DRAFT
+  ISSUED
+  DISPENSED
+  VOIDED
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  authId    String   @unique
+  email     String   @unique
+  fullName  String
+  role      Role     @default(PATIENT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient                 Patient?
+  clinicianAppointments   Appointment[]         @relation("ClinicianAppointments")
+  clinicianConsultations  Consultation[]        @relation("ClinicianConsultations")
+  clinicianPrescriptions  Prescription[]        @relation("ClinicianPrescriptions")
+  performedStockMovements StockMovement[]
+  auditLogs               AuditLog[]
+  sentMessages            ConsultationMessage[] @relation("SentConsultationMessages")
+}
+
+model Patient {
+  id                 String   @id @default(uuid())
+  profileId          String?  @unique
+  profile            Profile? @relation(fields: [profileId], references: [id])
+  patientNo          String   @unique // PT-2026-0001
+  firstName          String
+  middleName         String?
+  lastName           String
+  birthDate          DateTime @db.Date
+  sex                Sex
+  contactNumber      String
+  address            String
+  guardianName       String?
+  guardianContact    String?
+  emergencyName      String
+  emergencyContact   String
+  bloodType          String?
+  allergies          String?
+  existingConditions String?
+  consentGivenAt     DateTime
+  isArchived         Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  appointments  Appointment[]
+  consultations Consultation[]
+  prescriptions Prescription[]
+
+  @@index([lastName, firstName])
+}
+
+model Appointment {
+  id           String            @id @default(uuid())
+  patientId    String
+  patient      Patient           @relation(fields: [patientId], references: [id])
+  clinicianId  String
+  clinician    Profile           @relation("ClinicianAppointments", fields: [clinicianId], references: [id])
+  scheduledAt  DateTime
+  endsAt       DateTime
+  type         AppointmentType
+  status       AppointmentStatus @default(PENDING)
+  reason       String
+  meetingUrl   String?
+  cancelReason String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  consultation Consultation?
+  messages     ConsultationMessage[]
+
+  @@index([clinicianId, scheduledAt])
+  @@index([patientId, scheduledAt])
+}
+
+model Consultation {
+  id             String      @id @default(uuid())
+  appointmentId  String      @unique
+  appointment    Appointment @relation(fields: [appointmentId], references: [id])
+  patientId      String
+  patient        Patient     @relation(fields: [patientId], references: [id])
+  clinicianId    String
+  clinician      Profile     @relation("ClinicianConsultations", fields: [clinicianId], references: [id])
+  chiefComplaint String
+  vitals         Json?
+  findings       String?
+  diagnosis      String?
+  treatmentPlan  String?
+  startedAt      DateTime?
+  endedAt        DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  prescription Prescription?
+
+  @@index([patientId])
+  @@index([clinicianId])
+}
+
+/// Private chat between a patient and their clinician for an ONLINE appointment.
+model ConsultationMessage {
+  id            String      @id @default(uuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  senderId      String
+  sender        Profile     @relation("SentConsultationMessages", fields: [senderId], references: [id])
+  body          String      @db.VarChar(2000)
+  readAt        DateTime?
+  createdAt     DateTime    @default(now())
+
+  @@index([appointmentId, createdAt])
+}
+
+model Medicine {
+  id           String   @id @default(uuid())
+  name         String
+  genericName  String?
+  dosageForm   String
+  strength     String
+  unit         String
+  reorderLevel Int      @default(10)
+  isArchived   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  batches           MedicineBatch[]
+  stockMovements    StockMovement[]
+  prescriptionItems PrescriptionItem[]
+
+  @@unique([name, strength, dosageForm])
+}
+
+model MedicineBatch {
+  id         String   @id @default(uuid())
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  batchNo    String
+  expiryDate DateTime @db.Date
+  quantity   Int
+  createdAt  DateTime @default(now())
+
+  stockMovements StockMovement[]
+
+  @@unique([medicineId, batchNo])
+  @@index([expiryDate])
+}
+
+model StockMovement {
+  id             String            @id @default(uuid())
+  medicineId     String
+  medicine       Medicine          @relation(fields: [medicineId], references: [id])
+  batchId        String
+  batch          MedicineBatch     @relation(fields: [batchId], references: [id])
+  type           StockMovementType
+  quantity       Int
+  reason         String?
+  performedById  String
+  performedBy    Profile           @relation(fields: [performedById], references: [id])
+  prescriptionId String?
+  prescription   Prescription?     @relation(fields: [prescriptionId], references: [id])
+  createdAt      DateTime          @default(now())
+
+  @@index([medicineId])
+  @@index([batchId])
+  @@index([performedById])
+}
+
+model Prescription {
+  id             String             @id @default(uuid())
+  prescriptionNo String?            @unique // RX-2026-0001
+  consultationId String             @unique
+  consultation   Consultation       @relation(fields: [consultationId], references: [id])
+  patientId      String
+  patient        Patient            @relation(fields: [patientId], references: [id])
+  clinicianId    String
+  clinician      Profile            @relation("ClinicianPrescriptions", fields: [clinicianId], references: [id])
+  status         PrescriptionStatus @default(DRAFT)
+  notes          String?
+  voidReason     String?
+  issuedAt       DateTime?
+  dispensedAt    DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  items          PrescriptionItem[]
+  stockMovements StockMovement[]
+
+  @@index([patientId])
+  @@index([clinicianId])
+}
+
+model PrescriptionItem {
+  id             String       @id @default(uuid())
+  prescriptionId String
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicineId     String
+  medicine       Medicine     @relation(fields: [medicineId], references: [id])
+  dosage         String
+  frequency      String
+  durationDays   Int
+  quantity       Int
+  instructions   String?
+
+  @@index([prescriptionId])
+  @@index([medicineId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String
+  actor     Profile  @relation(fields: [actorId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actorId])
+}
+
+model Counter {
+  key   String @id
+  value Int    @default(0)
+}

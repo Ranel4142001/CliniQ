@@ -1,6 +1,9 @@
 # CliniQ — Healthcare & Clinic Management System
 
-A web-based clinic management system designed for community and institutional health clinics. Built with Next.js 14 (App Router), TypeScript Strict, Tailwind CSS + shadcn/ui, Prisma ORM, PostgreSQL (Supabase), and TanStack Query.
+A web-based clinic management system designed for community and institutional health clinics.
+
+- **Frontend:** Next.js 15 (App Router) + React 19, TypeScript strict, Tailwind CSS + shadcn/ui, TanStack Query, React Hook Form.
+- **Backend:** Node.js + Hono, hexagonal modular monolith (ports & adapters), Prisma ORM, PostgreSQL (Supabase), Supabase Auth, Zod.
 
 ---
 
@@ -8,8 +11,8 @@ A web-based clinic management system designed for community and institutional he
 
 1. **Role-Based Authentication & Access Control**
    - 4 distinct roles: `ADMIN`, `CLINICIAN`, `STAFF`, and `PATIENT`.
-   - Cookie-based session tokens with automatic demo fallback and Supabase Auth integration.
-   - Granular permission matrix (`can(role, action)`) enforced at route handlers and services.
+   - Supabase Auth sessions (HTTP-only cookies) with server-side role checks on every endpoint.
+   - Granular permission matrix (`can(role, action)`) enforced in API controllers and services.
 
 2. **Patient Records Management**
    - Full demographic, emergency, and clinical information tracking with PhilHealth compliance.
@@ -24,6 +27,7 @@ A web-based clinic management system designed for community and institutional he
 4. **Clinical Consultations (SOAP Workflow)**
    - Vitals recording (BP, Heart Rate, Respiratory Rate, Temp, Weight, SpO2) with BMI calculation.
    - Chief complaint, objective findings, diagnosis, and treatment plan.
+   - Messenger-style private chat between patient and clinician for online consultations.
 
 5. **Medicine Inventory & FEFO Stock Management**
    - First-Expired, First-Out (FEFO) automated dispensing and deduction.
@@ -43,177 +47,120 @@ A web-based clinic management system designed for community and institutional he
 
 ---
 
-## 📐 Architecture & Layering Rules
+## 📁 Project Structure
 
-CliniQ adheres strictly to a 6-layer decoupled architecture:
-
-```
-Page (App Router)
-   │
-   ▼
-Component (UI Presentation & RHF)
-   │
-   ▼
-Hook (TanStack Query / Mutation)
-   │
-   ▼
-Route Handler (/api/* with withApiHandler + requireAuth)
-   │
-   ▼
-Service (Pure Business Rules, Calculations, & Validation)
-   │
-   ▼
-Repository (Data Access & Prisma Client Transactions)
-```
-
-- **Feature-Based Folders**: Features live in `src/features/<feature-name>/`.
-- **Public API Contract**: Features only expose exports via their `index.ts`. No internal deep imports across features.
-- **Prisma Isolation**: Prisma Client is strictly confined to `repositories/`. No direct Prisma calls in pages or components.
-- **Single Responsibility**: Functions under 30 lines, components under 150 lines, zero `any` types.
-
----
-
-## 📁 Folder Structure Map
+CliniQ is split into two applications that live in one repository (npm workspaces):
 
 ```text
-src/
-├── app/                              # Next.js App Router
-│   ├── (app)/                        # Authenticated app shell layout & pages
-│   │   ├── appointments/             # Appointments list & booking
-│   │   ├── consultations/            # Clinical consultation workflow
-│   │   ├── dashboard/                # Role-based dashboard
-│   │   ├── medicines/                # FEFO inventory management
-│   │   ├── patients/                 # Patient directory & charts
-│   │   ├── prescriptions/            # Digital prescriptions & dispensing
-│   │   ├── reports/                  # Analytics & PDF/CSV reporting
-│   │   └── users/                    # Admin staff user management
-│   ├── (auth)/                       # Public auth routes (login, register)
-│   ├── api/                          # Route handlers with requireAuth & Zod
-│   ├── error.tsx                     # Root error boundary
-│   ├── not-found.tsx                 # Root 404 page
-│   └── layout.tsx                    # Root layout with fonts & providers
-├── features/                         # Modular business domains
-│   ├── appointments/                 # Schedulers, slots, status state-machine
-│   ├── auth/                         # Sessions, guards, login/register hooks
-│   ├── consultations/                # SOAP forms, vitals, summary views
-│   ├── dashboard/                    # Role KPIs, counters, pending tasks
-│   ├── medicines/                    # FEFO deduction, batches, stock status
-│   ├── patients/                     # Patient records, forms, sequence numbers
-│   ├── prescriptions/                # Rx issuance, dispensing, PDF generator
-│   └── reports/                      # 5 analytics reports, CSV/PDF configs
-├── shared/                           # Reusable code across all features
-│   ├── components/                   # DataTable, FormField, Dialogs, PDF layout
-│   ├── constants/                    # Roles, permissions, routes, config
-│   ├── hooks/                        # useDebounce, useMediaQuery
-│   └── lib/                          # Api client, errors, notifications, date utils
-├── config/                           # Environment variable schema validation
-prisma/                               # Database schema, migrations, seed script
-tests/                                # Vitest unit and integration test suite
+CliniQ/
+├── frontend/                     # Everything the user sees (Next.js)
+│   ├── public/
+│   ├── src/
+│   │   ├── app/                  # Pages (App Router) + /api proxy to the backend
+│   │   ├── features/<feature>/   # components/, hooks/, utils/ per feature
+│   │   ├── components/           # Shared UI: ui/, data-table/, form/, feedback/, layout/, pdf/
+│   │   ├── hooks/  lib/  config/  constants/
+│   │   └── middleware.ts         # Page-level auth redirects
+│   └── tests/unit/
+│
+├── backend/                      # Everything on the server (Node.js API)
+│   ├── src/
+│   │   ├── modules/<module>/     # auth, patients, appointments, consultations,
+│   │   │   ├── domain/           #   medicines, prescriptions, dashboard, reports
+│   │   │   ├── application/
+│   │   │   ├── adapters/inbound/http/
+│   │   │   ├── infrastructure/persistence/
+│   │   │   └── index.ts          # Module public API
+│   │   ├── shared/               # Shared kernel
+│   │   ├── contracts/            # The only backend code the frontend may import
+│   │   ├── bootstrap/            # Composition root
+│   │   └── main.ts               # Server entry point
+│   ├── database/                 # schema.prisma, migrations/, seeds/
+│   ├── tests/                    # unit/, architecture/
+│   └── docs/                     # architecture/, api/
+│
+├── docker-compose.yml
+└── package.json                  # Workspace root
 ```
+
+The browser only ever talks to the frontend. The frontend forwards `/api/*` to the backend
+from the server, so cookies stay first-party and no CORS is needed.
+
+- Backend layering and dependency rules: [backend/docs/architecture/system-overview.md](backend/docs/architecture/system-overview.md)
+- Every endpoint and who can call it: [backend/docs/api/endpoints.md](backend/docs/api/endpoints.md)
+- Engineering rules: [CLINIQ_RULES.md](CLINIQ_RULES.md)
 
 ---
 
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-- **Node.js**: v18.17+ or v20+
-- **npm** or **pnpm**
-- **PostgreSQL** instance (Supabase recommended)
+- **Node.js** 20+ and npm
+- A **Supabase** project (Auth) and a **PostgreSQL** database (Supabase or `docker compose up db`)
 
-### 2. Installation
+### 2. Install
 ```bash
-git clone <repository-url>
-cd CliniQ
-npm install
+npm install          # installs both workspaces and generates the Prisma client
 ```
 
-### 3. Environment Setup
-Copy the template and fill in your Supabase project credentials:
+### 3. Configure environment
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+```
+Fill in the database URL and Supabase keys. The service-role key goes **only** in `backend/.env`.
+
+### 4. Create the database and seed it
+```bash
+npm run db:migrate -w backend     # applies backend/database/migrations
+npm run db:seed -w backend        # needs SEED_ADMIN_PASSWORD and SEED_STAFF_PASSWORD
 ```
 
-Key variables:
-- `DATABASE_URL`: Supabase Transaction Pooler URL (port 6543)
-- `DIRECT_URL`: Supabase Direct Session URL (port 5432)
-- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon public key
-- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role secret
-
-### 4. Database Migration & Seed
-```bash
-# Push schema to database
-npx prisma db push
-
-# Seed initial admin, clinicians, staff, fictional patients, and medicines
-npm run db:seed
-```
-
-### 5. Run Development Server
+### 5. Run
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-> **💡 Demo Mode**: When running without an active PostgreSQL instance, CliniQ operates in **Demo Mode**. You can log in using `admin@gmail.com` (Admin), `doctor@gmail.com` (Doctor), `staff@gmail.com` (Staff), or `raneldahil@gmail.com` (Patient) to explore the system with fictional sample data.
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend: [http://localhost:4000/api/health](http://localhost:4000/api/health)
 
 ---
 
-## 🛠️ Available Scripts
+## 🛠️ Scripts (run from the repository root)
 
-| Script | Command | Purpose |
-|---|---|---|
-| `npm run dev` | `next dev` | Start development server on port 3000 |
-| `npm run build` | `next build` | Create optimized production build |
-| `npm run start` | `next start` | Run production build |
-| `npm run lint` | `next lint` | Run ESLint strict checks |
-| `npm test` | `vitest run` | Execute entire Vitest unit & integration test suite |
-| `npm run format` | `prettier --write .` | Format all source files with Prettier |
-| `npm run db:seed` | `ts-node prisma/seed.ts` | Seed database with sample fictional data |
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Starts backend (`:4000`) and frontend (`:3000`) together |
+| `npm run build` | Builds the backend bundle and the frontend |
+| `npm test` | Runs unit + architecture tests in both workspaces |
+| `npm run lint` | Lints both workspaces (including layer-boundary rules) |
+| `npm run typecheck` | Type-checks both workspaces |
+| `npm run db:migrate -w backend` | Applies database migrations |
+| `npm run db:seed -w backend` | Seeds sample data |
 
 ---
 
 ## 🧩 How to Add a New Feature
 
-When adding a new feature (e.g., `laboratory`), follow the strict 6-layer convention:
+Example: a `laboratory` module.
 
-1. **Define Types & Zod Schemas**:
-   - Create `src/features/<feature>/types/<feature>.types.ts`
-   - Create `src/features/<feature>/validations/<feature>.schema.ts`
+**Backend** (`backend/src/modules/laboratory/`)
+1. `domain/`: pure rules and constants (no Prisma, no HTTP).
+2. `application/dto/laboratory.schema.ts` and `laboratory.types.ts`: Zod input schemas and response types.
+3. `infrastructure/persistence/repositories/laboratory.repository.ts`: Prisma queries only.
+4. `application/services/laboratory.service.ts`: use cases, ownership checks, `AppError` subclasses.
+5. `adapters/inbound/http/laboratory.controller.ts`: routes with `withApiHandler` + `requireAuth([...])`.
+6. `index.ts`: export the controller and anything other modules need, then register the controller in `bootstrap/register-modules.ts`.
+7. Re-export the DTOs the UI needs from `src/contracts/index.ts`.
 
-2. **Implement Repository (Prisma only)**:
-   - Create `src/features/<feature>/repositories/<feature>.repository.ts`
-   - Handle database queries, pagination, and relations.
+**Frontend** (`frontend/src/features/laboratory/`)
+1. `hooks/`: TanStack Query hooks calling `/api/laboratory`.
+2. `components/`: UI built from the shared `DataTable`, form fields and feedback states.
+3. A page under `src/app/(app)/laboratory/`.
 
-3. **Implement Service (Business Logic)**:
-   - Create `src/features/<feature>/services/<feature>.service.ts`
-   - Enforce business invariants, sequence generation, ownership checks, and throw `AppError` subclasses.
-
-4. **Create API Route Handlers**:
-   - Create `src/app/api/<feature>/route.ts` and `src/app/api/<feature>/[id]/route.ts`
-   - Wrap with `withApiHandler(...)` and protect with `await requireAuth([Role.ADMIN, ...])`.
-
-5. **Create TanStack Query Hooks**:
-   - Create `src/features/<feature>/hooks/use-<feature>.ts` for fetching and mutating data.
-
-6. **Build UI Components & Page**:
-   - Place components in `src/features/<feature>/components/` using shared UI components (`DataTable`, `FormField`, etc.).
-   - Create the page in `src/app/(app)/<feature>/page.tsx`.
-
-7. **Export via Public API**:
-   - Expose only necessary types, hooks, and components in `src/features/<feature>/index.ts`.
-
-8. **Write Unit Tests**:
-   - Add tests in `tests/<feature>-service.test.ts` covering validation, permissions, and edge cases.
+`npm test` will fail if a layer rule is broken.
 
 ---
 
-## 🚢 Deployment to Vercel
+## 🚢 Deployment
 
-1. **Push repository** to GitHub or GitLab.
-2. **Import project** into [Vercel](https://vercel.com).
-3. **Configure Environment Variables** in Vercel Project Settings matching `.env.example`.
-4. Set **Supabase Auth Redirect URLs** in Supabase Dashboard:
-   - Site URL: `https://your-domain.vercel.app`
-   - Redirect URL: `https://your-domain.vercel.app/api/auth/callback`
-5. Deploy!
+See [DEPLOYMENT.md](DEPLOYMENT.md).

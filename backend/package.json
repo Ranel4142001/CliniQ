@@ -1,0 +1,42 @@
+{
+  "name": "@cliniq/backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/main.ts",
+    "build": "esbuild src/main.ts --bundle --platform=node --target=node20 --packages=external --sourcemap --outfile=dist/main.js",
+    "start": "node --enable-source-maps dist/main.js",
+    "test": "vitest run",
+    "lint": "eslint src tests database --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx --env-file-if-exists=.env database/seeds/seed.ts"
+  },
+  "prisma": {
+    "schema": "database/schema.prisma",
+    "seed": "tsx database/seeds/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
+    "date-fns": "^4.4.0",
+    "date-fns-tz": "^3.2.0",
+    "zod": "^4.6.7",
+    "@hono/node-server": "^2.1.3",
+    "hono": "4.13.13"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "eslint": "^8",
+    "prisma": "^5.22.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.5",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "esbuild": "^0.28.0"
+  }
+}

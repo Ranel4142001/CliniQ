@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["@backend/*", "!@backend/contracts"],
+            "message": "The frontend may only import the backend's public API contract: @backend/contracts."
+          }
+        ]
+      }
+    ]
+  }
+}

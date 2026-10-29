@@ -1,0 +1,188 @@
+import type { ReportConfig } from "@/features/reports/types/report-config.types";
+import type {
+  AppointmentReportRow,
+  ConsultationReportRow,
+  InventoryReportRow,
+  MovementReportRow,
+  PrescriptionReportRow,
+} from "@backend/contracts";
+
+export const appointmentsReportConfig: ReportConfig<AppointmentReportRow> = {
+  key: "appointments",
+  title: "Appointments Report",
+  description: "Scheduled and completed appointments by date range and status",
+  supportsDateRange: true,
+  columns: [
+    { header: "Scheduled Date & Time", accessorKey: "scheduledAt" },
+    { header: "Patient Name", accessorKey: "patientName" },
+    { header: "Patient ID", accessorKey: "patientNo" },
+    { header: "Clinician", accessorKey: "clinicianName" },
+    { header: "Type", accessorKey: "type" },
+    { header: "Status", accessorKey: "status" },
+    { header: "Reason", accessorKey: "reason" },
+  ],
+  csvColumns: [
+    { header: "Scheduled At", key: "scheduledAt" },
+    { header: "Patient Name", key: "patientName" },
+    { header: "Patient ID", key: "patientNo" },
+    { header: "Clinician", key: "clinicianName" },
+    { header: "Type", key: "type" },
+    { header: "Status", key: "status" },
+    { header: "Reason", key: "reason" },
+  ],
+  pdfHeaders: ["Date & Time", "Patient", "ID", "Clinician", "Type", "Status"],
+  pdfRowMapper: (item) => [
+    item.scheduledAt,
+    item.patientName,
+    item.patientNo,
+    item.clinicianName,
+    item.type,
+    item.status,
+  ],
+};
+
+export const consultationsReportConfig: ReportConfig<ConsultationReportRow> = {
+  key: "consultations",
+  title: "Patient Visits Report",
+  description: "Completed clinical consultations, chief complaints, and diagnoses",
+  supportsDateRange: true,
+  columns: [
+    { header: "Date", accessorKey: "consultationDate" },
+    { header: "Patient Name", accessorKey: "patientName" },
+    { header: "Patient ID", accessorKey: "patientNo" },
+    { header: "Clinician", accessorKey: "clinicianName" },
+    { header: "Chief Complaint", accessorKey: "chiefComplaint" },
+    { header: "Diagnosis", accessorKey: "diagnosis" },
+    { header: "Completed Time", accessorKey: "completedAt" },
+  ],
+  csvColumns: [
+    { header: "Date", key: "consultationDate" },
+    { header: "Patient Name", key: "patientName" },
+    { header: "Patient ID", key: "patientNo" },
+    { header: "Clinician", key: "clinicianName" },
+    { header: "Chief Complaint", key: "chiefComplaint" },
+    { header: "Diagnosis", key: "diagnosis" },
+    { header: "Completed Time", key: "completedAt" },
+  ],
+  pdfHeaders: ["Date", "Patient", "ID", "Clinician", "Diagnosis", "Completed"],
+  pdfRowMapper: (item) => [
+    item.consultationDate,
+    item.patientName,
+    item.patientNo,
+    item.clinicianName,
+    item.diagnosis,
+    item.completedAt,
+  ],
+};
+
+export const inventoryReportConfig: ReportConfig<InventoryReportRow> = {
+  key: "inventory",
+  title: "Medicine Inventory Report",
+  description: "Active medication stock levels, reorder thresholds, and status",
+  supportsDateRange: false,
+  columns: [
+    { header: "Medicine Name", accessorKey: "name" },
+    { header: "Generic Name", accessorKey: "genericName" },
+    { header: "Form & Strength", cell: (item) => `${item.dosageForm} • ${item.strength}` },
+    { header: "Total Stock", cell: (item) => `${item.totalStock} ${item.unit}` },
+    { header: "Reorder Level", cell: (item) => `${item.reorderLevel} ${item.unit}` },
+    { header: "Status", accessorKey: "stockStatus" },
+  ],
+  csvColumns: [
+    { header: "Medicine Name", key: "name" },
+    { header: "Generic Name", key: "genericName" },
+    { header: "Dosage Form", key: "dosageForm" },
+    { header: "Strength", key: "strength" },
+    { header: "Total Stock", key: "totalStock" },
+    { header: "Unit", key: "unit" },
+    { header: "Reorder Level", key: "reorderLevel" },
+    { header: "Stock Status", key: "stockStatus" },
+  ],
+  pdfHeaders: ["Medicine", "Form", "Strength", "Stock", "Reorder", "Status"],
+  pdfRowMapper: (item) => [
+    item.name,
+    item.dosageForm,
+    item.strength,
+    `${item.totalStock} ${item.unit}`,
+    `${item.reorderLevel} ${item.unit}`,
+    item.stockStatus,
+  ],
+};
+
+export const movementsReportConfig: ReportConfig<MovementReportRow> = {
+  key: "movements",
+  title: "Stock Movements Report",
+  description: "Audit trail of all incoming batches, deductions, and adjustments",
+  supportsDateRange: true,
+  columns: [
+    { header: "Date & Time", accessorKey: "date" },
+    { header: "Medicine Name", accessorKey: "medicineName" },
+    { header: "Batch No", accessorKey: "batchNo" },
+    { header: "Movement Type", accessorKey: "type" },
+    { header: "Quantity", accessorKey: "quantity" },
+    { header: "Reason", accessorKey: "reason" },
+    { header: "Performed By", accessorKey: "performedBy" },
+  ],
+  csvColumns: [
+    { header: "Date", key: "date" },
+    { header: "Medicine", key: "medicineName" },
+    { header: "Batch No", key: "batchNo" },
+    { header: "Type", key: "type" },
+    { header: "Quantity", key: "quantity" },
+    { header: "Reason", key: "reason" },
+    { header: "Staff", key: "performedBy" },
+  ],
+  pdfHeaders: ["Date", "Medicine", "Batch", "Type", "Qty", "Staff"],
+  pdfRowMapper: (item) => [
+    item.date,
+    item.medicineName,
+    item.batchNo,
+    item.type,
+    String(item.quantity),
+    item.performedBy,
+  ],
+};
+
+export const prescriptionsReportConfig: ReportConfig<PrescriptionReportRow> = {
+  key: "prescriptions",
+  title: "Prescriptions Report",
+  description: "Digital prescriptions issued by clinicians and dispensed by staff",
+  supportsDateRange: true,
+  columns: [
+    { header: "Rx Number", accessorKey: "prescriptionNo" },
+    { header: "Issued Date", accessorKey: "issuedAt" },
+    { header: "Patient Name", accessorKey: "patientName" },
+    { header: "Patient ID", accessorKey: "patientNo" },
+    { header: "Clinician", accessorKey: "clinicianName" },
+    { header: "Status", accessorKey: "status" },
+    { header: "Medicines", cell: (item) => `${item.itemsCount} item(s)` },
+    { header: "Dispensed Date", accessorKey: "dispensedAt" },
+  ],
+  csvColumns: [
+    { header: "Rx Number", key: "prescriptionNo" },
+    { header: "Issued Date", key: "issuedAt" },
+    { header: "Patient Name", key: "patientName" },
+    { header: "Patient ID", key: "patientNo" },
+    { header: "Clinician", key: "clinicianName" },
+    { header: "Status", key: "status" },
+    { header: "Items Count", key: "itemsCount" },
+    { header: "Dispensed Date", key: "dispensedAt" },
+  ],
+  pdfHeaders: ["Rx Number", "Issued Date", "Patient", "Clinician", "Status", "Items"],
+  pdfRowMapper: (item) => [
+    item.prescriptionNo,
+    item.issuedAt,
+    item.patientName,
+    item.clinicianName,
+    item.status,
+    String(item.itemsCount),
+  ],
+};
+
+export const ALL_REPORT_CONFIGS = [
+  appointmentsReportConfig,
+  consultationsReportConfig,
+  inventoryReportConfig,
+  movementsReportConfig,
+  prescriptionsReportConfig,
+];

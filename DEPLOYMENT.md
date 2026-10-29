@@ -1,101 +1,95 @@
-# CliniQ Production Deployment Guide
+# CliniQ Deployment Guide
 
-This guide covers deployment instructions for **Vercel + Supabase (Recommended)**, **Docker / Self-Hosted VPS**, and **Railway / Render**.
+CliniQ runs as **two services**:
+
+| Service | What it is | Public? |
+| --- | --- | --- |
+| `frontend` | Next.js app. Serves pages and proxies `/api/*` to the backend | Yes (port 3000) |
+| `backend` | Node.js (Hono) API. Talks to PostgreSQL and Supabase | No, only the frontend should reach it |
+
+The frontend finds the backend through `BACKEND_URL`, which is read at runtime.
 
 ---
 
-## 🚀 Option 1: Vercel + Supabase Deployment (Recommended)
+## 1. Supabase setup (both options)
 
-### 1. Set Up Supabase Project
-1. Log in to [supabase.com](https://supabase.com) and create a new project.
-2. Note your database password.
-3. In Supabase Dashboard -> **Project Settings** -> **Database**:
-   - Copy the **Connection String (Transaction Pooler, port 6543)** -> this is your `DATABASE_URL`.
-   - Copy the **Connection String (Direct connection, port 5432)** -> this is your `DIRECT_URL`.
-4. In Supabase Dashboard -> **Project Settings** -> **API**:
-   - Copy **Project URL** -> `NEXT_PUBLIC_SUPABASE_URL`.
-   - Copy **Anon Key** -> `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-   - Copy **Service Role Key** -> `SUPABASE_SERVICE_ROLE_KEY`.
+1. Create a project at [supabase.com](https://supabase.com).
+2. **Project Settings → Database**
+   - Transaction pooler connection string (port 6543) → `DATABASE_URL`
+   - Direct connection string (port 5432) → `DIRECT_URL`
+3. **Project Settings → API**
+   - Project URL → `SUPABASE_URL` (backend) and `NEXT_PUBLIC_SUPABASE_URL` (frontend)
+   - Anon key → `SUPABASE_ANON_KEY` (backend) and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (frontend)
+   - Service role key → `SUPABASE_SERVICE_ROLE_KEY` (**backend only**)
 
-### 2. Push Schema & Seed Initial Admin
-From your local terminal connected to Supabase:
+### Create tables and seed
+
 ```bash
-# Push Prisma schema to live Supabase PostgreSQL
-DATABASE_URL="your-supabase-direct-url" npx prisma db push
-
-# (Optional) Seed standard clinic medicines and admin account
-DATABASE_URL="your-supabase-direct-url" npm run db:seed
+cp backend/.env.example backend/.env    # fill in the values above + SEED_* passwords
+npm install
+npm run db:migrate -w backend
+npm run db:seed -w backend
 ```
 
-### 3. Deploy to Vercel
-1. Push your code to GitHub.
-2. Go to [vercel.com](https://vercel.com) -> **Add New Project** -> Select your CliniQ repository.
-3. In **Environment Variables**, add:
-
-| Variable | Description | Example |
-|---|---|---|
-| `DATABASE_URL` | Supabase pooled connection string (port 6543) | `postgresql://postgres.[ref]:[pwd]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true` |
-| `DIRECT_URL` | Supabase direct connection string (port 5432) | `postgresql://postgres.[ref]:[pwd]@aws-0-[region].pooler.supabase.com:5432/postgres` |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase API URL | `https://[project-ref].supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key | `eyJhbGci...` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Private service role key | `eyJhbGci...` |
-| `NEXT_PUBLIC_APP_URL` | Your custom domain or Vercel URL | `https://cliniq.vercel.app` |
-
-4. Click **Deploy**. Vercel will run `npm run deploy:build` and deploy the application.
+> **Existing database created with `prisma db push`?** Mark the initial migration as already
+> applied before running `db:migrate`:
+> `npx prisma migrate resolve --applied 20261029000000_init` (run inside `backend/`).
 
 ---
 
-## 🐳 Option 2: Docker Container Deployment (Self-Hosted)
+## 2. Option A: Docker Compose (self-hosted)
 
-For running on an Ubuntu VPS, local clinic server, or cloud VM with Docker installed:
+Create a `.env` file next to `docker-compose.yml`:
 
 ```bash
-# 1. Clone repository
-git clone <your-repo-url> CliniQ
-cd CliniQ
+POSTGRES_PASSWORD="a-long-random-password"
+SUPABASE_URL="https://<project-ref>.supabase.co"
+SUPABASE_ANON_KEY="<anon key>"
+SUPABASE_SERVICE_ROLE_KEY="<service role key>"
+```
 
-# 2. Start Web & PostgreSQL containers in the background
+```bash
 docker compose up -d --build
-
-# 3. Check health and logs
 docker compose ps
-docker compose logs -f web
 ```
 
-The web application will be accessible at `http://<your-server-ip>:3000`.
+- The app is served at `http://<server>:3000`. Put it behind HTTPS (e.g. Caddy or nginx).
+- The backend is not published. Postgres is bound to `127.0.0.1` only.
+- Apply migrations and seed from the host against `127.0.0.1:5432`, as in step 1.
 
 ---
 
-## 🩺 System Health Monitoring
+## 3. Option B: Vercel (frontend) + container host (backend)
 
-CliniQ provides an unauthenticated `/api/health` endpoint for uptime probes:
+**Backend:** deploy `backend/Dockerfile` (build context = repository root) to any container host
+(Railway, Render, Fly.io, a VPS…) with the backend environment variables. Expose it over HTTPS.
+
+**Frontend on Vercel:**
+1. Import the repository and set **Root Directory** to `frontend`. `frontend/vercel.json` installs from the monorepo root.
+2. Environment variables: `BACKEND_URL` (the backend's HTTPS URL), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+3. Deploy.
+
+If the backend is publicly reachable, restrict it to the frontend where your host allows it (private networking or an IP allowlist).
+
+---
+
+## 🩺 Health checks
+
 ```bash
-curl http://localhost:3000/api/health
+curl http://localhost:4000/api/health      # backend directly
+curl http://localhost:3000/api/health      # through the frontend proxy
 ```
 
-Expected Response (`200 OK`):
-```json
-{
-  "status": "ok",
-  "timestamp": "2026-10-26T14:30:00.000Z",
-  "uptimeSeconds": 1245,
-  "environment": "production",
-  "database": {
-    "status": "healthy",
-    "latencyMs": 3
-  },
-  "memory": {
-    "rssMb": 85,
-    "heapUsedMb": 42
-  },
-  "responseTimeMs": 4
-}
-```
+`200 {"status":"ok","database":"healthy"}`, or `503` when the database is unreachable.
+No environment or process details are exposed.
 
 ---
 
-## 🔐 Default Admin Account (After Seeding)
+## 🔐 First admin account
 
-- **Email**: `admin@cliniq.local`
-- **Password**: `Admin@CliniQ2025!`
-- **Role**: `ADMIN`
+Created by the seed script:
+
+- **Email:** `SEED_ADMIN_EMAIL` (default `admin@cliniq.local`)
+- **Password:** the `SEED_ADMIN_PASSWORD` you set (no default is shipped)
+
+Sign in and change it, then create staff accounts from **Users**.
