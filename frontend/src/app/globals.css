@@ -74,3 +74,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ---------- Auth screens (sign in / register / onboarding) ---------- */
+@layer components {
+  /* Fine grid lines for the brand panel, fading out toward the edges. */
+  .auth-grid {
+    background-image:
+      linear-gradient(to right, hsl(0 0% 100% / 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(0 0% 100% / 0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at 30% 40%, black 30%, transparent 75%);
+  }
+
+  /* Subtle dot texture behind the form card; follows the theme in dark mode. */
+  .auth-dots {
+    background-image: radial-gradient(hsl(var(--foreground) / 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  }
+}
