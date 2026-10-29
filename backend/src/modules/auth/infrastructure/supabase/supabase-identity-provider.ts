@@ -24,7 +24,9 @@ export const supabaseIdentityProvider: IdentityProviderPort = {
 
   async signIn(email, password) {
     const { data, error } = await createClient().auth.signInWithPassword({ email, password });
-    return error || !data.user ? null : toIdentity(data.user);
+    if (error?.code === "email_not_confirmed") return { ok: false, reason: "email_not_confirmed" };
+    if (error || !data.user) return { ok: false, reason: "invalid_credentials" };
+    return { ok: true, identity: toIdentity(data.user) };
   },
 
   async signUp({ email, password, fullName }) {

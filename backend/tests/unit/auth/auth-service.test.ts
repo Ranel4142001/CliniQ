@@ -39,7 +39,7 @@ function setup(
   } satisfies ProfileRepositoryPort;
   const identityProvider = {
     getSessionIdentity: vi.fn().mockResolvedValue(null),
-    signIn: vi.fn().mockResolvedValue(null),
+    signIn: vi.fn().mockResolvedValue({ ok: false, reason: "invalid_credentials" }),
     signUp: vi.fn().mockResolvedValue(null),
     signOut: vi.fn().mockResolvedValue(undefined),
     createConfirmedUser: vi.fn().mockResolvedValue(null),
@@ -109,7 +109,12 @@ describe("Auth Service Business Rules", () => {
   it("signs the user out again if their profile cannot be used after login", async () => {
     const { service, identityProvider } = setup({
       identity: {
-        signIn: vi.fn().mockResolvedValue({ id: baseProfile.authId, email: baseProfile.email }),
+        signIn: vi
+          .fn()
+          .mockResolvedValue({
+            ok: true,
+            identity: { id: baseProfile.authId, email: baseProfile.email },
+          }),
       },
       repo: {
         findByAuthId: vi.fn().mockResolvedValue({ ...baseProfile, isActive: false, patient: null }),
@@ -119,5 +124,21 @@ describe("Auth Service Business Rules", () => {
       ForbiddenError
     );
     expect(identityProvider.signOut).toHaveBeenCalled();
+  });
+
+  it("tells the user to confirm their email instead of claiming the password is wrong", async () => {
+    const { service } = setup({
+      identity: { signIn: vi.fn().mockResolvedValue({ ok: false, reason: "email_not_confirmed" }) },
+    });
+    await expect(service.login({ email: baseProfile.email, password: "x" })).rejects.toThrow(
+      /confirm your email/
+    );
+  });
+
+  it("rejects wrong credentials with a generic message", async () => {
+    const { service } = setup();
+    await expect(service.login({ email: baseProfile.email, password: "x" })).rejects.toThrow(
+      "Invalid email or password"
+    );
   });
 });

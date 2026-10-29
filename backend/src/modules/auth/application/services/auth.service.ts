@@ -83,13 +83,19 @@ export function createAuthService({ authRepository, identityProvider }: AuthServ
     },
 
     async login({ email, password }: LoginInput): Promise<UserProfile> {
-      const identity = await identityProvider.signIn(email, password);
-      if (!identity) {
+      const result = await identityProvider.signIn(email, password);
+      if (!result.ok) {
+        // Supabase reports "not confirmed" only after the password checked out, so this reveals nothing to guessers.
+        if (result.reason === "email_not_confirmed") {
+          throw new ForbiddenError(
+            "Please confirm your email address first. Check your inbox (and spam folder) for the link."
+          );
+        }
         throw new UnauthorizedError("Invalid email or password");
       }
 
       try {
-        return await this.getOrCreateProfile(identity);
+        return await this.getOrCreateProfile(result.identity);
       } catch (err) {
         await identityProvider.signOut();
         throw err;
