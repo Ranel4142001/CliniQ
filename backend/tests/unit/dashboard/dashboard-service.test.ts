@@ -8,11 +8,8 @@ const notImplemented = () => Promise.reject(new Error("not stubbed in this test"
 const dashboardRepository: DashboardQueryPort = {
   getTodayAppointments: notImplemented,
   getPendingAppointments: notImplemented,
-  countAppointmentsToday: notImplemented,
-  countPendingAppointments: notImplemented,
-  countTotalPatients: notImplemented,
+  getStaffCounts: notImplemented,
   getMedicinesWithBatches: notImplemented,
-  countExpiringBatches: notImplemented,
   getPatientByProfileId: notImplemented,
   getPatientUpcomingAppointments: notImplemented,
   countPatientUpcomingAppointments: notImplemented,
@@ -96,11 +93,13 @@ describe("DashboardService", () => {
 
   it("returns admin/staff dashboard metrics for ADMIN role", async () => {
     vi.spyOn(dashboardRepository, "getTodayAppointments").mockResolvedValue([]);
-    vi.spyOn(dashboardRepository, "countAppointmentsToday").mockResolvedValue(5);
     vi.spyOn(dashboardRepository, "getPendingAppointments").mockResolvedValue([]);
-    vi.spyOn(dashboardRepository, "countPendingAppointments").mockResolvedValue(2);
-    vi.spyOn(dashboardRepository, "countTotalPatients").mockResolvedValue(45);
-    vi.spyOn(dashboardRepository, "countExpiringBatches").mockResolvedValue(3);
+    vi.spyOn(dashboardRepository, "getStaffCounts").mockResolvedValue({
+      todayAppointments: 5,
+      pendingAppointments: 2,
+      activePatients: 45,
+      expiringBatches: 3,
+    });
     vi.spyOn(dashboardRepository, "getMedicinesWithBatches").mockResolvedValue([
       {
         id: "med-1",
@@ -133,16 +132,19 @@ describe("DashboardService", () => {
     };
 
     const getTodaySpy = vi.spyOn(dashboardRepository, "getTodayAppointments").mockResolvedValue([]);
-    vi.spyOn(dashboardRepository, "countAppointmentsToday").mockResolvedValue(2);
     vi.spyOn(dashboardRepository, "getPendingAppointments").mockResolvedValue([]);
-    vi.spyOn(dashboardRepository, "countPendingAppointments").mockResolvedValue(0);
-    vi.spyOn(dashboardRepository, "countTotalPatients").mockResolvedValue(45);
     vi.spyOn(dashboardRepository, "getMedicinesWithBatches").mockResolvedValue([]);
-    vi.spyOn(dashboardRepository, "countExpiringBatches").mockResolvedValue(0);
+    const countsSpy = vi.spyOn(dashboardRepository, "getStaffCounts").mockResolvedValue({
+      todayAppointments: 2,
+      pendingAppointments: 0,
+      activePatients: 45,
+      expiringBatches: 0,
+    });
 
     const result = await service.getDashboardData(mockClinicianUser);
 
     expect(result.role).toBe("CLINICIAN");
     expect(getTodaySpy).toHaveBeenCalledWith(expect.any(Date), expect.any(Date), "doc-1");
+    expect(countsSpy).toHaveBeenCalledWith(expect.objectContaining({ clinicianId: "doc-1" }));
   });
 });

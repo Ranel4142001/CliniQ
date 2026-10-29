@@ -19,19 +19,29 @@ export type PatientRecentPrescription = Prescription & {
   items: PrescriptionItem[];
 };
 
+export interface StaffDashboardCounts {
+  todayAppointments: number;
+  pendingAppointments: number;
+  activePatients: number;
+  expiringBatches: number;
+}
+
 /** Read-only queries behind the role-specific dashboards. */
 export interface DashboardQueryPort {
+  /** All staff-dashboard counters in a single database round trip. */
+  getStaffCounts(params: {
+    todayStart: Date;
+    todayEnd: Date;
+    expiringUntil: Date;
+    clinicianId?: string;
+  }): Promise<StaffDashboardCounts>;
   getTodayAppointments(
     todayStart: Date,
     todayEnd: Date,
     clinicianId?: string
   ): Promise<DashboardAppointment[]>;
   getPendingAppointments(clinicianId?: string): Promise<DashboardAppointment[]>;
-  countAppointmentsToday(todayStart: Date, todayEnd: Date, clinicianId?: string): Promise<number>;
-  countPendingAppointments(clinicianId?: string): Promise<number>;
-  countTotalPatients(): Promise<number>;
   getMedicinesWithBatches(): Promise<(Medicine & { batches: MedicineBatch[] })[]>;
-  countExpiringBatches(startDate: Date, endDate: Date): Promise<number>;
   getPatientByProfileId(profileId: string): Promise<Patient | null>;
   getPatientUpcomingAppointments(
     patientId: string,

@@ -3,6 +3,30 @@ import type { DashboardQueryPort } from "@backend/modules/dashboard/application/
 import type { Prisma } from "@prisma/client";
 
 export const dashboardRepository = {
+  async getStaffCounts({ todayStart, todayEnd, expiringUntil, clinicianId }) {
+    const clinician = clinicianId ?? null;
+    const [row] = await prisma.$queryRaw<
+      { today: bigint; pending: bigint; patients: bigint; expiring: bigint }[]
+    >`
+      SELECT
+        (SELECT count(*) FROM "Appointment"
+          WHERE "scheduledAt" BETWEEN ${todayStart} AND ${todayEnd}
+            AND (${clinician}::text IS NULL OR "clinicianId" = ${clinician})) AS today,
+        (SELECT count(*) FROM "Appointment"
+          WHERE status = 'PENDING'::"AppointmentStatus"
+            AND (${clinician}::text IS NULL OR "clinicianId" = ${clinician})) AS pending,
+        (SELECT count(*) FROM "Patient" WHERE "isArchived" = false) AS patients,
+        (SELECT count(*) FROM "MedicineBatch"
+          WHERE quantity > 0 AND "expiryDate" > ${todayStart} AND "expiryDate" <= ${expiringUntil}) AS expiring
+    `;
+    return {
+      todayAppointments: Number(row.today),
+      pendingAppointments: Number(row.pending),
+      activePatients: Number(row.patients),
+      expiringBatches: Number(row.expiring),
+    };
+  },
+
   async getTodayAppointments(todayStart: Date, todayEnd: Date, clinicianId?: string) {
     const where: Prisma.AppointmentWhereInput = {
       scheduledAt: { gte: todayStart, lte: todayEnd },
@@ -35,42 +59,11 @@ export const dashboardRepository = {
     });
   },
 
-  async countAppointmentsToday(todayStart: Date, todayEnd: Date, clinicianId?: string) {
-    return prisma.appointment.count({
-      where: {
-        scheduledAt: { gte: todayStart, lte: todayEnd },
-        ...(clinicianId ? { clinicianId } : {}),
-      },
-    });
-  },
-
-  async countPendingAppointments(clinicianId?: string) {
-    return prisma.appointment.count({
-      where: {
-        status: "PENDING",
-        ...(clinicianId ? { clinicianId } : {}),
-      },
-    });
-  },
-
-  async countTotalPatients() {
-    return prisma.patient.count({ where: { isArchived: false } });
-  },
-
   async getMedicinesWithBatches() {
     return prisma.medicine.findMany({
       where: { isArchived: false },
       include: { batches: true },
       orderBy: { name: "asc" },
-    });
-  },
-
-  async countExpiringBatches(startDate: Date, endDate: Date) {
-    return prisma.medicineBatch.count({
-      where: {
-        quantity: { gt: 0 },
-        expiryDate: { gt: startDate, lte: endDate },
-      },
     });
   },
 

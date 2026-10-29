@@ -88,33 +88,27 @@ export class DashboardService {
     const expiringLimit = new Date(todayStart);
     expiringLimit.setDate(expiringLimit.getDate() + MEDICINE_CONFIG.EXPIRING_SOON_DAYS);
 
-    const [
-      todayAppts,
-      todayCount,
-      pendingAppts,
-      pendingCount,
-      totalPatients,
-      medicines,
-      expiringCount,
-    ] = await Promise.all([
+    const [todayAppts, pendingAppts, medicines, counts] = await Promise.all([
       this.deps.dashboardRepository.getTodayAppointments(todayStart, todayEnd, clinicianId),
-      this.deps.dashboardRepository.countAppointmentsToday(todayStart, todayEnd, clinicianId),
       this.deps.dashboardRepository.getPendingAppointments(clinicianId),
-      this.deps.dashboardRepository.countPendingAppointments(clinicianId),
-      this.deps.dashboardRepository.countTotalPatients(),
       this.deps.dashboardRepository.getMedicinesWithBatches(),
-      this.deps.dashboardRepository.countExpiringBatches(todayStart, expiringLimit),
+      this.deps.dashboardRepository.getStaffCounts({
+        todayStart,
+        todayEnd,
+        expiringUntil: expiringLimit,
+        clinicianId,
+      }),
     ]);
 
     const { lowStockMedicines, lowStockCount } = this.processLowStockMedicines(medicines);
 
     return {
       stats: {
-        todayAppointmentsCount: todayCount,
-        pendingAppointmentsCount: pendingCount,
+        todayAppointmentsCount: counts.todayAppointments,
+        pendingAppointmentsCount: counts.pendingAppointments,
         lowStockCount,
-        expiringCount,
-        totalPatientsCount: totalPatients,
+        expiringCount: counts.expiringBatches,
+        totalPatientsCount: counts.activePatients,
       },
       todayAppointments: todayAppts,
       pendingAppointments: pendingAppts,

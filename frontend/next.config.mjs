@@ -29,6 +29,8 @@ const nextConfig = {
 
   // Standalone output for the Docker image
   output: process.env.STANDALONE === "true" ? "standalone" : undefined,
+  // Separate build folder (e.g. for a production build alongside a running `next dev`)
+  distDir: process.env.NEXT_DIST_DIR || ".next",
 
   // Monorepo root, so standalone output traces hoisted workspace dependencies
   outputFileTracingRoot: path.join(__dirname, ".."),

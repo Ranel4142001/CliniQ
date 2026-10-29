@@ -36,10 +36,11 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Refreshes the session cookie; must run on every matched request.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Refreshes an expired session cookie, then verifies the token signature locally
+  // against Supabase's cached public keys: no network round trip per page load.
+  // This only decides redirects; the backend re-verifies on every API call.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims.sub ? data.claims : null;
 
   const { pathname } = request.nextUrl;
 
