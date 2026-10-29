@@ -18,8 +18,15 @@ function toIdentity(user: User): AuthIdentity {
 /** Supabase Auth implementation of the identity provider port. Sessions live in request cookies. */
 export const supabaseIdentityProvider: IdentityProviderPort = {
   async getSessionIdentity() {
-    const { data } = await createClient().auth.getUser();
-    return data.user ? toIdentity(data.user) : null;
+    // getClaims() refreshes an expired session, then verifies the access token's signature
+    // locally against the project's cached public keys (ES256): no network round trip per request.
+    // Trade-off: a session revoked elsewhere stays valid until the token expires (≤1 hour);
+    // deactivated accounts are still blocked immediately by the profile's isActive check.
+    const { data, error } = await createClient().auth.getClaims();
+    if (error || !data?.claims.sub) return null;
+    const { sub, email, user_metadata: metadata } = data.claims;
+    const fullName = metadata?.full_name;
+    return { id: sub, email, fullName: typeof fullName === "string" ? fullName : null };
   },
 
   async signIn(email, password) {

@@ -109,12 +109,10 @@ describe("Auth Service Business Rules", () => {
   it("signs the user out again if their profile cannot be used after login", async () => {
     const { service, identityProvider } = setup({
       identity: {
-        signIn: vi
-          .fn()
-          .mockResolvedValue({
-            ok: true,
-            identity: { id: baseProfile.authId, email: baseProfile.email },
-          }),
+        signIn: vi.fn().mockResolvedValue({
+          ok: true,
+          identity: { id: baseProfile.authId, email: baseProfile.email },
+        }),
       },
       repo: {
         findByAuthId: vi.fn().mockResolvedValue({ ...baseProfile, isActive: false, patient: null }),

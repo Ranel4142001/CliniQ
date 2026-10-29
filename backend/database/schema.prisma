@@ -1,5 +1,8 @@
 generator client {
   provider = "prisma-client-js"
+  // Load `include`/`select` relations with SQL joins in one query instead of one
+  // follow-up query per relation: every round trip to the database costs real latency.
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
