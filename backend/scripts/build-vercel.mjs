@@ -16,7 +16,7 @@ await build({
   entryPoints: ["src/vercel.ts"],
   bundle: true,
   platform: "node",
-  target: "node20",
+  target: "node22",
   format: "cjs",
   sourcemap: "inline",
   // Prisma ships a native query engine, so it is copied next to the bundle instead of bundled.
@@ -33,7 +33,7 @@ writeFileSync(
   join(FUNC, ".vc-config.json"),
   JSON.stringify(
     {
-      runtime: "nodejs20.x",
+      runtime: "nodejs22.x",
       handler: "index.js",
       launcherType: "Nodejs",
       shouldAddHelpers: false,
