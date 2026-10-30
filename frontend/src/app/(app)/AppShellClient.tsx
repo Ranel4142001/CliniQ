@@ -1,28 +1,32 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/layout/AppShell";
+import { LoadingState } from "@/components/feedback/LoadingState";
+import { ErrorState } from "@/components/feedback/ErrorState";
 import { notify } from "@/lib/notify";
-import { apiClient } from "@/lib/api-client";
+import { ApiError, apiClient } from "@/lib/api-client";
 import { ROUTES } from "@/constants/routes";
-import { Role } from "@backend/contracts";
+import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 
-interface AppShellClientProps {
-  children: ReactNode;
-  user: {
-    fullName: string;
-    email: string;
-    role: Role;
-  };
-}
+const SESSION_ENDED_STATUSES = new Set([401, 403]);
 
 /**
- * Client boundary for the app shell.
- * Handles logout (calls API then redirects to /login).
+ * Client boundary for the app shell: loads the signed-in user (cached by React Query,
+ * so later page changes are instant) and handles logout.
  */
-export function AppShellClient({ children, user }: AppShellClientProps) {
+export function AppShellClient({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { user, isLoading, error, refetch } = useCurrentUser();
+
+  // Expired session or deactivated account: back to sign in.
+  const sessionEnded = error instanceof ApiError && SESSION_ENDED_STATUSES.has(error.status);
+  useEffect(() => {
+    if (sessionEnded) router.replace(ROUTES.LOGIN);
+  }, [sessionEnded, router]);
 
   const handleLogout = async () => {
     try {
@@ -31,12 +35,33 @@ export function AppShellClient({ children, user }: AppShellClientProps) {
     } catch {
       // ignore errors – still redirect
     }
+    // Drop every cached response so the next person on this browser sees nothing of this session.
+    queryClient.clear();
     router.push(ROUTES.LOGIN);
     router.refresh();
   };
 
+  if (error && !sessionEnded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <ErrorState
+          title="CliniQ is temporarily unavailable"
+          message="We couldn't load your account. Please try again in a moment."
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (isLoading || sessionEnded || !user) {
+    return <LoadingState message="Loading CliniQ…" className="min-h-screen" />;
+  }
+
   return (
-    <AppShell user={user} onLogout={handleLogout}>
+    <AppShell
+      user={{ fullName: user.fullName, email: user.email, role: user.role }}
+      onLogout={handleLogout}
+    >
       {children}
     </AppShell>
   );

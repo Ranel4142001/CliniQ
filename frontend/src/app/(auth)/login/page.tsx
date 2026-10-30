@@ -47,9 +47,7 @@ function LoginForm() {
     <>
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Sign in to CliniQ</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Enter your credentials to continue
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Enter your credentials to continue</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -62,9 +60,7 @@ function LoginForm() {
             placeholder="you@example.com"
             {...register("email")}
           />
-          {errors.email && (
-            <p className="text-xs text-destructive">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-1.5">
@@ -81,19 +77,13 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          {errors.password && (
-            <p className="text-xs text-destructive">{errors.password.message}</p>
-          )}
+          {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
@@ -103,14 +93,10 @@ function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
-        <Link
-          href={ROUTES.REGISTER}
-          className="font-medium text-primary hover:underline"
-        >
+        <Link href={ROUTES.REGISTER} className="font-medium text-primary hover:underline">
           Create account
         </Link>
       </p>
-
     </>
   );
 }

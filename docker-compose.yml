@@ -8,12 +8,11 @@ services:
       args:
         NEXT_PUBLIC_SUPABASE_URL: ${SUPABASE_URL:?SUPABASE_URL is required}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:?SUPABASE_ANON_KEY is required}
+        BACKEND_URL: http://backend:4000
     container_name: cliniq-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      - BACKEND_URL=http://backend:4000
     depends_on:
       backend:
         condition: service_healthy

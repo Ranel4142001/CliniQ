@@ -3,10 +3,13 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV !== "production";
+// The backend API, reached through a same-origin rewrite so cookies stay first-party and no CORS is needed.
+// Read at build time: changing it requires a rebuild/redeploy.
+const backendUrl = (process.env.BACKEND_URL ?? "http://localhost:4000").replace(/\/+$/, "");
 
 // 'unsafe-inline' scripts are required by Next.js App Router hydration without nonces;
 // 'wasm-unsafe-eval' is required by @react-pdf/renderer's layout engine.
-// The browser only talks to this origin: /api/* is proxied to the backend server-side.
+// The browser only talks to this origin: /api/* is rewritten to the backend.
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""}`,
@@ -40,6 +43,11 @@ const nextConfig = {
     // Compile the shared API contract from ../backend/src/contracts
     externalDir: true,
   },
+
+  // Forward /api/* to the backend at the platform's routing layer (on Vercel: no extra function hop).
+  rewrites: async () => ({
+    beforeFiles: [{ source: "/api/:path*", destination: `${backendUrl}/api/:path*` }],
+  }),
 
   images: {
     formats: ["image/avif", "image/webp"],

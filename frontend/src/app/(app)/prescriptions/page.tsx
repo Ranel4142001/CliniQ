@@ -45,10 +45,16 @@ export default function PrescriptionsPage() {
   const issueMutation = useIssuePrescription(selectedRx?.id || "");
   const dispenseMutation = useDispensePrescription(selectedRx?.id || "");
 
-  const handleOpenAction = (rx: PrescriptionWithRelations, action: "view" | "edit" | "issue" | "dispense" | "void") => {
+  const handleOpenAction = (
+    rx: PrescriptionWithRelations,
+    action: "view" | "edit" | "issue" | "dispense" | "void"
+  ) => {
     setSelectedRx(rx);
     if (action === "view") setIsDetailOpen(true);
-    if (action === "edit") { setFormConsultationId(undefined); setIsFormOpen(true); }
+    if (action === "edit") {
+      setFormConsultationId(undefined);
+      setIsFormOpen(true);
+    }
     if (action === "issue") issueMutation.mutate();
     if (action === "dispense") dispenseMutation.mutate();
     if (action === "void") setIsVoidOpen(true);
@@ -81,7 +87,10 @@ export default function PrescriptionsPage() {
         error={error as Error}
         onRetry={refetch}
         search={search}
-        onSearchChange={(val) => { setSearch(val); setPage(1); }}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
         onView={(rx) => handleOpenAction(rx, "view")}
         onEdit={(rx) => handleOpenAction(rx, "edit")}
         onIssue={(rx) => handleOpenAction(rx, "issue")}
@@ -110,8 +119,14 @@ export default function PrescriptionsPage() {
         open={isDetailOpen}
         onOpenChange={setIsDetailOpen}
         prescription={selectedRx}
-        onEdit={(rx) => { setIsDetailOpen(false); handleOpenAction(rx, "edit"); }}
-        onVoidClick={(rx) => { setIsDetailOpen(false); handleOpenAction(rx, "void"); }}
+        onEdit={(rx) => {
+          setIsDetailOpen(false);
+          handleOpenAction(rx, "edit");
+        }}
+        onVoidClick={(rx) => {
+          setIsDetailOpen(false);
+          handleOpenAction(rx, "void");
+        }}
       />
 
       {selectedRx && (

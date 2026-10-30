@@ -1,19 +1,10 @@
-import Link from "next/link";
-import { Stethoscope, CheckCircle2, LogIn, UserPlus, LayoutDashboard } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/constants/routes";
-import { getCurrentUser } from "@/lib/server-api";
+import { Stethoscope, CheckCircle2 } from "lucide-react";
+import { LandingActions } from "@/app/LandingActions";
 
-export default async function Home() {
-  // The landing page must render even if the API is briefly unavailable.
-  const isLoggedIn = await getCurrentUser().then(
-    (user) => user !== null,
-    () => false
-  );
-
+export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12 text-center sm:px-6 lg:px-8">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg mb-6">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
         <Stethoscope className="h-8 w-8" />
       </div>
 
@@ -24,48 +15,32 @@ export default async function Home() {
         Modern Clinic Management System designed for community and institutional healthcare.
       </p>
 
-      <div className="mt-8 flex flex-col sm:flex-row gap-3">
-        {isLoggedIn ? (
-          <Button asChild size="lg" className="gap-2">
-            <Link href={ROUTES.DASHBOARD}>
-              <LayoutDashboard className="h-4 w-4" />
-              Go to Dashboard
-            </Link>
-          </Button>
-        ) : (
-          <>
-            <Button asChild size="lg" className="gap-2">
-              <Link href={ROUTES.LOGIN}>
-                <LogIn className="h-4 w-4" />
-                Sign In to CliniQ
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="gap-2">
-              <Link href={ROUTES.REGISTER}>
-                <UserPlus className="h-4 w-4" />
-                Register as Patient
-              </Link>
-            </Button>
-          </>
-        )}
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <LandingActions />
       </div>
 
-      <div className="mt-12 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-2 text-left">
+      <div className="mt-12 grid max-w-xl grid-cols-1 gap-3 text-left sm:grid-cols-2">
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
-          <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="text-muted-foreground">Comprehensive patient records & consultation history</span>
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <span className="text-muted-foreground">
+            Comprehensive patient records & consultation history
+          </span>
         </div>
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
-          <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <span className="text-muted-foreground">In-person & online appointment scheduling</span>
         </div>
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
-          <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="text-muted-foreground">FEFO medicine stock tracking & reorder alerts</span>
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <span className="text-muted-foreground">
+            FEFO medicine stock tracking & reorder alerts
+          </span>
         </div>
         <div className="flex items-start gap-2.5 rounded-lg border bg-card p-3 text-sm">
-          <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <span className="text-muted-foreground">Role-based security for doctors, staff & patients</span>
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <span className="text-muted-foreground">
+            Role-based security for doctors, staff & patients
+          </span>
         </div>
       </div>
     </div>

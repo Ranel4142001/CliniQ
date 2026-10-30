@@ -35,11 +35,20 @@ export default function MedicinesPage() {
   const { data: alerts } = useMedicineAlerts();
   const updateMutation = useUpdateMedicine(selectedMed?.id || "");
 
-  const handleOpenAction = (med: MedicineWithStock, action: "in" | "out" | "adj" | "history" | "edit" | "archive") => {
+  const handleOpenAction = (
+    med: MedicineWithStock,
+    action: "in" | "out" | "adj" | "history" | "edit" | "archive"
+  ) => {
     setSelectedMed(med);
     if (action === "in") setIsBatchOpen(true);
-    if (action === "out") { setMovementType("STOCK_OUT"); setIsMovementOpen(true); }
-    if (action === "adj") { setMovementType("ADJUSTMENT"); setIsMovementOpen(true); }
+    if (action === "out") {
+      setMovementType("STOCK_OUT");
+      setIsMovementOpen(true);
+    }
+    if (action === "adj") {
+      setMovementType("ADJUSTMENT");
+      setIsMovementOpen(true);
+    }
     if (action === "history") setIsHistoryOpen(true);
     if (action === "edit") setIsFormOpen(true);
     if (action === "archive") setIsArchiveOpen(true);
@@ -52,7 +61,12 @@ export default function MedicinesPage() {
         description="Catalog management, FEFO dispensing, batch tracking, and stock movements"
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Medicines" }]}
         actions={
-          <Button onClick={() => { setSelectedMed(null); setIsFormOpen(true); }}>
+          <Button
+            onClick={() => {
+              setSelectedMed(null);
+              setIsFormOpen(true);
+            }}
+          >
             <Plus className="mr-2 h-4 w-4" /> Add Medicine
           </Button>
         }
@@ -65,12 +79,18 @@ export default function MedicinesPage() {
         expiredCount={alerts?.expired?.length ?? 0}
       />
 
-      {alerts && (alerts.lowStock.length > 0 || alerts.expiringSoon.length > 0 || alerts.expired.length > 0) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <LowStockPanel medicines={alerts.lowStock} onStockIn={(m) => handleOpenAction(m, "in")} />
-          <ExpiringPanel expiringSoon={alerts.expiringSoon} expired={alerts.expired} />
-        </div>
-      )}
+      {alerts &&
+        (alerts.lowStock.length > 0 ||
+          alerts.expiringSoon.length > 0 ||
+          alerts.expired.length > 0) && (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <LowStockPanel
+              medicines={alerts.lowStock}
+              onStockIn={(m) => handleOpenAction(m, "in")}
+            />
+            <ExpiringPanel expiringSoon={alerts.expiringSoon} expired={alerts.expired} />
+          </div>
+        )}
 
       <MedicineTable
         medicines={data?.items}
@@ -78,7 +98,10 @@ export default function MedicinesPage() {
         error={error as Error}
         onRetry={refetch}
         search={search}
-        onSearchChange={(val) => { setSearch(val); setPage(1); }}
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
         onStockIn={(m) => handleOpenAction(m, "in")}
         onStockOut={(m) => handleOpenAction(m, "out")}
         onAdjust={(m) => handleOpenAction(m, "adj")}

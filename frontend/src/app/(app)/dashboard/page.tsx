@@ -7,10 +7,7 @@ import { ErrorState } from "@/components/feedback/ErrorState";
 import { useDashboard } from "@/features/dashboard/hooks/use-dashboard";
 import { AdminStaffDashboard } from "@/features/dashboard/components/AdminStaffDashboard";
 import { PatientDashboard } from "@/features/dashboard/components/PatientDashboard";
-import type {
-  AdminStaffDashboardData,
-  PatientDashboardData,
-} from "@backend/contracts";
+import type { AdminStaffDashboardData, PatientDashboardData } from "@backend/contracts";
 
 export default function DashboardPage() {
   const { data, isLoading, error, refetch } = useDashboard();

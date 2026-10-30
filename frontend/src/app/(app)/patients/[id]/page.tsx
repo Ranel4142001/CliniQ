@@ -4,12 +4,7 @@ import React, { use, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   usePatient,
   useUpdatePatient,
@@ -77,11 +72,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
         ]}
       />
 
-      <PatientProfileCard
-        patient={patient}
-        canEdit={canEdit}
-        onEdit={() => setIsEditOpen(true)}
-      />
+      <PatientProfileCard patient={patient} canEdit={canEdit} onEdit={() => setIsEditOpen(true)} />
 
       <div className="space-y-3 pt-2">
         <h3 className="text-base font-semibold text-foreground">Clinical History</h3>
@@ -89,7 +80,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
       </div>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Patient Record</DialogTitle>
           </DialogHeader>

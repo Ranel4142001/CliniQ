@@ -4,12 +4,7 @@ import React, { useState } from "react";
 import { UserPlus } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   usePatients,
   useCreatePatient,
@@ -30,12 +25,7 @@ export default function PatientsPage() {
 
   const debouncedSearch = useDebounce(search, 300);
 
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-  } = usePatients({
+  const { data, isLoading, error, refetch } = usePatients({
     page,
     pageSize: 10,
     search: debouncedSearch,
@@ -87,7 +77,7 @@ export default function PatientsPage() {
       />
 
       <Dialog open={isRegisterOpen} onOpenChange={setIsRegisterOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Register New Patient</DialogTitle>
           </DialogHeader>

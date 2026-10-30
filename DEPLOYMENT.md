@@ -7,7 +7,7 @@ CliniQ runs as **two services**:
 | `frontend` | Next.js app. Serves pages and proxies `/api/*` to the backend | Yes (port 3000) |
 | `backend` | Node.js (Hono) API. Talks to PostgreSQL and Supabase | No, only the frontend should reach it |
 
-The frontend finds the backend through `BACKEND_URL`, which is read at runtime.
+The frontend forwards `/api/*` to the backend through `BACKEND_URL`. It is read at **build** time, so redeploy the frontend after changing it.
 
 ---
 

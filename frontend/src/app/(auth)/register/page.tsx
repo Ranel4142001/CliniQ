@@ -39,7 +39,8 @@ export default function RegisterPage() {
       router.refresh();
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 400 && err.details) {
-        const fieldErrors = (err.details as { fieldErrors?: Record<string, string[]> })?.fieldErrors;
+        const fieldErrors = (err.details as { fieldErrors?: Record<string, string[]> })
+          ?.fieldErrors;
         if (fieldErrors) {
           const firstErr = Object.values(fieldErrors).flat()[0];
           if (firstErr) {
@@ -48,8 +49,7 @@ export default function RegisterPage() {
           }
         }
       }
-      const msg =
-        err instanceof Error ? err.message : "Registration failed. Please try again.";
+      const msg = err instanceof Error ? err.message : "Registration failed. Please try again.";
       notify.error(msg);
     }
   };
@@ -74,9 +74,7 @@ export default function RegisterPage() {
             placeholder="Juan dela Cruz"
             {...register("fullName")}
           />
-          {errors.fullName && (
-            <p className="text-xs text-destructive">{errors.fullName.message}</p>
-          )}
+          {errors.fullName && <p className="text-xs text-destructive">{errors.fullName.message}</p>}
         </div>
 
         {/* Email */}
@@ -89,9 +87,7 @@ export default function RegisterPage() {
             placeholder="you@example.com"
             {...register("email")}
           />
-          {errors.email && (
-            <p className="text-xs text-destructive">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
         </div>
 
         {/* Password */}
@@ -109,20 +105,18 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
           {errors.password ? (
             <p className="text-xs text-destructive">{errors.password.message}</p>
           ) : (
-            <p className="text-[11px] text-muted-foreground">Minimum 8 characters with at least 1 uppercase letter and 1 number.</p>
+            <p className="text-[11px] text-muted-foreground">
+              Minimum 8 characters with at least 1 uppercase letter and 1 number.
+            </p>
           )}
         </div>
 
@@ -141,20 +135,14 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowConfirmPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
               aria-label={showConfirmPassword ? "Hide password" : "Show password"}
             >
-              {showConfirmPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-xs text-destructive">
-              {errors.confirmPassword.message}
-            </p>
+            <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
           )}
         </div>
 

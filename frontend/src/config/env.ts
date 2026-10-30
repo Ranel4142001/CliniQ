@@ -5,12 +5,7 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, "NEXT_PUBLIC_SUPABASE_ANON_KEY is required"),
 });
 
-const serverEnvSchema = z.object({
-  BACKEND_URL: z.string().url("BACKEND_URL must be a valid URL").default("http://localhost:4000"),
-});
-
 export type PublicEnv = z.infer<typeof publicEnvSchema>;
-export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
 function parseEnv<T extends z.ZodTypeAny>(
   schema: T,
@@ -28,7 +23,6 @@ function parseEnv<T extends z.ZodTypeAny>(
 }
 
 let cachedPublicEnv: PublicEnv | undefined;
-let cachedServerEnv: ServerEnv | undefined;
 
 /** Browser-safe configuration. Variables are referenced literally so Next.js can inline them. */
 export function getPublicEnv(): PublicEnv {
@@ -37,10 +31,4 @@ export function getPublicEnv(): PublicEnv {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   });
   return cachedPublicEnv;
-}
-
-/** Server-only configuration (route handlers, server components). */
-export function getServerEnv(): ServerEnv {
-  cachedServerEnv ??= parseEnv(serverEnvSchema, { BACKEND_URL: process.env.BACKEND_URL });
-  return cachedServerEnv;
 }

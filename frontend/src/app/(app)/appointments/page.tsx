@@ -4,12 +4,7 @@ import React, { useState } from "react";
 import { Plus, List, Calendar as CalendarIcon } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   useAppointments,
   useBookAppointment,
@@ -85,7 +80,7 @@ export default function AppointmentsPage() {
                 variant={viewMode === "table" ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("table")}
-                className="h-9 px-2.5 text-xs gap-1.5 lg:h-7"
+                className="h-9 gap-1.5 px-2.5 text-xs lg:h-7"
               >
                 <List className="h-3.5 w-3.5" /> Table
               </Button>
@@ -93,7 +88,7 @@ export default function AppointmentsPage() {
                 variant={viewMode === "calendar" ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("calendar")}
-                className="h-9 px-2.5 text-xs gap-1.5 lg:h-7"
+                className="h-9 gap-1.5 px-2.5 text-xs lg:h-7"
               >
                 <CalendarIcon className="h-3.5 w-3.5" /> Calendar
               </Button>
@@ -105,7 +100,7 @@ export default function AppointmentsPage() {
         }
       />
 
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="flex flex-wrap items-center gap-1.5">
         {[
           { label: "All Statuses", value: undefined },
           { label: "Pending", value: "PENDING" },
@@ -117,7 +112,7 @@ export default function AppointmentsPage() {
             key={item.label}
             variant={statusFilter === item.value ? "secondary" : "ghost"}
             size="sm"
-            className={`h-9 text-xs lg:h-7 ${statusFilter === item.value ? "font-semibold border" : ""}`}
+            className={`h-9 text-xs lg:h-7 ${statusFilter === item.value ? "border font-semibold" : ""}`}
             onClick={() => {
               setStatusFilter(item.value);
               setPage(1);
@@ -151,7 +146,7 @@ export default function AppointmentsPage() {
       )}
 
       <Dialog open={isBookOpen} onOpenChange={setIsBookOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Book New Appointment</DialogTitle>
           </DialogHeader>

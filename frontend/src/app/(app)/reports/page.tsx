@@ -23,10 +23,25 @@ const REPORTS: Array<{
   config: ReportConfig<any>;
 }> = [
   { key: "appointments", label: "Appointments", icon: Calendar, config: appointmentsReportConfig },
-  { key: "consultations", label: "Patient Visits", icon: UserCheck, config: consultationsReportConfig },
+  {
+    key: "consultations",
+    label: "Patient Visits",
+    icon: UserCheck,
+    config: consultationsReportConfig,
+  },
   { key: "inventory", label: "Inventory", icon: Pill, config: inventoryReportConfig },
-  { key: "movements", label: "Stock Movements", icon: ArrowLeftRight, config: movementsReportConfig },
-  { key: "prescriptions", label: "Prescriptions", icon: FileText, config: prescriptionsReportConfig },
+  {
+    key: "movements",
+    label: "Stock Movements",
+    icon: ArrowLeftRight,
+    config: movementsReportConfig,
+  },
+  {
+    key: "prescriptions",
+    label: "Prescriptions",
+    icon: FileText,
+    config: prescriptionsReportConfig,
+  },
 ];
 
 export default function ReportsPage() {

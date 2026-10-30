@@ -1,17 +1,11 @@
 import { ReactNode } from "react";
-import { redirect } from "next/navigation";
 import { AppShellClient } from "@/app/(app)/AppShellClient";
-import { ROUTES } from "@/constants/routes";
-import { getCurrentUser } from "@/lib/server-api";
 
 /**
- * Server layout for the authenticated app shell. Asks the backend for the
- * signed-in profile, then passes minimal user props to the client shell.
+ * Layout for the authenticated app. Deliberately does no server-side data fetching,
+ * so pages are served instantly; the signed-in user is loaded (and cached) in the
+ * browser by AppShellClient. Middleware already redirects visitors without a session.
  */
-export default async function AppLayout({ children }: { children: ReactNode }) {
-  const profile = await getCurrentUser();
-  if (!profile) redirect(ROUTES.LOGIN);
-
-  const user = { fullName: profile.fullName, email: profile.email, role: profile.role };
-  return <AppShellClient user={user}>{children}</AppShellClient>;
+export default function AppLayout({ children }: { children: ReactNode }) {
+  return <AppShellClient>{children}</AppShellClient>;
 }

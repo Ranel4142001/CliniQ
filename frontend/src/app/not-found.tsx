@@ -6,19 +6,17 @@ import { ROUTES } from "@/constants/routes";
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-6 shadow-sm">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
         <FileQuestion className="h-8 w-8" />
       </div>
 
-      <span className="text-sm font-semibold tracking-wider text-primary uppercase">
-        404 Error
-      </span>
+      <span className="text-sm font-semibold uppercase tracking-wider text-primary">404 Error</span>
       <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
         Page Not Found
       </h1>
-      <p className="mt-4 max-w-md text-sm text-muted-foreground leading-relaxed">
-        The page you are looking for doesn&apos;t exist, has been moved, or is
-        temporarily unavailable.
+      <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
+        The page you are looking for doesn&apos;t exist, has been moved, or is temporarily
+        unavailable.
       </p>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -36,9 +34,7 @@ export default function NotFound() {
         </Button>
       </div>
 
-      <p className="mt-12 text-xs text-muted-foreground">
-        CliniQ · Secure Healthcare Management
-      </p>
+      <p className="mt-12 text-xs text-muted-foreground">CliniQ · Secure Healthcare Management</p>
     </div>
   );
 }

@@ -16,10 +16,13 @@ COPY backend backend
 COPY frontend frontend
 
 # NEXT_PUBLIC_* values are inlined into the client bundle at build time
+# BACKEND_URL is baked into the /api rewrite at build time
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG BACKEND_URL=http://backend:4000
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL \
     NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY \
+    BACKEND_URL=$BACKEND_URL \
     NEXT_TELEMETRY_DISABLED=1 \
     STANDALONE=true
 

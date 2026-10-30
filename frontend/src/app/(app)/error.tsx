@@ -16,7 +16,7 @@ export default function AppError({ error, reset }: AppErrorProps) {
 
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed border-destructive/30 bg-destructive/5 p-8 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive mb-4">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
         <AlertCircle className="h-6 w-6" />
       </div>
 
@@ -24,12 +24,11 @@ export default function AppError({ error, reset }: AppErrorProps) {
         Unable to Load Section
       </h2>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        There was a problem loading this part of the application. Please try
-        refreshing the view.
+        There was a problem loading this part of the application. Please try refreshing the view.
       </p>
 
       {error.message && process.env.NODE_ENV === "development" && (
-        <div className="mt-4 max-w-md rounded-md bg-destructive/10 p-2.5 font-mono text-xs text-destructive text-left overflow-x-auto">
+        <div className="mt-4 max-w-md overflow-x-auto rounded-md bg-destructive/10 p-2.5 text-left font-mono text-xs text-destructive">
           {error.message}
         </div>
       )}
