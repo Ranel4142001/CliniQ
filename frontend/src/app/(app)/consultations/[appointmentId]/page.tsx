@@ -20,6 +20,7 @@ import {
   useUpdateConsultation,
   useCompleteConsultation,
   ConsultationChat,
+  PrivateChatNotice,
 } from "@/features/consultations";
 import { updateConsultationSchema, type UpdateConsultationInput } from "@backend/contracts";
 import { MeetingPanel } from "@/features/consultations/components/MeetingPanel";
@@ -197,6 +198,12 @@ export default function ConsultationPage({
               subtitle={`Online consultation · ${formatDateTime(appointment.scheduledAt)}`}
               meetingUrl={appointment.meetingUrl}
               scheduledAt={appointment.scheduledAt}
+            />
+          )}
+          {appointment.type === "ONLINE" && user && !isChatParticipant && (
+            <PrivateChatNotice
+              patientName={appointment.patientName}
+              clinicianName={appointment.clinicianName}
             />
           )}
         </div>

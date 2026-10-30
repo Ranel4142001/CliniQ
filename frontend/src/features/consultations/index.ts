@@ -8,3 +8,4 @@ export * from "@/features/consultations/utils/can-join-meeting";
 export * from "@/features/consultations/components/chat/ConsultationChat";
 export * from "@/features/consultations/hooks/useConsultationChat";
 export * from "@/features/consultations/utils/group-messages";
+export * from "./components/chat/PrivateChatNotice";
