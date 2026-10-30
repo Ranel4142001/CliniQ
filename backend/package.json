@@ -12,7 +12,8 @@
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",
-    "db:seed": "tsx --env-file-if-exists=.env database/seeds/seed.ts"
+    "db:seed": "tsx --env-file-if-exists=.env database/seeds/seed.ts",
+    "build:vercel": "node scripts/build-vercel.mjs"
   },
   "prisma": {
     "schema": "database/schema.prisma",
