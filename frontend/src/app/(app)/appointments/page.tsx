@@ -79,13 +79,13 @@ export default function AppointmentsPage() {
         description="Schedule, confirm, and manage clinic patient consultations"
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Appointments" }]}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center rounded-lg border bg-muted p-0.5">
               <Button
                 variant={viewMode === "table" ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("table")}
-                className="h-7 px-2.5 text-xs gap-1.5"
+                className="h-9 px-2.5 text-xs gap-1.5 lg:h-7"
               >
                 <List className="h-3.5 w-3.5" /> Table
               </Button>
@@ -93,7 +93,7 @@ export default function AppointmentsPage() {
                 variant={viewMode === "calendar" ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("calendar")}
-                className="h-7 px-2.5 text-xs gap-1.5"
+                className="h-9 px-2.5 text-xs gap-1.5 lg:h-7"
               >
                 <CalendarIcon className="h-3.5 w-3.5" /> Calendar
               </Button>
@@ -117,7 +117,7 @@ export default function AppointmentsPage() {
             key={item.label}
             variant={statusFilter === item.value ? "secondary" : "ghost"}
             size="sm"
-            className={`h-7 text-xs ${statusFilter === item.value ? "font-semibold border" : ""}`}
+            className={`h-9 text-xs lg:h-7 ${statusFilter === item.value ? "font-semibold border" : ""}`}
             onClick={() => {
               setStatusFilter(item.value);
               setPage(1);

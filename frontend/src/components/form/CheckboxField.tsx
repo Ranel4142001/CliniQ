@@ -26,7 +26,9 @@ export function CheckboxField<TFieldValues extends FieldValues>({
   const effectiveControl = control || formContext?.control;
 
   if (!effectiveControl) {
-    throw new Error(`CheckboxField for "${name}" must be used within a FormProvider or passed a control prop.`);
+    throw new Error(
+      `CheckboxField for "${name}" must be used within a FormProvider or passed a control prop.`
+    );
   }
 
   return (
@@ -46,9 +48,7 @@ export function CheckboxField<TFieldValues extends FieldValues>({
               <Label htmlFor={name} className="cursor-pointer text-sm font-medium">
                 {label}
               </Label>
-              {description && (
-                <p className="text-xs text-muted-foreground">{description}</p>
-              )}
+              {description && <p className="text-xs text-muted-foreground">{description}</p>}
             </div>
           </div>
           {error && <p className="text-xs font-medium text-destructive">{error.message}</p>}

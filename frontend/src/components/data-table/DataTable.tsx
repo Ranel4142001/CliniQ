@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { SearchInput } from "@/components/data-table/SearchInput";
 import { DataTablePaginationBar } from "@/components/data-table/DataTablePaginationBar";
+import { DataTableCards } from "@/components/data-table/DataTableCards";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { ErrorState } from "@/components/feedback/ErrorState";
@@ -81,7 +82,7 @@ export function DataTable<T extends Record<string, unknown>>({
   return (
     <div className={`space-y-4 ${className}`}>
       {(onSearchChange || actions) && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
           {onSearchChange && (
             <SearchInput
               value={search}
@@ -90,11 +91,11 @@ export function DataTable<T extends Record<string, unknown>>({
               className="w-full sm:w-72"
             />
           )}
-          {actions && <div className="flex items-center gap-2 ml-auto">{actions}</div>}
+          {actions && <div className="ml-auto flex items-center gap-2">{actions}</div>}
         </div>
       )}
 
-      <div className="rounded-xl border border-border/80 bg-card shadow-xs overflow-hidden">
+      <div className="shadow-xs overflow-hidden rounded-xl border border-border/80 bg-card">
         {error ? (
           <ErrorState message={error.message} onRetry={onRetry} />
         ) : isLoading ? (
@@ -102,51 +103,66 @@ export function DataTable<T extends Record<string, unknown>>({
         ) : data.length === 0 ? (
           <EmptyState title={emptyTitle} description={emptyMessage} />
         ) : (
-          <Table>
-            <TableHeader className="bg-muted/40 border-b border-border/80">
-              <TableRow className="hover:bg-transparent">
-                {columns.map((col, idx) => (
-                  <TableHead key={idx} className={`text-xs font-semibold text-muted-foreground uppercase tracking-wider py-3 ${col.className ?? ""}`}>
-                    {col.sortable && col.accessorKey && onSortChange ? (
-                      <button
-                        type="button"
-                        onClick={() => handleSort(col.accessorKey)}
-                        className="flex items-center gap-1 font-semibold hover:text-foreground transition-colors"
+          <>
+            {/* Phones and tablets: one card per row. Laptops and up: the full table. */}
+            <div className="lg:hidden">
+              <DataTableCards data={data} columns={columns} onRowClick={onRowClick} />
+            </div>
+            <div className="hidden lg:block">
+              <Table>
+                <TableHeader className="border-b border-border/80 bg-muted/40">
+                  <TableRow className="hover:bg-transparent">
+                    {columns.map((col, idx) => (
+                      <TableHead
+                        key={idx}
+                        className={`py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground ${col.className ?? ""}`}
                       >
-                        {col.header}
-                        {sortBy === col.accessorKey ? (
-                          sortOrder === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
+                        {col.sortable && col.accessorKey && onSortChange ? (
+                          <button
+                            type="button"
+                            onClick={() => handleSort(col.accessorKey)}
+                            className="flex items-center gap-1 font-semibold transition-colors hover:text-foreground"
+                          >
+                            {col.header}
+                            {sortBy === col.accessorKey ? (
+                              sortOrder === "asc" ? (
+                                <ArrowUp className="h-3.5 w-3.5" />
+                              ) : (
+                                <ArrowDown className="h-3.5 w-3.5" />
+                              )
+                            ) : (
+                              <ArrowUpDown className="h-3.5 w-3.5 opacity-50" />
+                            )}
+                          </button>
                         ) : (
-                          <ArrowUpDown className="h-3.5 w-3.5 opacity-50" />
+                          col.header
                         )}
-                      </button>
-                    ) : (
-                      col.header
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody className="divide-y divide-border/60">
-              {data.map((item, rowIdx) => (
-                <TableRow
-                  key={rowIdx}
-                  onClick={() => onRowClick?.(item)}
-                  className={`transition-colors hover:bg-muted/30 ${onRowClick ? "cursor-pointer" : ""}`}
-                >
-                  {columns.map((col, colIdx) => (
-                    <TableCell key={colIdx} className={`py-3 ${col.className ?? ""}`}>
-                      {col.cell
-                        ? col.cell(item)
-                        : col.accessorKey
-                        ? String(item[col.accessorKey as string] ?? "-")
-                        : null}
-                    </TableCell>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="divide-y divide-border/60">
+                  {data.map((item, rowIdx) => (
+                    <TableRow
+                      key={rowIdx}
+                      onClick={() => onRowClick?.(item)}
+                      className={`transition-colors hover:bg-muted/30 ${onRowClick ? "cursor-pointer" : ""}`}
+                    >
+                      {columns.map((col, colIdx) => (
+                        <TableCell key={colIdx} className={`py-3 ${col.className ?? ""}`}>
+                          {col.cell
+                            ? col.cell(item)
+                            : col.accessorKey
+                              ? String(item[col.accessorKey as string] ?? "-")
+                              : null}
+                        </TableCell>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </div>
 

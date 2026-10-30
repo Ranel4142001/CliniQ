@@ -98,10 +98,10 @@ export function AdminStaffDashboard({ data }: AdminStaffDashboardProps) {
       </div>
 
       {/* Main Operational Grids */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Today's Appointments */}
         <Card className="rounded-xl border border-border/80 shadow-xs overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 bg-muted/20 border-b border-border/60">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3 bg-muted/20 border-b border-border/60">
             <div>
               <CardTitle className="text-base font-semibold">Today&apos;s Appointments</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">{todayAppointments.length} patient(s) queued for today</p>
@@ -160,7 +160,7 @@ export function AdminStaffDashboard({ data }: AdminStaffDashboardProps) {
         <div className="space-y-6">
           {/* Pending Confirmations */}
           <Card className="rounded-xl border border-border/80 shadow-xs overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between pb-3 bg-muted/20 border-b border-border/60">
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3 bg-muted/20 border-b border-border/60">
               <div>
                 <CardTitle className="text-base font-semibold">Pending Confirmations</CardTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">Requires front desk or clinician review</p>
@@ -205,7 +205,7 @@ export function AdminStaffDashboard({ data }: AdminStaffDashboardProps) {
 
           {/* Low Stock Alerts */}
           <Card className="rounded-xl border border-border/80 shadow-xs overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between pb-3 bg-muted/20 border-b border-border/60">
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3 bg-muted/20 border-b border-border/60">
               <div>
                 <CardTitle className="text-base font-semibold">Inventory Alerts</CardTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">Medicines near or below threshold</p>

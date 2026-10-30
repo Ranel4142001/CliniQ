@@ -40,7 +40,7 @@ export function SearchInput({
 
   return (
     <div className={`relative flex items-center ${className}`}>
-      <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+      <Search className="pointer-events-none absolute left-2.5 h-4 w-4 text-muted-foreground" />
       <Input
         value={internalValue}
         onChange={(e) => setInternalValue(e.target.value)}

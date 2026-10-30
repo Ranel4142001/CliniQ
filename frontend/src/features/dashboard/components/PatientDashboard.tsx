@@ -75,10 +75,10 @@ export function PatientDashboard({ data }: PatientDashboardProps) {
       </div>
 
       {/* Lists */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Upcoming Appointments */}
         <Card className="rounded-xl border border-border/80 shadow-xs overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 bg-muted/20 border-b border-border/60">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3 bg-muted/20 border-b border-border/60">
             <div>
               <CardTitle className="text-base font-semibold">My Appointments</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">Your schedule with our clinic</p>
@@ -131,7 +131,7 @@ export function PatientDashboard({ data }: PatientDashboardProps) {
 
         {/* Recent Prescriptions */}
         <Card className="rounded-xl border border-border/80 shadow-xs overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 bg-muted/20 border-b border-border/60">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3 bg-muted/20 border-b border-border/60">
             <div>
               <CardTitle className="text-base font-semibold">My Prescriptions</CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">Recent medications prescribed by doctors</p>

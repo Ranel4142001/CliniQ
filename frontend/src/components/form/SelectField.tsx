@@ -44,7 +44,9 @@ export function SelectField<TFieldValues extends FieldValues>({
   const effectiveControl = control || formContext?.control;
 
   if (!effectiveControl) {
-    throw new Error(`SelectField for "${name}" must be used within a FormProvider or passed a control prop.`);
+    throw new Error(
+      `SelectField for "${name}" must be used within a FormProvider or passed a control prop.`
+    );
   }
 
   return (
@@ -57,11 +59,7 @@ export function SelectField<TFieldValues extends FieldValues>({
             {label}
             {required && <span className="ml-1 text-destructive">*</span>}
           </Label>
-          <Select
-            disabled={disabled}
-            onValueChange={field.onChange}
-            value={field.value ?? ""}
-          >
+          <Select disabled={disabled} onValueChange={field.onChange} value={field.value ?? ""}>
             <SelectTrigger
               id={name}
               className={error ? "border-destructive focus:ring-destructive" : ""}
@@ -76,9 +74,7 @@ export function SelectField<TFieldValues extends FieldValues>({
               ))}
             </SelectContent>
           </Select>
-          {description && !error && (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && !error && <p className="text-xs text-muted-foreground">{description}</p>}
           {error && <p className="text-xs font-medium text-destructive">{error.message}</p>}
         </div>
       )}

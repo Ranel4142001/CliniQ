@@ -46,7 +46,7 @@ export function FormDialog({
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
 
-          <div className="py-4 space-y-4">{children}</div>
+          <div className="space-y-4 py-4">{children}</div>
 
           <DialogFooter className="flex justify-end gap-2 pt-2">
             <Button

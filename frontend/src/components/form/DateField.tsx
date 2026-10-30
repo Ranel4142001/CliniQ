@@ -32,7 +32,9 @@ export function DateField<TFieldValues extends FieldValues>({
   const effectiveControl = control || formContext?.control;
 
   if (!effectiveControl) {
-    throw new Error(`DateField for "${name}" must be used within a FormProvider or passed a control prop.`);
+    throw new Error(
+      `DateField for "${name}" must be used within a FormProvider or passed a control prop.`
+    );
   }
 
   return (
@@ -56,9 +58,7 @@ export function DateField<TFieldValues extends FieldValues>({
             aria-invalid={!!error}
             className={error ? "border-destructive focus-visible:ring-destructive" : ""}
           />
-          {description && !error && (
-            <p className="text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && !error && <p className="text-xs text-muted-foreground">{description}</p>}
           {error && <p className="text-xs font-medium text-destructive">{error.message}</p>}
         </div>
       )}

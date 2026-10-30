@@ -25,14 +25,17 @@ export function PageHeader({
   return (
     <div className={`mb-6 space-y-2 ${className}`}>
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav aria-label="Breadcrumbs" className="flex items-center space-x-1.5 text-xs text-muted-foreground">
+        <nav
+          aria-label="Breadcrumbs"
+          className="flex items-center space-x-1.5 text-xs text-muted-foreground"
+        >
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
             return (
               <React.Fragment key={idx}>
                 {idx > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
                 {crumb.href && !isLast ? (
-                  <Link href={crumb.href} className="hover:text-foreground transition-colors">
+                  <Link href={crumb.href} className="transition-colors hover:text-foreground">
                     {crumb.label}
                   </Link>
                 ) : (
@@ -44,12 +47,12 @@ export function PageHeader({
         </nav>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
           {description && <p className="text-sm text-muted-foreground">{description}</p>}
         </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </div>
     </div>
   );

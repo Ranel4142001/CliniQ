@@ -83,7 +83,7 @@ export function AsyncSelect({
         </SelectValue>
       </SelectTrigger>
       <SelectContent className="max-h-60 w-[var(--radix-select-trigger-width)]">
-        <div className="p-2 border-b">
+        <div className="border-b p-2">
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
