@@ -11,7 +11,7 @@
  *   npm run db:seed
  *
  * Requires SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
- * SEED_ADMIN_PASSWORD and SEED_STAFF_PASSWORD (used for clinician and staff accounts).
+ * SEED_ADMIN_PASSWORD and SEED_STAFF_PASSWORD (used for the sample clinician, staff and patient accounts).
  */
 
 import { PrismaClient, Role, Sex, AppointmentType, AppointmentStatus } from "@prisma/client";
@@ -539,7 +539,29 @@ async function main() {
     }
   }
 
-  // 7. Seed Counters
+  // 7. Sample patient login, linked to the patient who has the online consultation,
+  //    so the patient side of the consultation chat can be tested.
+  console.log("7️⃣  Seeding sample patient login…");
+  const PATIENT_EMAIL = "patient.maria@cliniq.local";
+  const onlineVisit = await prisma.appointment.findFirst({
+    where: { type: AppointmentType.ONLINE },
+    include: { patient: true },
+    orderBy: { scheduledAt: "asc" },
+  });
+  const existingPatientLogin = await prisma.profile.findFirst({ where: { email: PATIENT_EMAIL } });
+  if (onlineVisit && !existingPatientLogin && !onlineVisit.patient.profileId) {
+    const fullName = `${onlineVisit.patient.firstName} ${onlineVisit.patient.lastName}`;
+    const authId = await createAuthUser(supabaseAdmin, { email: PATIENT_EMAIL, password: STAFF_PASSWORD, fullName });
+    const profile = await prisma.profile.create({
+      data: { authId, email: PATIENT_EMAIL, fullName, role: Role.PATIENT, isActive: true },
+    });
+    await prisma.patient.update({ where: { id: onlineVisit.patientId }, data: { profileId: profile.id } });
+    console.log(`   ✅ Created patient login for ${fullName}: ${PATIENT_EMAIL}`);
+  } else {
+    console.log("   ℹ️ Sample patient login already exists (or no online visit to link).");
+  }
+
+  // 8. Seed Counters
   await prisma.counter.upsert({
     where: { key: "PT-2026" },
     update: {},

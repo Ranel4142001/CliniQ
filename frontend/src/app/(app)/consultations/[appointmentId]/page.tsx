@@ -4,14 +4,7 @@ import React, { use, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import {
-  Stethoscope,
-  Play,
-  Save,
-  CheckCircle2,
-  FilePlus,
-  Lock,
-} from "lucide-react";
+import { Stethoscope, Play, Save, CheckCircle2, FilePlus, Lock } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/feedback/LoadingState";
@@ -28,10 +21,7 @@ import {
   useCompleteConsultation,
   ConsultationChat,
 } from "@/features/consultations";
-import {
-  updateConsultationSchema,
-  type UpdateConsultationInput,
-} from "@backend/contracts";
+import { updateConsultationSchema, type UpdateConsultationInput } from "@backend/contracts";
 import { MeetingPanel } from "@/features/consultations/components/MeetingPanel";
 import { VitalsForm } from "@/features/consultations/components/VitalsForm";
 import { ConsultationNotesForm } from "@/features/consultations/components/ConsultationNotesForm";
@@ -41,7 +31,11 @@ import { notify } from "@/lib/notify";
 
 const CONSULTATION_STATUS_MAP: StatusMap<"PENDING" | "IN_PROGRESS" | "COMPLETED"> = {
   PENDING: { label: "Not Started", variant: "secondary" },
-  IN_PROGRESS: { label: "In Progress", variant: "outline", className: "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-950/40" },
+  IN_PROGRESS: {
+    label: "In Progress",
+    variant: "outline",
+    className: "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-950/40",
+  },
   COMPLETED: { label: "Completed", variant: "default", className: "bg-emerald-600 text-white" },
 };
 
@@ -54,12 +48,14 @@ export default function ConsultationPage({
   const { user } = useCurrentUser();
   const [completeOpen, setCompleteOpen] = useState(false);
 
-  const { data: appointment, isLoading: apptLoading, error: apptError } =
-    useAppointment(appointmentId);
+  const {
+    data: appointment,
+    isLoading: apptLoading,
+    error: apptError,
+  } = useAppointment(appointmentId);
   const { data: consultation, isLoading: consultLoading } =
     useConsultationByAppointment(appointmentId);
-  const { data: patient, isLoading: patientLoading } =
-    usePatient(appointment?.patientId || "");
+  const { data: patient, isLoading: patientLoading } = usePatient(appointment?.patientId || "");
 
   const startMutation = useStartConsultation();
   const updateMutation = useUpdateConsultation(consultation?.id || "");
@@ -149,15 +145,11 @@ export default function ConsultationPage({
     setCompleteOpen(false);
   };
 
-  const statusKey = isCompleted
-    ? "COMPLETED"
-    : consultation
-    ? "IN_PROGRESS"
-    : "PENDING";
+  const statusKey = isCompleted ? "COMPLETED" : consultation ? "IN_PROGRESS" : "PENDING";
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeader
           title="Clinical Consultation"
           description={`Scheduled: ${formatDateTime(appointment.scheduledAt)} • ${appointment.type}`}
@@ -181,28 +173,30 @@ export default function ConsultationPage({
       </div>
 
       {/* Main Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left Column: Patient Summary & Meeting Panel */}
         <div className="space-y-6 lg:col-span-1">
           {patient ? (
             <ConsultationPatientSidebar patient={patient} />
           ) : (
             <div className="rounded-xl border bg-card p-5 shadow-sm">
-              <h3 className="font-semibold text-foreground text-sm">{appointment.patientName}</h3>
+              <h3 className="text-sm font-semibold text-foreground">{appointment.patientName}</h3>
               <p className="font-mono text-xs text-muted-foreground">{appointment.patientNo}</p>
             </div>
           )}
 
-          <MeetingPanel
-            scheduledAt={appointment.scheduledAt}
-            meetingUrl={appointment.meetingUrl}
-          />
+          <MeetingPanel scheduledAt={appointment.scheduledAt} meetingUrl={appointment.meetingUrl} />
 
           {appointment.type === "ONLINE" && user && isChatParticipant && (
             <ConsultationChat
               appointmentId={appointment.id}
               currentUser={{ id: user.id, fullName: user.fullName, role: user.role }}
-              counterpartName={user.role === "PATIENT" ? appointment.clinicianName : appointment.patientName}
+              counterpartName={
+                user.role === "PATIENT" ? appointment.clinicianName : appointment.patientName
+              }
+              subtitle={`Online consultation · ${formatDateTime(appointment.scheduledAt)}`}
+              meetingUrl={appointment.meetingUrl}
+              scheduledAt={appointment.scheduledAt}
             />
           )}
         </div>
@@ -211,14 +205,17 @@ export default function ConsultationPage({
         <div className="space-y-6 lg:col-span-2">
           {/* Action Banner for Start / In-Progress */}
           {!consultation ? (
-            <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 text-center space-y-4">
-              <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="space-y-4 rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Stethoscope className="h-6 w-6" />
               </div>
-              <div className="max-w-md mx-auto space-y-1">
-                <h3 className="text-base font-semibold text-foreground">Ready to start consultation?</h3>
+              <div className="mx-auto max-w-md space-y-1">
+                <h3 className="text-base font-semibold text-foreground">
+                  Ready to start consultation?
+                </h3>
                 <p className="text-xs text-muted-foreground">
-                  Starting the consultation creates the medical record and logs your clinical start time.
+                  Starting the consultation creates the medical record and logs your clinical start
+                  time.
                 </p>
               </div>
               {isClinicianOrAdmin ? (
@@ -239,7 +236,7 @@ export default function ConsultationPage({
           ) : (
             <div className="space-y-6">
               {isCompleted && (
-                <div className="rounded-xl border bg-muted/40 p-3.5 flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center justify-between rounded-xl border bg-muted/40 p-3.5 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1.5 font-medium">
                     <Lock className="h-3.5 w-3.5 text-emerald-600" />
                     Consultation completed and locked as read-only.
@@ -271,7 +268,7 @@ export default function ConsultationPage({
                     variant="default"
                     onClick={() => setCompleteOpen(true)}
                     disabled={completeMutation.isPending}
-                    className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700"
                   >
                     <CheckCircle2 className="h-4 w-4" />
                     <span>Complete Consultation</span>

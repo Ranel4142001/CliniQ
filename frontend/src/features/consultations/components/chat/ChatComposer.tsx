@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { Lock, SendHorizontal } from "lucide-react";
+import { Lock, SendHorizontal, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,8 @@ import { CHAT_CONFIG } from "@backend/contracts";
 
 /** Show the character counter once the draft reaches this share of the limit. */
 const COUNTER_VISIBLE_RATIO = 0.9;
+/** Messenger-style quick reply sent by the button when the input is empty. */
+const QUICK_REPLY = "👍";
 
 interface ChatComposerProps {
   canSend: boolean;
@@ -57,7 +59,7 @@ export function ChatComposer({ canSend, onSend }: ChatComposerProps) {
 
   return (
     <form
-      className="flex items-end gap-2 border-t p-3"
+      className="flex items-end gap-2 border-t bg-background/80 p-3 backdrop-blur"
       onSubmit={(event) => {
         event.preventDefault();
         submit();
@@ -72,23 +74,42 @@ export function ChatComposer({ canSend, onSend }: ChatComposerProps) {
           onKeyDown={handleKeyDown}
           placeholder="Aa"
           aria-label="Type a message"
-          className="max-h-32 min-h-[40px] resize-none rounded-2xl bg-muted/60 px-4 py-2.5"
+          className="max-h-32 min-h-[40px] resize-none rounded-[20px] border-0 bg-muted px-4 py-2.5 shadow-none focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
         />
         {showCounter && (
-          <span className={cn("mt-1 self-end text-[10px]", isTooLong ? "text-destructive" : "text-muted-foreground")}>
+          <span
+            className={cn(
+              "mt-1 self-end text-[10px]",
+              isTooLong ? "text-destructive" : "text-muted-foreground"
+            )}
+          >
             {draft.length}/{CHAT_CONFIG.MAX_MESSAGE_LENGTH}
           </span>
         )}
       </div>
-      <Button
-        type="submit"
-        size="icon"
-        className="h-10 w-10 shrink-0 rounded-full"
-        disabled={!trimmed || isTooLong}
-        aria-label="Send message"
-      >
-        <SendHorizontal className="h-4 w-4" />
-      </Button>
+      {trimmed ? (
+        <Button
+          type="submit"
+          size="icon"
+          variant="ghost"
+          className="h-10 w-10 shrink-0 rounded-full text-primary hover:bg-primary/10 hover:text-primary"
+          disabled={isTooLong}
+          aria-label="Send message"
+        >
+          <SendHorizontal className="h-5 w-5" />
+        </Button>
+      ) : (
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          className="h-10 w-10 shrink-0 rounded-full text-primary hover:bg-primary/10 hover:text-primary"
+          onClick={() => onSend(QUICK_REPLY)}
+          aria-label="Send a thumbs up"
+        >
+          <ThumbsUp className="h-5 w-5" />
+        </Button>
+      )}
     </form>
   );
 }

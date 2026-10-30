@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Check, X, CalendarClock, UserX, Video, Stethoscope } from "lucide-react";
+import { Check, X, CalendarClock, UserX, Video, Stethoscope, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +49,11 @@ export function AppointmentActions({
   const isPending = appointment.status === "PENDING";
   const isConfirmed = appointment.status === "CONFIRMED";
   const isStaffOrAdmin = userRole === "ADMIN" || userRole === "STAFF";
+  // Online visits get a private chat between the patient and the clinician (admins/staff excluded).
+  const canChat =
+    appointment.type === "ONLINE" &&
+    (userRole === "PATIENT" || userRole === "CLINICIAN") &&
+    (isConfirmed || appointment.status === "COMPLETED");
 
   const handleConfirmClick = async () => {
     if (appointment.type === "ONLINE" && !appointment.meetingUrl) {
@@ -59,12 +64,12 @@ export function AppointmentActions({
   };
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap">
+    <div className="flex flex-wrap items-center gap-1.5">
       {isPending && isStaffOrAdmin && (
         <Button
           size="sm"
           variant="outline"
-          className="h-7 text-xs gap-1 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+          className="h-7 gap-1 border-blue-500 text-xs text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50"
           onClick={handleConfirmClick}
           disabled={isUpdating}
         >
@@ -77,7 +82,7 @@ export function AppointmentActions({
           <Button
             size="sm"
             variant="ghost"
-            className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground"
+            className="h-7 gap-1 text-xs text-muted-foreground hover:text-foreground"
             onClick={() => setRescheduleOpen(true)}
             disabled={isUpdating}
           >
@@ -87,7 +92,7 @@ export function AppointmentActions({
           <Button
             size="sm"
             variant="ghost"
-            className="h-7 text-xs gap-1 text-destructive hover:bg-destructive/10"
+            className="h-7 gap-1 text-xs text-destructive hover:bg-destructive/10"
             onClick={() => setCancelOpen(true)}
             disabled={isUpdating}
           >
@@ -96,12 +101,20 @@ export function AppointmentActions({
         </>
       )}
 
-      {isConfirmed && (
+      {canChat && (
+        <Link href={`/consultations/${appointment.id}/chat`}>
+          <Button size="sm" className="h-7 gap-1 rounded-full text-xs">
+            <MessageCircle className="h-3.5 w-3.5" /> Chat
+          </Button>
+        </Link>
+      )}
+
+      {isConfirmed && userRole !== "PATIENT" && (
         <Link href={`/consultations/${appointment.id}`}>
           <Button
             size="sm"
             variant="outline"
-            className="h-7 text-xs gap-1 border-primary text-primary hover:bg-primary/10"
+            className="h-7 gap-1 border-primary text-xs text-primary hover:bg-primary/10"
           >
             <Stethoscope className="h-3.5 w-3.5" /> Consult
           </Button>
@@ -112,7 +125,7 @@ export function AppointmentActions({
         <Button
           size="sm"
           variant="outline"
-          className="h-7 text-xs gap-1 border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
+          className="h-7 gap-1 border-emerald-600 text-xs text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
           onClick={onComplete}
           disabled={isUpdating}
         >
@@ -124,7 +137,7 @@ export function AppointmentActions({
         <Button
           size="sm"
           variant="ghost"
-          className="h-7 text-xs gap-1 text-muted-foreground hover:text-destructive"
+          className="h-7 gap-1 text-xs text-muted-foreground hover:text-destructive"
           onClick={onNoShow}
           disabled={isUpdating}
         >
@@ -149,14 +162,16 @@ export function AppointmentActions({
               value={meetingUrl}
               onChange={(e) => setMeetingUrl(e.target.value)}
               placeholder="https://meet.google.com/xxx-xxxx-xxx"
-              className="text-xs font-mono"
+              className="font-mono text-xs"
             />
             <p className="text-[11px] text-muted-foreground">
               Please paste the generated Google Meet link. Patients will use this link to join.
             </p>
           </div>
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+            <Button variant="outline" size="sm" onClick={() => setConfirmOpen(false)}>
+              Cancel
+            </Button>
             <Button
               size="sm"
               disabled={!meetingUrl.trim() || isUpdating}
@@ -191,7 +206,9 @@ export function AppointmentActions({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setCancelOpen(false)}>Close</Button>
+            <Button variant="outline" size="sm" onClick={() => setCancelOpen(false)}>
+              Close
+            </Button>
             <Button
               variant="destructive"
               size="sm"
@@ -209,7 +226,7 @@ export function AppointmentActions({
 
       {/* Reschedule Dialog */}
       <Dialog open={rescheduleOpen} onOpenChange={setRescheduleOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Reschedule Appointment</DialogTitle>
           </DialogHeader>
@@ -222,7 +239,9 @@ export function AppointmentActions({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setRescheduleOpen(false)}>Cancel</Button>
+            <Button variant="outline" size="sm" onClick={() => setRescheduleOpen(false)}>
+              Cancel
+            </Button>
             <Button
               size="sm"
               disabled={!newSlot || isUpdating}
