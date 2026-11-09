@@ -41,6 +41,10 @@ export const prescriptionRepository = {
     return found !== null;
   },
 
+  async countPrescriptionNosStartingWith(prefix: string, tx?: TransactionContext) {
+    return dbClient(tx).prescription.count({ where: { prescriptionNo: { startsWith: prefix } } });
+  },
+
   async findById(id: string): Promise<PrescriptionWithRelations | null> {
     return prisma.prescription.findUnique({
       where: { id },

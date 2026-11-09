@@ -1,4 +1,4 @@
-/** Prefixes of the human-readable numbers shown in lists, e.g. PT-2026-11-10-482. */
+/** Prefixes of the human-readable numbers shown in lists, e.g. PT-261110-347. */
 export const RECORD_PREFIXES = {
   PATIENT: "PT",
   PRESCRIPTION: "RX",
@@ -7,22 +7,33 @@ export const RECORD_PREFIXES = {
 export type RecordPrefix = (typeof RECORD_PREFIXES)[keyof typeof RECORD_PREFIXES];
 
 export const RECORD_NUMBER_CONFIG = {
-  /** Random digits after the date; allows 1,000 numbers per prefix per day. */
-  SUFFIX_DIGITS: 3,
-  /** Random draws before giving up on a (nearly full) day. */
+  /** Random digits after the day's counter. */
+  RANDOM_DIGITS: 2,
+  /** Random draws before giving up (only needed when two records race for the same counter). */
   MAX_ATTEMPTS: 30,
 } as const;
 
-/** Number of distinct suffixes, e.g. 1000 for 3 digits. */
-export const RECORD_SUFFIX_RANGE = 10 ** RECORD_NUMBER_CONFIG.SUFFIX_DIGITS;
+/** Number of distinct random endings, e.g. 100 for 2 digits. */
+export const RECORD_RANDOM_RANGE = 10 ** RECORD_NUMBER_CONFIG.RANDOM_DIGITS;
 
-export const RECORD_NUMBER_PATTERN = /^(PT|RX)-\d{4}-\d{2}-\d{2}-\d{3}$/;
+/** PREFIX-YYMMDD-<counter starting at 1><2 random digits>. */
+export const RECORD_NUMBER_PATTERN = /^(PT|RX)-\d{6}-[1-9]\d{2,}$/;
+
+/** "PT-261110-": every number issued on that day starts with this. */
+export function recordDayPrefix(prefix: RecordPrefix, localDate: string): string {
+  return `${prefix}-${localDate}-`;
+}
 
 /**
- * PREFIX-YEAR-MONTH-DAY-NNN, e.g. formatRecordNumber("PT", "2026-11-10", 7) → "PT-2026-11-10-007".
- * `localDate` is the clinic-local issue date as yyyy-MM-dd.
+ * e.g. formatRecordNumber("PT", "261110", 12, 7) → "PT-261110-1207".
+ * `localDate` is the clinic-local issue date as yyMMdd; `counter` is the record's position that day.
  */
-export function formatRecordNumber(prefix: RecordPrefix, localDate: string, suffix: number): string {
-  const digits = String(suffix).padStart(RECORD_NUMBER_CONFIG.SUFFIX_DIGITS, "0");
-  return `${prefix}-${localDate}-${digits}`;
+export function formatRecordNumber(
+  prefix: RecordPrefix,
+  localDate: string,
+  counter: number,
+  random: number
+): string {
+  const ending = String(random).padStart(RECORD_NUMBER_CONFIG.RANDOM_DIGITS, "0");
+  return `${recordDayPrefix(prefix, localDate)}${counter}${ending}`;
 }

@@ -141,9 +141,11 @@ export class PrescriptionService {
     }
 
     const issued = await this.deps.transactions.run(async (tx) => {
-      const prescriptionNo = await this.deps.recordNumbers.next(RECORD_PREFIXES.PRESCRIPTION, (candidate) =>
-        this.deps.prescriptionRepository.isPrescriptionNoTaken(candidate, tx)
-      );
+      const { prescriptionRepository } = this.deps;
+      const prescriptionNo = await this.deps.recordNumbers.next(RECORD_PREFIXES.PRESCRIPTION, {
+        isTaken: (candidate) => prescriptionRepository.isPrescriptionNoTaken(candidate, tx),
+        countIssued: (dayPrefix) => prescriptionRepository.countPrescriptionNosStartingWith(dayPrefix, tx),
+      });
       return this.deps.prescriptionRepository.transition(
         id,
         ["DRAFT"],

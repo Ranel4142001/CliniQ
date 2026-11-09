@@ -414,9 +414,11 @@ async function main() {
       where: { firstName: p.firstName, lastName: p.lastName, birthDate: p.birthDate },
     });
     if (!patient) {
-      const patientNo = await recordNumberGenerator.next(RECORD_PREFIXES.PATIENT, async (candidate) =>
-        Boolean(await prisma.patient.findUnique({ where: { patientNo: candidate }, select: { id: true } }))
-      );
+      const patientNo = await recordNumberGenerator.next(RECORD_PREFIXES.PATIENT, {
+        isTaken: async (candidate) =>
+          Boolean(await prisma.patient.findUnique({ where: { patientNo: candidate }, select: { id: true } })),
+        countIssued: (dayPrefix) => prisma.patient.count({ where: { patientNo: { startsWith: dayPrefix } } }),
+      });
       patient = await prisma.patient.create({
         data: {
           ...p,

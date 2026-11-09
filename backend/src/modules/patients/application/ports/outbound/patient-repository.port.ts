@@ -45,6 +45,7 @@ export interface PatientRepositoryPort {
   findById(id: string): Promise<PatientRecord | null>;
   findByPatientNo(patientNo: string): Promise<PatientRecord | null>;
   isPatientNoTaken(patientNo: string, tx?: TransactionContext): Promise<boolean>;
+  countPatientNosStartingWith(prefix: string, tx?: TransactionContext): Promise<number>;
   findByProfileId(profileId: string): Promise<PatientRecord | null>;
   findDuplicate(
     firstName: string,

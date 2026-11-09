@@ -10,7 +10,7 @@ import { fakeAuditLog, fakeRecordNumbers, fakeTransactions } from "../../support
 
 const createdPatient = {
   id: "pt-123",
-  patientNo: "PT-2026-11-10-482",
+  patientNo: "PT-261110-347",
   profileId: null,
   firstName: "John",
   middleName: null,
@@ -36,6 +36,7 @@ const patientRepository = {
   findById: vi.fn(),
   findByPatientNo: vi.fn(),
   isPatientNoTaken: vi.fn().mockResolvedValue(false),
+  countPatientNosStartingWith: vi.fn().mockResolvedValue(0),
   findByProfileId: vi.fn(),
   findDuplicate: vi.fn(),
   list: vi.fn(),
@@ -49,7 +50,7 @@ const patientRepository = {
 const patientService = createPatientService({
   patientRepository,
   transactions: fakeTransactions(),
-  recordNumbers: fakeRecordNumbers("PT-2026-11-10-482"),
+  recordNumbers: fakeRecordNumbers("PT-261110-347"),
   auditRepository: fakeAuditLog(),
 });
 
@@ -92,7 +93,7 @@ describe("Patient Service & Business Rules", () => {
   it("throws ConflictError when a duplicate patient is detected", async () => {
     vi.mocked(patientRepository.findDuplicate).mockResolvedValueOnce({
       id: "pt-existing",
-      patientNo: "PT-2026-11-09-305",
+      patientNo: "PT-261109-512",
     });
 
     await expect(patientService.createPatient("STAFF", "staff-1", validAdultInput)).rejects.toThrow(
@@ -115,7 +116,7 @@ describe("Patient Service & Business Rules", () => {
   it("prevents PATIENT from viewing another patient's record", async () => {
     vi.mocked(patientRepository.findById).mockResolvedValueOnce({
       id: "pt-123",
-      patientNo: "PT-2026-11-10-482",
+      patientNo: "PT-261110-347",
       profileId: "profile-other",
       firstName: "Secret",
       middleName: null,
@@ -145,7 +146,7 @@ describe("Patient Service & Business Rules", () => {
   it("allows PATIENT to only update allowed self-edit fields", async () => {
     vi.mocked(patientRepository.findById).mockResolvedValueOnce({
       id: "pt-123",
-      patientNo: "PT-2026-11-10-482",
+      patientNo: "PT-261110-347",
       profileId: "my-profile-id",
       firstName: "Original",
       middleName: null,
@@ -169,7 +170,7 @@ describe("Patient Service & Business Rules", () => {
 
     vi.mocked(patientRepository.update).mockImplementation(async (id, data) => ({
       id,
-      patientNo: "PT-2026-11-10-482",
+      patientNo: "PT-261110-347",
       profileId: "my-profile-id",
       firstName: "Original", // Did not change
       middleName: null,

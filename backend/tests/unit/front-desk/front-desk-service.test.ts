@@ -30,7 +30,7 @@ const CLINICIAN = { id: "clinician-1", role: "CLINICIAN" as const };
 const patient = {
   id: PATIENT_ID,
   profileId: PATIENT_PROFILE.id,
-  patientNo: "PT-2026-11-10-482",
+  patientNo: "PT-261110-347",
   firstName: "Maria Clara",
   middleName: null,
   lastName: "Santos",

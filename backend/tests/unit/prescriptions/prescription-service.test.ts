@@ -22,6 +22,7 @@ const prescriptionRepository: PrescriptionRepositoryPort = {
   findConsultation: notImplemented,
   findArchivedMedicines: async () => [],
   isPrescriptionNoTaken: async () => false,
+  countPrescriptionNosStartingWith: async () => 0,
 };
 
 const stock = { dispense: vi.fn().mockResolvedValue([]) };
@@ -36,7 +37,7 @@ describe("PrescriptionService Business Rules", () => {
       prescriptionRepository,
       stock,
       transactions: fakeTransactions(),
-      recordNumbers: fakeRecordNumbers("RX-2026-11-10-917"),
+      recordNumbers: fakeRecordNumbers("RX-261110-291"),
       auditLog: fakeAuditLog(),
     });
   });
@@ -51,7 +52,7 @@ describe("PrescriptionService Business Rules", () => {
 
   const mockPrescription = {
     id: "rx-1",
-    prescriptionNo: "RX-2026-11-10-917",
+    prescriptionNo: "RX-261110-291",
     consultationId: "consult-1",
     patientId: "patient-1",
     clinicianId: "doc-1",
@@ -177,7 +178,7 @@ describe("PrescriptionService Business Rules", () => {
     const transitionSpy = vi.spyOn(prescriptionRepository, "transition").mockResolvedValue({
       ...mockPrescription,
       status: "ISSUED",
-      prescriptionNo: "RX-2026-11-10-917",
+      prescriptionNo: "RX-261110-291",
       issuedAt: new Date(),
     } as any);
 
@@ -186,7 +187,7 @@ describe("PrescriptionService Business Rules", () => {
       "rx-1",
       ["DRAFT"],
       "ISSUED",
-      expect.objectContaining({ prescriptionNo: "RX-2026-11-10-917" }),
+      expect.objectContaining({ prescriptionNo: "RX-261110-291" }),
       expect.anything()
     );
     expect(issued.status).toBe("ISSUED");

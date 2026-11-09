@@ -26,6 +26,7 @@ export type PrescriptionTransitionData = Partial<
 export interface PrescriptionRepositoryPort {
   findById(id: string): Promise<PrescriptionWithRelations | null>;
   isPrescriptionNoTaken(prescriptionNo: string, tx?: TransactionContext): Promise<boolean>;
+  countPrescriptionNosStartingWith(prefix: string, tx?: TransactionContext): Promise<number>;
   findByConsultationId(consultationId: string): Promise<PrescriptionWithRelations | null>;
   findAll(
     params: PrescriptionFilter & { skip?: number; take?: number }

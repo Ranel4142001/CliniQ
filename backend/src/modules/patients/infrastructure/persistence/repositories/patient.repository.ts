@@ -59,6 +59,10 @@ export const patientRepository = {
     return found !== null;
   },
 
+  async countPatientNosStartingWith(prefix: string, tx?: TransactionContext) {
+    return dbClient(tx).patient.count({ where: { patientNo: { startsWith: prefix } } });
+  },
+
   async findByProfileId(profileId: string) {
     return prisma.patient.findUnique({ where: { profileId }, select: DETAIL_SELECT });
   },

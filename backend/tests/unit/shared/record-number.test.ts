@@ -7,39 +7,56 @@ import {
   RECORD_NUMBER_PATTERN,
 } from "@backend/shared/domain/record-number";
 
-const today = () => "2026-11-10";
+const today = () => "261110";
+
+/** A table holding `existing` numbers. */
+function storeWith(existing: string[]) {
+  const taken = new Set(existing);
+  return {
+    isTaken: async (candidate: string) => taken.has(candidate),
+    countIssued: async (dayPrefix: string) => [...taken].filter((n) => n.startsWith(dayPrefix)).length,
+  };
+}
 
 describe("formatRecordNumber", () => {
-  it("is PREFIX-YEAR-MONTH-DAY-NNN with a zero-padded suffix", () => {
-    expect(formatRecordNumber("PT", "2026-11-10", 482)).toBe("PT-2026-11-10-482");
-    expect(formatRecordNumber("RX", "2026-01-05", 7)).toBe("RX-2026-01-05-007");
+  it("is PREFIX-YYMMDD-<counter><2 random digits>", () => {
+    expect(formatRecordNumber("PT", "261110", 1, 47)).toBe("PT-261110-147");
+    expect(formatRecordNumber("RX", "260105", 12, 7)).toBe("RX-260105-1207");
   });
 });
 
 describe("record number generator", () => {
-  it("skips numbers that are already taken", async () => {
-    const suffixes = [482, 482, 91];
-    const generator = createRecordNumberGenerator({ today, randomSuffix: () => suffixes.shift() ?? 0 });
-    const taken = new Set(["PT-2026-11-10-482"]);
+  it("numbers each day's records 1, 2, 3… and ignores other days", async () => {
+    const generator = createRecordNumberGenerator({ today, randomEnding: () => 47 });
+    const store = storeWith(["PT-261110-183", "PT-261110-209", "PT-261109-150", "RX-261110-111"]);
 
-    const number = await generator.next("PT", async (candidate) => taken.has(candidate));
-    expect(number).toBe("PT-2026-11-10-091");
+    expect(await generator.next("PT", store)).toBe("PT-261110-347");
   });
 
-  it("gives up with a clear error instead of looping forever on a full day", async () => {
-    const generator = createRecordNumberGenerator({ today, randomSuffix: () => 1 });
+  it("starts at 1 on a new day", async () => {
+    const generator = createRecordNumberGenerator({ today, randomEnding: () => 5 });
+    expect(await generator.next("RX", storeWith([]))).toBe("RX-261110-105");
+  });
+
+  it("draws new random digits when the candidate is taken", async () => {
+    const endings = [47, 47, 91];
+    const generator = createRecordNumberGenerator({ today, randomEnding: () => endings.shift() ?? 0 });
+    const store = { isTaken: async (c: string) => c === "PT-261110-147", countIssued: async () => 0 };
+
+    expect(await generator.next("PT", store)).toBe("PT-261110-191");
+  });
+
+  it("gives up with a clear error instead of looping forever", async () => {
+    const generator = createRecordNumberGenerator({ today, randomEnding: () => 1 });
     const isTaken = vi.fn().mockResolvedValue(true);
 
-    await expect(generator.next("RX", isTaken)).rejects.toThrow(ConflictError);
+    await expect(generator.next("RX", { isTaken, countIssued: async () => 0 })).rejects.toThrow(ConflictError);
     expect(isTaken.mock.calls.length).toBeGreaterThan(1);
   });
 
-  it("produces well-formed, non-sequential numbers in production", async () => {
-    const numbers = new Set<string>();
-    for (let i = 0; i < 20; i++) {
-      numbers.add(await recordNumberGenerator.next("PT", async () => false));
-    }
-    for (const n of numbers) expect(n).toMatch(RECORD_NUMBER_PATTERN);
-    expect(numbers.size).toBeGreaterThan(10);
+  it("produces well-formed numbers in production", async () => {
+    const number = await recordNumberGenerator.next("PT", storeWith([]));
+    expect(number).toMatch(RECORD_NUMBER_PATTERN);
+    expect(number).toMatch(/^PT-\d{6}-1\d{2}$/);
   });
 });

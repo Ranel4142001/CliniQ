@@ -168,9 +168,10 @@ export function createPatientService({
 
       // Assign the patient number inside the transaction that creates the patient
       const patient = await transactions.run(async (tx) => {
-        const patientNo = await recordNumbers.next(RECORD_PREFIXES.PATIENT, (candidate) =>
-          patientRepository.isPatientNoTaken(candidate, tx)
-        );
+        const patientNo = await recordNumbers.next(RECORD_PREFIXES.PATIENT, {
+          isTaken: (candidate) => patientRepository.isPatientNoTaken(candidate, tx),
+          countIssued: (dayPrefix) => patientRepository.countPatientNosStartingWith(dayPrefix, tx),
+        });
 
         const created = await patientRepository.create(
           {
