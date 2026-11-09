@@ -10,6 +10,7 @@ export const ROUTES = {
   CONSULTATION: (appointmentId: string) => `/consultations/${appointmentId}`,
   MESSAGES: "/messages",
   MESSAGE_THREAD: (appointmentId: string) => `/messages/${appointmentId}`,
+  FRONT_DESK_THREAD: (patientId: string) => `/messages/desk/${patientId}`,
   MEDICINES: "/medicines",
   PRESCRIPTIONS: "/prescriptions",
   REPORTS: "/reports",

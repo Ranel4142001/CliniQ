@@ -10,7 +10,7 @@ import { notify } from "@/lib/notify";
 import { ApiError, apiClient } from "@/lib/api-client";
 import { ROUTES } from "@/constants/routes";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
-import { canUseChat, useUnreadChatCount } from "@/features/consultations";
+import { useInbox } from "@/features/consultations";
 
 const SESSION_ENDED_STATUSES = new Set([401, 403]);
 
@@ -22,7 +22,7 @@ export function AppShellClient({ children }: { children: ReactNode }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { user, isLoading, error, refetch } = useCurrentUser();
-  const unreadMessages = useUnreadChatCount(canUseChat(user?.role));
+  const { unreadCount: unreadMessages } = useInbox(user?.role);
 
   // Expired session or deactivated account: back to sign in.
   const sessionEnded = error instanceof ApiError && SESSION_ENDED_STATUSES.has(error.status);

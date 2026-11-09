@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeft, Maximize2, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,8 @@ interface ChatHeaderProps {
   backClassName?: string;
   /** Shows an expand button (embedded panel). */
   expandHref?: string;
+  /** Replaces the initials in the avatar, e.g. a clinic icon. */
+  avatarIcon?: ReactNode;
 }
 
 const ICON_BUTTON =
@@ -69,6 +71,7 @@ export function ChatHeader({
   backHref,
   backClassName,
   expandHref,
+  avatarIcon,
 }: ChatHeaderProps) {
   const presenceLabel = getPresenceLabel(status);
 
@@ -80,7 +83,7 @@ export function ChatHeader({
         </Link>
       )}
       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-violet-600 text-sm font-semibold text-white">
-        {getInitials(counterpartName)}
+        {avatarIcon ?? getInitials(counterpartName)}
         {status?.isActive && (
           <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-background" />
         )}

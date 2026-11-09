@@ -19,6 +19,8 @@ interface ChatMessageListProps {
   currentUserId: string;
   counterpartName: string;
   isCounterpartTyping: boolean;
+  /** Line under the name before the first message. */
+  emptyHint?: string;
 }
 
 export function ChatMessageList({
@@ -26,6 +28,7 @@ export function ChatMessageList({
   currentUserId,
   counterpartName,
   isCounterpartTyping,
+  emptyHint,
 }: ChatMessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isFollowingRef = useRef(true);
@@ -60,7 +63,7 @@ export function ChatMessageList({
         <p className="mt-1 text-base font-semibold text-foreground">{counterpartName}</p>
         <p className="flex max-w-[260px] items-center gap-1.5 text-xs text-muted-foreground">
           <Lock className="h-3 w-3 shrink-0" />
-          Private to you and {counterpartName}. Say hello 👋
+          {emptyHint ?? `Private to you and ${counterpartName}. Say hello 👋`}
         </p>
       </div>
     );

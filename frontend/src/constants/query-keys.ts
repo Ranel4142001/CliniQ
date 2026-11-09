@@ -18,6 +18,10 @@ export const QUERY_KEYS = {
     chat: (appointmentId: string) => ["consultations", "chat", appointmentId] as const,
     conversations: ["consultations", "conversations"] as const,
   },
+  FRONT_DESK: {
+    threads: ["front-desk", "threads"] as const,
+    chat: (patientId: string) => ["front-desk", "chat", patientId] as const,
+  },
   MEDICINES: {
     all: ["medicines"] as const,
     list: (params?: unknown) => ["medicines", "list", params] as const,

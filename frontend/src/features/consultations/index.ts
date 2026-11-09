@@ -13,3 +13,6 @@ export * from "./components/inbox/ConversationList";
 export * from "./components/inbox/ChatThread";
 export * from "./hooks/useConversations";
 export * from "./utils/chat-roles";
+export * from "./hooks/useInbox";
+export * from "./hooks/useFrontDesk";
+export * from "./components/front-desk/FrontDeskThread";

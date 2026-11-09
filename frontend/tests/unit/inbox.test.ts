@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
-import type { ChatConversationDTO } from "@backend/contracts";
+import type { ChatConversationDTO, FrontDeskThreadDTO } from "@backend/contracts";
 import {
-  filterConversations,
+  filterInbox,
   formatInboxTimestamp,
-  getConversationPreview,
+  fromConsultation,
+  fromFrontDeskThread,
   getTotalUnread,
+  sortInbox,
 } from "@/features/consultations/utils/inbox";
-import { canUseChat } from "@/features/consultations/utils/chat-roles";
+import { hasConsultationChats, hasFrontDeskChat } from "@/features/consultations/utils/chat-roles";
 import { formatBadgeCount } from "@/lib/format";
 
 function conversation(overrides: Partial<ChatConversationDTO> = {}): ChatConversationDTO {
@@ -22,6 +24,19 @@ function conversation(overrides: Partial<ChatConversationDTO> = {}): ChatConvers
   };
 }
 
+function deskThread(overrides: Partial<FrontDeskThreadDTO> = {}): FrontDeskThreadDTO {
+  return {
+    patientId: "patient-1",
+    patientName: "Maria Clara Santos",
+    patientNo: "PT-2026-11-10-482",
+    lastMessage: null,
+    unreadCount: 0,
+    ...overrides,
+  };
+}
+
+const message = (createdAt: string, isMine = false) => ({ body: "Hi", createdAt, isMine });
+
 describe("formatInboxTimestamp", () => {
   const NOW = "2026-10-29T06:00:00Z"; // Thu 2:00 PM Manila
 
@@ -33,37 +48,52 @@ describe("formatInboxTimestamp", () => {
   });
 });
 
-describe("getConversationPreview", () => {
-  it("prefixes my own messages and flattens line breaks", () => {
-    const mine = conversation({
-      lastMessage: { body: "See you\nat 3", createdAt: "2026-10-29T02:00:00Z", isMine: true },
-    });
-    expect(getConversationPreview(mine)).toBe("You: See you at 3");
+describe("inbox items", () => {
+  it("previews consultation chats with 'You:' and flattened line breaks", () => {
+    const item = fromConsultation(
+      conversation({ lastMessage: { body: "See you\nat 3", createdAt: "2026-10-29T02:00:00Z", isMine: true } })
+    );
+    expect(item.preview).toBe("You: See you at 3");
+    expect(fromConsultation(conversation()).preview).toBe("Say hello 👋");
+    expect(fromConsultation(conversation({ canSend: false })).preview).toBe("No messages");
   });
 
-  it("invites a first message only while the chat is open", () => {
-    expect(getConversationPreview(conversation())).toBe("Say hello 👋");
-    expect(getConversationPreview(conversation({ canSend: false }))).toBe("No messages");
+  it("shows the front desk to patients and the patient to staff", () => {
+    const asPatient = fromFrontDeskThread(deskThread(), true);
+    const asStaff = fromFrontDeskThread(deskThread({ lastMessage: message("2026-10-29T02:00:00Z", true) }), false);
+    expect(asPatient).toMatchObject({ title: "Clinic front desk", avatar: "clinic", href: "/messages/desk/patient-1" });
+    expect(asStaff).toMatchObject({ title: "Maria Clara Santos", avatar: "person", preview: "Clinic: Hi" });
+  });
+
+  it("sorts newest message first and pins the front desk for patients", () => {
+    const old = fromConsultation(conversation({ appointmentId: "old", lastMessage: message("2026-10-01T02:00:00Z") }));
+    const recent = fromConsultation(conversation({ appointmentId: "new", lastMessage: message("2026-10-28T02:00:00Z") }));
+    const empty = fromConsultation(conversation({ appointmentId: "empty" }));
+    const desk = fromFrontDeskThread(deskThread(), true);
+
+    expect(sortInbox([empty, old, desk, recent], false).map((i) => i.key)).toEqual([
+      "consultation-new",
+      "consultation-old",
+      "consultation-empty",
+      "desk-patient-1",
+    ]);
+    expect(sortInbox([empty, old, desk, recent], true)[0].key).toBe("desk-patient-1");
+  });
+
+  it("filters by name or patient number and sums unread counts", () => {
+    const items = [fromConsultation(conversation()), fromFrontDeskThread(deskThread({ unreadCount: 3 }), false)];
+    expect(filterInbox(items, "  ")).toHaveLength(2);
+    expect(filterInbox(items, "pt-2026-11").map((i) => i.title)).toEqual(["Maria Clara Santos"]);
+    expect(getTotalUnread(items)).toBe(3);
+    expect(formatBadgeCount(150)).toBe("99+");
   });
 });
 
-describe("inbox helpers", () => {
-  it("filters by name, ignoring case and blanks", () => {
-    const list = [conversation(), conversation({ appointmentId: "b", counterpartName: "Juan Dela Cruz" })];
-    expect(filterConversations(list, "  ").length).toBe(2);
-    expect(filterConversations(list, "juan").map((c) => c.appointmentId)).toEqual(["b"]);
-  });
-
-  it("sums unread counts and caps the badge text", () => {
-    expect(getTotalUnread([conversation({ unreadCount: 2 }), conversation({ unreadCount: 3 })])).toBe(5);
-    expect(formatBadgeCount(7)).toBe("7");
-    expect(formatBadgeCount(150)).toBe("99+");
-  });
-
-  it("gives an inbox only to patients and clinicians", () => {
-    expect(canUseChat("PATIENT")).toBe(true);
-    expect(canUseChat("CLINICIAN")).toBe(true);
-    expect(canUseChat("ADMIN")).toBe(false);
-    expect(canUseChat("STAFF")).toBe(false);
+describe("chat roles", () => {
+  it("gives every role a Messages inbox with the right kinds of chat", () => {
+    expect([hasConsultationChats("PATIENT"), hasFrontDeskChat("PATIENT")]).toEqual([true, true]);
+    expect([hasConsultationChats("CLINICIAN"), hasFrontDeskChat("CLINICIAN")]).toEqual([true, false]);
+    expect([hasConsultationChats("STAFF"), hasFrontDeskChat("STAFF")]).toEqual([false, true]);
+    expect([hasConsultationChats("ADMIN"), hasFrontDeskChat("ADMIN")]).toEqual([false, true]);
   });
 });

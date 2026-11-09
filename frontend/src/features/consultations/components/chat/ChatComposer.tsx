@@ -17,9 +17,16 @@ interface ChatComposerProps {
   onSend: (body: string) => void;
   /** Called on each keystroke with text in the box (throttled by the caller). */
   onTyping?: () => void;
+  /** Shown instead of the input when sending is not allowed. */
+  readOnlyReason?: string;
 }
 
-export function ChatComposer({ canSend, onSend, onTyping }: ChatComposerProps) {
+export function ChatComposer({
+  canSend,
+  onSend,
+  onTyping,
+  readOnlyReason = "This conversation is read-only.",
+}: ChatComposerProps) {
   const [draft, setDraft] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -54,7 +61,7 @@ export function ChatComposer({ canSend, onSend, onTyping }: ChatComposerProps) {
     return (
       <div className="flex items-center justify-center gap-1.5 border-t px-4 py-3 text-xs text-muted-foreground">
         <Lock className="h-3.5 w-3.5" />
-        This conversation is read-only.
+        {readOnlyReason}
       </div>
     );
   }

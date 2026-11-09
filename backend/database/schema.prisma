@@ -69,6 +69,7 @@ model Profile {
   auditLogs               AuditLog[]
   sentMessages            ConsultationMessage[]      @relation("SentConsultationMessages")
   chatPresences           ConsultationChatPresence[]
+  sentFrontDeskMessages   FrontDeskMessage[]         @relation("SentFrontDeskMessages")
 }
 
 model Patient {
@@ -95,9 +96,10 @@ model Patient {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  appointments  Appointment[]
-  consultations Consultation[]
-  prescriptions Prescription[]
+  appointments      Appointment[]
+  consultations     Consultation[]
+  prescriptions     Prescription[]
+  frontDeskMessages FrontDeskMessage[]
 
   @@index([lastName, firstName])
 }
@@ -174,6 +176,24 @@ model ConsultationChatPresence {
   typingAt      DateTime?
 
   @@id([appointmentId, userId])
+}
+
+/// Patient ↔ clinic front desk (admins and staff): one shared thread per patient for booking,
+/// payment and pickup questions. Separate from the private patient–clinician consultation chats.
+model FrontDeskMessage {
+  id            String    @id @default(uuid())
+  patientId     String
+  patient       Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  senderId      String
+  sender        Profile   @relation("SentFrontDeskMessages", fields: [senderId], references: [id])
+  /// True when the patient wrote it; false for any admin or staff member.
+  isFromPatient Boolean
+  body          String    @db.VarChar(2000)
+  /// When the other side (the patient, or any desk member) first read it.
+  readAt        DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([patientId, createdAt])
 }
 
 model Medicine {

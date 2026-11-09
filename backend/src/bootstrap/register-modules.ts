@@ -7,6 +7,7 @@ import {
   consultationsController,
   consultationChatController,
 } from "@backend/modules/consultations";
+import { frontDeskController } from "@backend/modules/front-desk";
 import { medicinesController } from "@backend/modules/medicines";
 import { prescriptionsController } from "@backend/modules/prescriptions";
 import { dashboardController } from "@backend/modules/dashboard";
@@ -19,6 +20,7 @@ const CONTROLLERS = [
   appointmentsController,
   consultationChatController,
   consultationsController,
+  frontDeskController,
   medicinesController,
   prescriptionsController,
   dashboardController,

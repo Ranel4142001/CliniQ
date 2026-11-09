@@ -34,6 +34,11 @@ export * from "../modules/consultations/application/dto/consultation-message.sch
 export * from "../modules/consultations/application/dto/consultation-message.types";
 export * from "../modules/consultations/domain/constants/consultation.constants";
 
+// Front desk
+export * from "../modules/front-desk/application/dto/front-desk.schema";
+export * from "../modules/front-desk/application/dto/front-desk.types";
+export * from "../modules/front-desk/domain/constants/front-desk.constants";
+
 // Medicines
 export * from "../modules/medicines/application/dto/medicine.schema";
 export * from "../modules/medicines/application/dto/medicine.types";

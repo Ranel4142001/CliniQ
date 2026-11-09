@@ -1,6 +1,10 @@
 "use client";
 
 import React, { use, useState } from "react";
+import Link from "next/link";
+import { MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
@@ -15,6 +19,7 @@ import {
 } from "@/features/patients";
 import type { EditPatientInput } from "@backend/contracts";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
+import { hasFrontDeskChat } from "@/features/consultations";
 
 interface PatientDetailPageProps {
   params: Promise<{ id: string }>;
@@ -59,6 +64,8 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
     user?.role === "ADMIN" ||
     user?.role === "STAFF" ||
     (user?.role === "PATIENT" && user?.id === patient.id);
+  // Admins and staff answer the clinic front desk; patients reach it from their own Messages page.
+  const canMessage = user?.role !== "PATIENT" && hasFrontDeskChat(user?.role);
 
   return (
     <div className="space-y-6">
@@ -70,6 +77,15 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
           { label: "Patients", href: "/patients" },
           { label: patient.patientNo },
         ]}
+        actions={
+          canMessage && (
+            <Button asChild size="sm" className="gap-1.5 rounded-full">
+              <Link href={ROUTES.FRONT_DESK_THREAD(patient.id)}>
+                <MessageCircle className="h-4 w-4" /> Message
+              </Link>
+            </Button>
+          )
+        }
       />
 
       <PatientProfileCard patient={patient} canEdit={canEdit} onEdit={() => setIsEditOpen(true)} />
