@@ -31,13 +31,9 @@ import { formatDateTime } from "@/lib/date";
 import { notify } from "@/lib/notify";
 
 const CONSULTATION_STATUS_MAP: StatusMap<"PENDING" | "IN_PROGRESS" | "COMPLETED"> = {
-  PENDING: { label: "Not Started", variant: "secondary" },
-  IN_PROGRESS: {
-    label: "In Progress",
-    variant: "outline",
-    className: "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-950/40",
-  },
-  COMPLETED: { label: "Completed", variant: "default", className: "bg-emerald-600 text-white" },
+  PENDING: { label: "Not Started", tone: "neutral" },
+  IN_PROGRESS: { label: "In Progress", tone: "amber" },
+  COMPLETED: { label: "Completed", tone: "green" },
 };
 
 export default function ConsultationPage({

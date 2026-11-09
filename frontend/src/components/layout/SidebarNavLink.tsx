@@ -31,18 +31,18 @@ export function SidebarNavLink({
       aria-label={isCollapsed ? label : undefined}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "group relative flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium transition-all duration-150",
+        "group relative flex min-h-11 items-center gap-3 rounded-xl py-2.5 text-[15px] font-medium transition-all duration-150",
         isCollapsed ? "justify-center px-0" : "px-3.5",
         isActive
-          ? "shadow-xs bg-primary font-semibold text-primary-foreground"
-          : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+          ? "bg-primary/10 font-semibold text-primary dark:bg-primary/15"
+          : "text-slate-600 hover:bg-muted/70 hover:text-foreground dark:text-slate-300"
       )}
     >
       <span className="relative">
         <Icon
           className={cn(
-            "h-4 w-4 shrink-0 transition-transform duration-150",
-            isActive ? "scale-110" : "group-hover:scale-105"
+            "h-5 w-5 shrink-0 transition-transform duration-150",
+            isActive ? "scale-105" : "group-hover:scale-105"
           )}
         />
         {isCollapsed && hasBadge && (
@@ -54,7 +54,7 @@ export function SidebarNavLink({
         <span
           className={cn(
             "ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold",
-            isActive ? "bg-primary-foreground text-primary" : "bg-rose-500 text-white"
+            isActive ? "bg-primary text-primary-foreground" : "bg-rose-500 text-white"
           )}
         >
           {formatBadgeCount(badgeCount)}

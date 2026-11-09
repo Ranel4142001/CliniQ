@@ -18,30 +18,34 @@ export function MedicineStats({
   expiredCount,
 }: MedicineStatsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="Total Medicines"
         value={totalMedicines}
         description="Active catalog items"
-        icon={<Package className="h-4 w-4" />}
+        icon={<Package className="h-5 w-5" />}
+        tone="blue"
       />
       <StatCard
         title="Low Stock Alerts"
         value={lowStockCount}
         description="Below reorder level"
-        icon={<AlertTriangle className="h-4 w-4 text-amber-500" />}
+        icon={<AlertTriangle className="h-5 w-5" />}
+        tone="amber"
       />
       <StatCard
         title="Expiring Soon"
         value={expiringSoonCount}
         description="Within next 60 days"
-        icon={<Clock className="h-4 w-4 text-orange-500" />}
+        icon={<Clock className="h-5 w-5" />}
+        tone="amber"
       />
       <StatCard
         title="Expired Batches"
         value={expiredCount}
         description="Cannot be dispensed"
-        icon={<ShieldAlert className="h-4 w-4 text-rose-500" />}
+        icon={<ShieldAlert className="h-5 w-5" />}
+        tone="red"
       />
     </div>
   );

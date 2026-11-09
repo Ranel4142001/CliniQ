@@ -27,22 +27,10 @@ export const STOCK_STATUS = {
 export type StockStatus = (typeof STOCK_STATUS)[keyof typeof STOCK_STATUS];
 
 export const STOCK_STATUS_MAP = {
-  IN_STOCK: {
-    label: "In Stock",
-    variant: "default" as const,
-    className: "bg-emerald-600 text-white",
-  },
-  LOW_STOCK: {
-    label: "Low Stock",
-    variant: "outline" as const,
-    className: "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-950/40",
-  },
-  OUT_OF_STOCK: { label: "Out of Stock", variant: "destructive" as const },
-  EXPIRED: {
-    label: "Expired",
-    variant: "destructive" as const,
-    className: "bg-rose-700 text-white",
-  },
+  IN_STOCK: { label: "In Stock", tone: "green" as const },
+  LOW_STOCK: { label: "Low Stock", tone: "amber" as const },
+  OUT_OF_STOCK: { label: "Out of Stock", tone: "red" as const },
+  EXPIRED: { label: "Expired", tone: "red" as const },
 };
 
 export const MEDICINE_CONFIG = {

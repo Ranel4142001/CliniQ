@@ -11,36 +11,41 @@ interface PrescriptionStatsProps {
 
 export function PrescriptionStats({ stats }: PrescriptionStatsProps) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       <StatCard
         title="Total Prescriptions"
         value={stats?.total ?? 0}
         description="All recorded orders"
-        icon={<FileText className="h-4 w-4" />}
+        icon={<FileText className="h-5 w-5" />}
+        tone="blue"
       />
       <StatCard
         title="Draft"
         value={stats?.draft ?? 0}
         description="Editable clinician drafts"
-        icon={<Clock className="h-4 w-4 text-slate-500" />}
+        icon={<Clock className="h-5 w-5" />}
+        tone="blue"
       />
       <StatCard
         title="Issued"
         value={stats?.issued ?? 0}
         description="Awaiting pharmacy dispensing"
-        icon={<CheckCircle2 className="h-4 w-4 text-blue-500" />}
+        icon={<CheckCircle2 className="h-5 w-5" />}
+        tone="blue"
       />
       <StatCard
         title="Dispensed"
         value={stats?.dispensed ?? 0}
         description="Completed & stock deducted"
-        icon={<PackageCheck className="h-4 w-4 text-emerald-500" />}
+        icon={<PackageCheck className="h-5 w-5" />}
+        tone="teal"
       />
       <StatCard
         title="Voided"
         value={stats?.voided ?? 0}
         description="Cancelled orders"
-        icon={<Ban className="h-4 w-4 text-rose-500" />}
+        icon={<Ban className="h-5 w-5" />}
+        tone="red"
       />
     </div>
   );

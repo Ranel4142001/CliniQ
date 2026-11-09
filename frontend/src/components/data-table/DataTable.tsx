@@ -95,7 +95,7 @@ export function DataTable<T extends Record<string, unknown>>({
         </div>
       )}
 
-      <div className="shadow-xs overflow-hidden rounded-xl border border-border/80 bg-card">
+      <div className="shadow-xs overflow-hidden rounded-2xl border border-border/80 bg-card">
         {error ? (
           <ErrorState message={error.message} onRetry={onRetry} />
         ) : isLoading ? (
@@ -110,7 +110,7 @@ export function DataTable<T extends Record<string, unknown>>({
             </div>
             <div className="hidden lg:block">
               <Table>
-                <TableHeader className="border-b border-border/80 bg-muted/40">
+                <TableHeader className="border-b border-border/80 bg-slate-50/80 dark:bg-muted/40">
                   <TableRow className="hover:bg-transparent">
                     {columns.map((col, idx) => (
                       <TableHead
@@ -149,7 +149,7 @@ export function DataTable<T extends Record<string, unknown>>({
                       className={`transition-colors hover:bg-muted/30 ${onRowClick ? "cursor-pointer" : ""}`}
                     >
                       {columns.map((col, colIdx) => (
-                        <TableCell key={colIdx} className={`py-3 ${col.className ?? ""}`}>
+                        <TableCell key={colIdx} className={`py-3.5 ${col.className ?? ""}`}>
                           {col.cell
                             ? col.cell(item)
                             : col.accessorKey

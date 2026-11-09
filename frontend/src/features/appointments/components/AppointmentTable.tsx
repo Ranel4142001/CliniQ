@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Video, User, ExternalLink } from "lucide-react";
 import { DataTable, DataTableColumn } from "@/components/data-table/DataTable";
 import { StatusBadge } from "@/components/feedback/StatusBadge";
+import { InitialsAvatar } from "@/components/feedback/InitialsAvatar";
+import { format } from "date-fns";
 import { formatDateTime } from "@/lib/date";
 import { APPOINTMENT_STATUS_MAP } from "@/features/appointments/constants/appointment-status.constants";
 import { AppointmentActions } from "@/features/appointments/components/AppointmentActions";
@@ -48,33 +50,46 @@ export function AppointmentTable({
 }: AppointmentTableProps) {
   const columns: DataTableColumn<AppointmentListItem>[] = [
     {
-      header: "Scheduled Time",
+      header: "When",
       cell: (item) => (
-        <span className="font-medium text-xs whitespace-nowrap">
-          {formatDateTime(item.scheduledAt)}
-        </span>
-      ),
-    },
-    {
-      header: "Patient",
-      cell: (item) => (
-        <div className="flex flex-col">
-          <Link
-            href={`/patients/${item.patientId}`}
-            className="font-medium text-xs text-foreground hover:text-primary hover:underline"
-          >
-            {item.patientName}
-          </Link>
-          <span className="font-mono text-[10px] text-muted-foreground">
-            {item.patientNo}
+        <div className="flex items-center gap-3" title={formatDateTime(item.scheduledAt)}>
+          <span className="flex w-12 shrink-0 flex-col items-center rounded-xl bg-blue-50 py-1 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+            <span className="text-[10px] font-semibold uppercase">
+              {format(new Date(item.scheduledAt), "MMM")}
+            </span>
+            <span className="text-lg font-bold leading-tight">
+              {format(new Date(item.scheduledAt), "dd")}
+            </span>
+          </span>
+          <span className="flex flex-col whitespace-nowrap">
+            <span className="text-sm font-semibold text-foreground">
+              {format(new Date(item.scheduledAt), "h:mm a")}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {format(new Date(item.scheduledAt), "EEEE, yyyy")}
+            </span>
           </span>
         </div>
       ),
     },
     {
+      header: "Patient",
+      cell: (item) => (
+        <Link href={`/patients/${item.patientId}`} className="group flex items-center gap-3">
+          <InitialsAvatar name={item.patientName} />
+          <span className="flex flex-col">
+            <span className="text-sm font-semibold text-foreground group-hover:text-primary">
+              {item.patientName}
+            </span>
+            <span className="font-mono text-[11px] text-muted-foreground">{item.patientNo}</span>
+          </span>
+        </Link>
+      ),
+    },
+    {
       header: "Clinician",
       cell: (item) => (
-        <span className="text-xs text-muted-foreground">{item.clinicianName}</span>
+        <span className="text-sm text-slate-600 dark:text-slate-400">{item.clinicianName}</span>
       ),
     },
     {
@@ -83,14 +98,15 @@ export function AppointmentTable({
         <div className="flex items-center gap-1.5 text-xs">
           {item.type === "ONLINE" ? (
             <>
-              <Video className="h-3.5 w-3.5 text-blue-600" />
-              <span>Online</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">
+                <Video className="h-3.5 w-3.5" /> Online
+              </span>
               {item.meetingUrl && (
                 <a
                   href={item.meetingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline ml-1 inline-flex items-center gap-0.5"
+                  className="ml-1 inline-flex items-center gap-0.5 text-primary hover:underline"
                   title="Open Google Meet"
                 >
                   <ExternalLink className="h-3 w-3" />
@@ -99,8 +115,9 @@ export function AppointmentTable({
             </>
           ) : (
             <>
-              <User className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>In-Person</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-700 dark:bg-slate-500/10 dark:text-slate-300">
+                <User className="h-3.5 w-3.5" /> In-person
+              </span>
             </>
           )}
         </div>
@@ -108,14 +125,12 @@ export function AppointmentTable({
     },
     {
       header: "Status",
-      cell: (item) => (
-        <StatusBadge status={item.status} statusMap={APPOINTMENT_STATUS_MAP} />
-      ),
+      cell: (item) => <StatusBadge status={item.status} statusMap={APPOINTMENT_STATUS_MAP} />,
     },
     {
       header: "Reason",
       accessorKey: "reason",
-      className: "text-xs text-muted-foreground max-w-xs truncate",
+      className: "text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate",
     },
     {
       header: "Actions",

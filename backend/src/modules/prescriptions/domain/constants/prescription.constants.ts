@@ -8,18 +8,10 @@ export const PRESCRIPTION_STATUS = {
 export type PrescriptionStatus = (typeof PRESCRIPTION_STATUS)[keyof typeof PRESCRIPTION_STATUS];
 
 export const PRESCRIPTION_STATUS_MAP = {
-  DRAFT: {
-    label: "Draft",
-    variant: "outline" as const,
-    className: "border-slate-400 text-slate-600 bg-slate-50 dark:bg-slate-900",
-  },
-  ISSUED: { label: "Issued", variant: "default" as const, className: "bg-blue-600 text-white" },
-  DISPENSED: {
-    label: "Dispensed",
-    variant: "default" as const,
-    className: "bg-emerald-600 text-white",
-  },
-  VOIDED: { label: "Voided", variant: "destructive" as const, className: "bg-rose-700 text-white" },
+  DRAFT: { label: "Draft", tone: "neutral" as const },
+  ISSUED: { label: "Issued", tone: "blue" as const },
+  DISPENSED: { label: "Dispensed", tone: "green" as const },
+  VOIDED: { label: "Voided", tone: "red" as const },
 };
 
 export const COMMON_FREQUENCIES = [

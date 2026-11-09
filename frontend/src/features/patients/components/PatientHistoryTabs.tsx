@@ -5,18 +5,21 @@ import { Calendar, Stethoscope } from "lucide-react";
 import { DataTable, DataTableColumn } from "@/components/data-table/DataTable";
 import { StatusBadge, StatusMap } from "@/components/feedback/StatusBadge";
 import { formatDateTime } from "@/lib/date";
-import { usePatientHistory, PatientHistoryRecord } from "@/features/patients/hooks/usePatientHistory";
+import {
+  usePatientHistory,
+  PatientHistoryRecord,
+} from "@/features/patients/hooks/usePatientHistory";
 
 interface PatientHistoryTabsProps {
   patientId: string;
 }
 
 const APPT_STATUS_MAP: StatusMap<string> = {
-  PENDING: { label: "Pending", variant: "outline" },
-  CONFIRMED: { label: "Confirmed", variant: "default", className: "bg-blue-600 text-white" },
-  COMPLETED: { label: "Completed", variant: "default", className: "bg-emerald-600 text-white" },
-  CANCELLED: { label: "Cancelled", variant: "destructive" },
-  NO_SHOW: { label: "No Show", variant: "secondary" },
+  PENDING: { label: "Pending", tone: "amber" },
+  CONFIRMED: { label: "Confirmed", tone: "blue" },
+  COMPLETED: { label: "Completed", tone: "green" },
+  CANCELLED: { label: "Cancelled", tone: "red" },
+  NO_SHOW: { label: "No Show", tone: "neutral" },
 };
 
 export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
@@ -35,9 +38,7 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
     {
       header: "Scheduled Date & Time",
       cell: (item) => (
-        <span className="font-medium text-xs">
-          {formatDateTime(item.scheduledAt)}
-        </span>
+        <span className="text-xs font-medium">{formatDateTime(item.scheduledAt)}</span>
       ),
     },
     {
@@ -50,9 +51,7 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
     },
     {
       header: "Status",
-      cell: (item) => (
-        <StatusBadge status={item.status} statusMap={APPT_STATUS_MAP} />
-      ),
+      cell: (item) => <StatusBadge status={item.status} statusMap={APPT_STATUS_MAP} />,
     },
     {
       header: "Reason / Chief Complaint",
@@ -74,15 +73,16 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
 
   const paginatedConsultations = useMemo(() => {
     const start = (consPage - 1) * pageSize;
-    return (consultationsData as unknown as Record<string, unknown>[]).slice(start, start + pageSize);
+    return (consultationsData as unknown as Record<string, unknown>[]).slice(
+      start,
+      start + pageSize
+    );
   }, [consultationsData, consPage]);
 
   const consultationColumns: DataTableColumn<(typeof consultationsData)[0]>[] = [
     {
       header: "Date",
-      cell: (item) => (
-        <span className="font-medium text-xs">{formatDateTime(item.date)}</span>
-      ),
+      cell: (item) => <span className="text-xs font-medium">{formatDateTime(item.date)}</span>,
     },
     {
       header: "Chief Complaint",

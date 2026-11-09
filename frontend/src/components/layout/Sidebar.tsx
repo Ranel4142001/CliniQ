@@ -50,7 +50,10 @@ export function Sidebar({
 
   return (
     <aside
-      className={cn("flex h-full flex-col border-r border-border/80 bg-card text-card-foreground", className)}
+      className={cn(
+        "flex h-full flex-col border-r border-border/80 bg-card text-card-foreground",
+        className
+      )}
     >
       {/* Brand Header */}
       <div
@@ -59,7 +62,7 @@ export function Sidebar({
           isCollapsed ? "justify-center px-2" : "px-5"
         )}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-blue-700 text-primary-foreground shadow-sm">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
           <Stethoscope className="h-5 w-5" />
         </div>
         {!isCollapsed && (
@@ -90,8 +93,8 @@ export function Sidebar({
       {/* Navigation Links */}
       <nav className={cn("flex-1 space-y-1 overflow-y-auto py-4", isCollapsed ? "px-2" : "px-3")}>
         {!isCollapsed && (
-          <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-            Navigation
+          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Menu
           </p>
         )}
         {navItems.map((item) => (

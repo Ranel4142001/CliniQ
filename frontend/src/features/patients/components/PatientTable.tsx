@@ -6,6 +6,7 @@ import { Eye, Archive } from "lucide-react";
 import { DataTable, DataTableColumn } from "@/components/data-table/DataTable";
 import { StatusBadge, StatusMap } from "@/components/feedback/StatusBadge";
 import { ConfirmDialog } from "@/components/feedback/ConfirmDialog";
+import { InitialsAvatar } from "@/components/feedback/InitialsAvatar";
 import { Button } from "@/components/ui/button";
 import type { PatientListItem } from "@backend/contracts";
 import { SEX_LABELS } from "@backend/contracts";
@@ -27,12 +28,8 @@ interface PatientTableProps {
 }
 
 const PATIENT_STATUS_MAP: StatusMap<"ACTIVE" | "ARCHIVED"> = {
-  ACTIVE: {
-    label: "Active",
-    variant: "default",
-    className: "bg-emerald-600 hover:bg-emerald-600 text-white",
-  },
-  ARCHIVED: { label: "Archived", variant: "destructive" },
+  ACTIVE: { label: "Active", tone: "green" },
+  ARCHIVED: { label: "Archived", tone: "red" },
 };
 
 export function PatientTable({
@@ -66,26 +63,30 @@ export function PatientTable({
 
   const columns: DataTableColumn<PatientListItem>[] = [
     {
-      header: "Patient No.",
-      accessorKey: "patientNo",
-      className: "font-mono text-xs font-semibold w-36",
-    },
-    {
-      header: "Full Name",
+      header: "Patient",
       accessorKey: "fullName",
       cell: (p) => (
-        <Link
-          href={`/patients/${p.id}`}
-          className="font-medium text-foreground hover:text-primary hover:underline"
-        >
-          {p.fullName}
+        <Link href={`/patients/${p.id}`} className="group flex items-center gap-3">
+          <InitialsAvatar name={p.fullName} />
+          <span className="text-[15px] font-semibold text-foreground group-hover:text-primary">
+            {p.fullName}
+          </span>
         </Link>
+      ),
+    },
+    {
+      header: "Patient No.",
+      accessorKey: "patientNo",
+      cell: (p) => (
+        <span className="whitespace-nowrap rounded-lg bg-blue-50 px-2 py-1 font-mono text-xs font-medium text-blue-900 dark:bg-blue-500/10 dark:text-blue-200">
+          {p.patientNo}
+        </span>
       ),
     },
     {
       header: "Age / Sex",
       cell: (p) => (
-        <span className="text-xs text-muted-foreground">
+        <span className="whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">
           {p.age} yrs · {SEX_LABELS[p.sex] ?? p.sex}
         </span>
       ),
@@ -93,33 +94,36 @@ export function PatientTable({
     {
       header: "Contact",
       accessorKey: "contactNumber",
-      className: "text-xs font-mono",
+      className: "text-sm tabular-nums text-slate-700 dark:text-slate-300",
     },
     {
       header: "Status",
       cell: (p) => (
-        <StatusBadge
-          status={p.isArchived ? "ARCHIVED" : "ACTIVE"}
-          statusMap={PATIENT_STATUS_MAP}
-        />
+        <StatusBadge status={p.isArchived ? "ARCHIVED" : "ACTIVE"} statusMap={PATIENT_STATUS_MAP} />
       ),
     },
     {
       header: "Actions",
-      className: "text-right w-24",
+      className: "text-right w-36",
       cell: (p) => (
         <div className="flex items-center justify-end gap-1">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8" title="View Profile">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="h-9 gap-1.5 rounded-lg font-semibold text-primary"
+          >
             <Link href={`/patients/${p.id}`}>
-              <Eye className="h-4 w-4" />
+              <Eye className="h-4 w-4" /> View
             </Link>
           </Button>
           {canArchive && !p.isArchived && onArchive && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-destructive hover:text-destructive"
+              className="h-9 w-9 text-destructive hover:text-destructive"
               title="Archive Patient"
+              aria-label={`Archive ${p.fullName}`}
               onClick={() => setTargetToArchive(p)}
             >
               <Archive className="h-4 w-4" />
@@ -140,7 +144,7 @@ export function PatientTable({
         onRetry={onRetry}
         search={search}
         onSearchChange={onSearchChange}
-        searchPlaceholder="Search patients by name or ID..."
+        searchPlaceholder="Search by name or patient no…"
         emptyTitle="No patients found"
         emptyMessage="Try adjusting your search query or register a new patient."
         pagination={{

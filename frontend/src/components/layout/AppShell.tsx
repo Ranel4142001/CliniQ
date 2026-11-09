@@ -65,7 +65,7 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
           user={user}
           onLogout={onLogout}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-canvas p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>

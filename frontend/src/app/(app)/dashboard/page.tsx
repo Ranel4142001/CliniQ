@@ -5,19 +5,23 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { useDashboard } from "@/features/dashboard/hooks/use-dashboard";
+import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 import { AdminStaffDashboard } from "@/features/dashboard/components/AdminStaffDashboard";
 import { PatientDashboard } from "@/features/dashboard/components/PatientDashboard";
 import type { AdminStaffDashboardData, PatientDashboardData } from "@backend/contracts";
 
 export default function DashboardPage() {
   const { data, isLoading, error, refetch } = useDashboard();
+  const { user } = useCurrentUser();
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Clinical Dashboard"
-        description="Real-time clinic activity, patient appointments, and inventory status"
-      />
+      {!data && (
+        <PageHeader
+          title="Dashboard"
+          description="Clinic activity, appointments, and inventory at a glance"
+        />
+      )}
 
       {isLoading && <LoadingState message="Loading dashboard overview..." />}
 
@@ -32,9 +36,12 @@ export default function DashboardPage() {
       {data && (
         <>
           {data.role === "PATIENT" ? (
-            <PatientDashboard data={data.data as PatientDashboardData} />
+            <PatientDashboard data={data.data as PatientDashboardData} userName={user?.fullName} />
           ) : (
-            <AdminStaffDashboard data={data.data as AdminStaffDashboardData} />
+            <AdminStaffDashboard
+              data={data.data as AdminStaffDashboardData}
+              userName={user?.fullName}
+            />
           )}
         </>
       )}
