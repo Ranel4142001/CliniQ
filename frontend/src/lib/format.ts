@@ -12,6 +12,14 @@ export function formatQuantity(qty: number, unit?: string | null): string {
   return unit ? `${qty} ${unit}` : `${qty}`;
 }
 
+/** Counts above this show as "99+" in badges. */
+const MAX_BADGE_COUNT = 99;
+
+/** Unread-style badge text: "3", "99+". */
+export function formatBadgeCount(count: number): string {
+  return count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : String(count);
+}
+
 /** Two-letter initials for avatars ("Maria Elena Reyes" → "MR"). */
 export function getInitials(name?: string | null): string {
   if (!name) return "CQ";

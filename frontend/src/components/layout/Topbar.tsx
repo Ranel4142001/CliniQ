@@ -2,7 +2,7 @@
 
 import { getInitials } from "@/lib/format";
 import React, { useState, useEffect } from "react";
-import { Menu, LogOut, Calendar, ShieldCheck } from "lucide-react";
+import { Menu, LogOut, Calendar, ShieldCheck, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,6 +17,11 @@ import { Role } from "@backend/contracts";
 
 interface TopbarProps {
   onOpenMobileMenu?: () => void;
+  /** Desktop: collapse the sidebar to icons, or expand it again. */
+  onToggleSidebar?: () => void;
+  isSidebarCollapsed?: boolean;
+  /** Red dot on the phone menu button when something in the menu is unread. */
+  hasNavBadge?: boolean;
   user?: {
     fullName?: string | null;
     email?: string | null;
@@ -48,7 +53,14 @@ const ROLE_STYLES: Record<string, { bg: string; text: string; badge: string }> =
   },
 };
 
-export function Topbar({ onOpenMobileMenu, user, onLogout }: TopbarProps) {
+export function Topbar({
+  onOpenMobileMenu,
+  onToggleSidebar,
+  isSidebarCollapsed = false,
+  hasNavBadge = false,
+  user,
+  onLogout,
+}: TopbarProps) {
   const [dateString, setDateString] = useState("");
 
   useEffect(() => {
@@ -73,11 +85,31 @@ export function Topbar({ onOpenMobileMenu, user, onLogout }: TopbarProps) {
           variant="ghost"
           size="icon"
           onClick={onOpenMobileMenu}
-          className="md:hidden"
-          aria-label="Open mobile navigation"
+          className="relative md:hidden"
+          aria-label={hasNavBadge ? "Open menu (unread messages)" : "Open menu"}
         >
           <Menu className="h-5 w-5" />
+          {hasNavBadge && (
+            <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-card" />
+          )}
         </Button>
+        {onToggleSidebar && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleSidebar}
+            className="hidden text-muted-foreground hover:text-foreground md:inline-flex"
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!isSidebarCollapsed}
+            title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isSidebarCollapsed ? (
+              <PanelLeftOpen className="h-5 w-5" />
+            ) : (
+              <PanelLeftClose className="h-5 w-5" />
+            )}
+          </Button>
+        )}
         <div className="flex items-center gap-2.5">
           <span className="hidden whitespace-nowrap text-sm font-semibold text-foreground sm:inline-block">
             Clinic Operations Portal
