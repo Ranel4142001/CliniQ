@@ -1,6 +1,6 @@
 import type { AppointmentStatus, AppointmentType } from "@prisma/client";
 
-export const CLINIC_TIMEZONE = "Asia/Manila";
+export { CLINIC_TIMEZONE } from "@backend/shared/domain/clinic-timezone";
 
 export const APPOINTMENT_CONFIG = {
   START_HOUR: 8, // 08:00 AM

@@ -44,7 +44,7 @@ export function PatientSelect({
       onChange={onChange}
       loadOptions={loadOptions}
       placeholder={placeholder}
-      searchPlaceholder="Search by name or PT-XXXX-XXXX..."
+      searchPlaceholder="Search by name or PT-YYYY-MM-DD-NNN..."
       disabled={disabled}
       className={className}
     />

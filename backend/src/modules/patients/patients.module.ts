@@ -2,13 +2,13 @@
 import { createPatientService } from "./application/services/patient.service";
 import { patientRepository } from "./infrastructure/persistence/repositories/patient.repository";
 import { prismaTransactionRunner } from "@backend/shared/infrastructure/persistence/prisma-transaction";
-import { prismaSequenceGenerator } from "@backend/shared/infrastructure/persistence/sequence";
+import { recordNumberGenerator } from "@backend/shared/infrastructure/persistence/record-number";
 import { prismaAuditLog } from "@backend/shared/infrastructure/audit/audit-log";
 
 export const patientService = createPatientService({
   patientRepository,
   transactions: prismaTransactionRunner,
-  sequences: prismaSequenceGenerator,
+  recordNumbers: recordNumberGenerator,
   auditRepository: prismaAuditLog,
 });
 

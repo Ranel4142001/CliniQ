@@ -1,7 +1,8 @@
 import type { PrescriptionRepositoryPort } from "@backend/modules/prescriptions/application/ports/outbound/prescription-repository.port";
 import type { StockDispenserPort } from "@backend/modules/prescriptions/application/ports/outbound/stock-dispenser.port";
 import type { AuditAction, AuditLogPort } from "@backend/shared/application/ports/audit-log.port";
-import type { SequenceGeneratorPort } from "@backend/shared/application/ports/sequence-generator.port";
+import type { RecordNumberGeneratorPort } from "@backend/shared/application/ports/record-number-generator.port";
+import { RECORD_PREFIXES } from "@backend/shared/domain/record-number";
 import type { TransactionRunner } from "@backend/shared/application/ports/transaction.port";
 import {
   getPaginationSkipTake,
@@ -26,7 +27,7 @@ export interface PrescriptionServiceDeps {
   prescriptionRepository: PrescriptionRepositoryPort;
   stock: StockDispenserPort;
   transactions: TransactionRunner;
-  sequences: SequenceGeneratorPort;
+  recordNumbers: RecordNumberGeneratorPort;
   auditLog: AuditLogPort;
 }
 
@@ -140,7 +141,9 @@ export class PrescriptionService {
     }
 
     const issued = await this.deps.transactions.run(async (tx) => {
-      const prescriptionNo = await this.deps.sequences.next(`RX-${new Date().getFullYear()}`, tx);
+      const prescriptionNo = await this.deps.recordNumbers.next(RECORD_PREFIXES.PRESCRIPTION, (candidate) =>
+        this.deps.prescriptionRepository.isPrescriptionNoTaken(candidate, tx)
+      );
       return this.deps.prescriptionRepository.transition(
         id,
         ["DRAFT"],

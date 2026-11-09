@@ -75,7 +75,7 @@ model Patient {
   id                 String   @id @default(uuid())
   profileId          String?  @unique
   profile            Profile? @relation(fields: [profileId], references: [id])
-  patientNo          String   @unique // PT-2026-0001
+  patientNo          String   @unique // PT-2026-11-10-482 (issue date + random suffix)
   firstName          String
   middleName         String?
   lastName           String
@@ -232,7 +232,7 @@ model StockMovement {
 
 model Prescription {
   id             String             @id @default(uuid())
-  prescriptionNo String?            @unique // RX-2026-0001
+  prescriptionNo String?            @unique // RX-2026-11-10-917 (issue date + random suffix)
   consultationId String             @unique
   consultation   Consultation       @relation(fields: [consultationId], references: [id])
   patientId      String

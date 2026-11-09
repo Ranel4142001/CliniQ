@@ -54,6 +54,11 @@ export const patientRepository = {
     return prisma.patient.findUnique({ where: { patientNo }, select: DETAIL_SELECT });
   },
 
+  async isPatientNoTaken(patientNo: string, tx?: TransactionContext) {
+    const found = await dbClient(tx).patient.findUnique({ where: { patientNo }, select: { id: true } });
+    return found !== null;
+  },
+
   async findByProfileId(profileId: string) {
     return prisma.patient.findUnique({ where: { profileId }, select: DETAIL_SELECT });
   },

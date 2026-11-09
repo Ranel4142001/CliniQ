@@ -6,7 +6,7 @@ import {
   ConflictError,
   ValidationError,
 } from "@backend/shared/domain/errors/app-error";
-import { fakeAuditLog, fakeSequences, fakeTransactions } from "../../support/fakes";
+import { fakeAuditLog, fakeRecordNumbers, fakeTransactions } from "../../support/fakes";
 
 const notImplemented = () => Promise.reject(new Error("not stubbed in this test"));
 
@@ -21,6 +21,7 @@ const prescriptionRepository: PrescriptionRepositoryPort = {
   countByStatus: notImplemented,
   findConsultation: notImplemented,
   findArchivedMedicines: async () => [],
+  isPrescriptionNoTaken: async () => false,
 };
 
 const stock = { dispense: vi.fn().mockResolvedValue([]) };
@@ -35,7 +36,7 @@ describe("PrescriptionService Business Rules", () => {
       prescriptionRepository,
       stock,
       transactions: fakeTransactions(),
-      sequences: fakeSequences("RX-2026-0001"),
+      recordNumbers: fakeRecordNumbers("RX-2026-11-10-917"),
       auditLog: fakeAuditLog(),
     });
   });
@@ -50,7 +51,7 @@ describe("PrescriptionService Business Rules", () => {
 
   const mockPrescription = {
     id: "rx-1",
-    prescriptionNo: "RX-2026-0001",
+    prescriptionNo: "RX-2026-11-10-917",
     consultationId: "consult-1",
     patientId: "patient-1",
     clinicianId: "doc-1",
@@ -171,12 +172,12 @@ describe("PrescriptionService Business Rules", () => {
     ).rejects.toThrow(ConflictError);
   });
 
-  it("issues prescription and assigns sequence number", async () => {
+  it("issues prescription and assigns a date-based record number", async () => {
     vi.spyOn(prescriptionRepository, "findById").mockResolvedValue(mockPrescription as any);
     const transitionSpy = vi.spyOn(prescriptionRepository, "transition").mockResolvedValue({
       ...mockPrescription,
       status: "ISSUED",
-      prescriptionNo: "RX-2026-0001",
+      prescriptionNo: "RX-2026-11-10-917",
       issuedAt: new Date(),
     } as any);
 
@@ -185,7 +186,7 @@ describe("PrescriptionService Business Rules", () => {
       "rx-1",
       ["DRAFT"],
       "ISSUED",
-      expect.objectContaining({ prescriptionNo: "RX-2026-0001" }),
+      expect.objectContaining({ prescriptionNo: "RX-2026-11-10-917" }),
       expect.anything()
     );
     expect(issued.status).toBe("ISSUED");

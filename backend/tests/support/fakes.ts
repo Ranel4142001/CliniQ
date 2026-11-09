@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import type { AuditLogPort } from "@backend/shared/application/ports/audit-log.port";
-import type { SequenceGeneratorPort } from "@backend/shared/application/ports/sequence-generator.port";
+import type { RecordNumberGeneratorPort } from "@backend/shared/application/ports/record-number-generator.port";
 import type {
   TransactionContext,
   TransactionRunner,
@@ -20,6 +20,12 @@ export function fakeAuditLog() {
   return { log: vi.fn().mockResolvedValue(undefined) } satisfies AuditLogPort;
 }
 
-export function fakeSequences(value = "SEQ-2026-0001") {
-  return { next: vi.fn().mockResolvedValue(value) } satisfies SequenceGeneratorPort;
+/** Always issues `value`, after asking the service's uniqueness check about it. */
+export function fakeRecordNumbers(value = "PT-2026-11-10-482") {
+  return {
+    next: vi.fn(async (_prefix, isTaken: (candidate: string) => Promise<boolean>) => {
+      await isTaken(value);
+      return value;
+    }),
+  } satisfies RecordNumberGeneratorPort;
 }

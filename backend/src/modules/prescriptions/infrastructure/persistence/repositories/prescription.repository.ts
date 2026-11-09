@@ -33,6 +33,14 @@ const PRESCRIPTION_INCLUDE = {
 } as const;
 
 export const prescriptionRepository = {
+  async isPrescriptionNoTaken(prescriptionNo: string, tx?: TransactionContext) {
+    const found = await dbClient(tx).prescription.findUnique({
+      where: { prescriptionNo },
+      select: { id: true },
+    });
+    return found !== null;
+  },
+
   async findById(id: string): Promise<PrescriptionWithRelations | null> {
     return prisma.prescription.findUnique({
       where: { id },

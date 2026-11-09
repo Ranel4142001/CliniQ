@@ -16,6 +16,8 @@
 
 import { PrismaClient, Role, Sex, AppointmentType, AppointmentStatus } from "@prisma/client";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { recordNumberGenerator } from "@backend/shared/infrastructure/persistence/record-number";
+import { RECORD_PREFIXES } from "@backend/shared/domain/record-number";
 
 const prisma = new PrismaClient();
 
@@ -42,7 +44,6 @@ const STAFF_MEMBERS = [
 
 const PATIENTS = [
   {
-    patientNo: "PT-2026-0001",
     firstName: "Juan",
     lastName: "Dela Cruz",
     birthDate: new Date("1985-06-12"),
@@ -55,7 +56,6 @@ const PATIENTS = [
     existingConditions: "Hypertension",
   },
   {
-    patientNo: "PT-2026-0002",
     firstName: "Maria Clara",
     lastName: "Santos",
     birthDate: new Date("1992-03-24"),
@@ -68,7 +68,6 @@ const PATIENTS = [
     allergies: "Penicillin",
   },
   {
-    patientNo: "PT-2026-0003",
     firstName: "Jose",
     lastName: "Rizal",
     birthDate: new Date("1990-12-30"),
@@ -81,7 +80,6 @@ const PATIENTS = [
     existingConditions: "Asthma",
   },
   {
-    patientNo: "PT-2026-0004",
     firstName: "Gabriela",
     lastName: "Silang",
     birthDate: new Date("1995-03-19"),
@@ -93,7 +91,6 @@ const PATIENTS = [
     bloodType: "AB+",
   },
   {
-    patientNo: "PT-2026-0005",
     firstName: "Andres",
     lastName: "Bonifacio",
     birthDate: new Date("1988-11-30"),
@@ -106,7 +103,6 @@ const PATIENTS = [
     existingConditions: "Type 2 Diabetes",
   },
   {
-    patientNo: "PT-2026-0006",
     firstName: "Melchora",
     lastName: "Aquino",
     birthDate: new Date("1970-01-06"),
@@ -119,7 +115,6 @@ const PATIENTS = [
     existingConditions: "Osteoarthritis",
   },
   {
-    patientNo: "PT-2026-0007",
     firstName: "Emilio",
     lastName: "Aguinaldo",
     birthDate: new Date("1983-03-22"),
@@ -131,7 +126,6 @@ const PATIENTS = [
     bloodType: "B-",
   },
   {
-    patientNo: "PT-2026-0008",
     firstName: "Apolinario",
     lastName: "Mabini",
     birthDate: new Date("1987-07-23"),
@@ -143,7 +137,6 @@ const PATIENTS = [
     bloodType: "AB-",
   },
   {
-    patientNo: "PT-2026-0009",
     firstName: "Marcelo",
     lastName: "Del Pilar",
     birthDate: new Date("1986-08-30"),
@@ -156,7 +149,6 @@ const PATIENTS = [
     allergies: "NSAIDs",
   },
   {
-    patientNo: "PT-2026-0010",
     firstName: "Antonio",
     lastName: "Luna",
     birthDate: new Date("1989-10-29"),
@@ -169,7 +161,6 @@ const PATIENTS = [
     existingConditions: "Hypertension",
   },
   {
-    patientNo: "PT-2026-0011",
     firstName: "Teresa",
     lastName: "Magbanua",
     birthDate: new Date("1994-10-13"),
@@ -181,7 +172,6 @@ const PATIENTS = [
     bloodType: "B+",
   },
   {
-    patientNo: "PT-2026-0012",
     firstName: "Gregorio",
     lastName: "Del Pilar",
     birthDate: new Date("1996-11-14"),
@@ -193,7 +183,6 @@ const PATIENTS = [
     bloodType: "O+",
   },
   {
-    patientNo: "PT-2026-0013",
     firstName: "Francisco",
     lastName: "Dagohoy",
     birthDate: new Date("1984-05-10"),
@@ -206,7 +195,6 @@ const PATIENTS = [
     existingConditions: "Gout",
   },
   {
-    patientNo: "PT-2026-0014",
     firstName: "Lapu",
     lastName: "Lapu",
     birthDate: new Date("1982-04-27"),
@@ -218,7 +206,6 @@ const PATIENTS = [
     bloodType: "O+",
   },
   {
-    patientNo: "PT-2026-0015",
     firstName: "Corazon",
     lastName: "Aquino",
     birthDate: new Date("1993-01-25"),
@@ -230,7 +217,6 @@ const PATIENTS = [
     bloodType: "A+",
   },
   {
-    patientNo: "PT-2026-0016",
     firstName: "Ramon",
     lastName: "Magsaysay",
     birthDate: new Date("1989-08-31"),
@@ -242,7 +228,6 @@ const PATIENTS = [
     bloodType: "B+",
   },
   {
-    patientNo: "PT-2026-0017",
     firstName: "Manuel",
     lastName: "Quezon",
     birthDate: new Date("1987-08-19"),
@@ -255,7 +240,6 @@ const PATIENTS = [
     existingConditions: "Asthma",
   },
   {
-    patientNo: "PT-2026-0018",
     firstName: "Teodora",
     lastName: "Alonso",
     birthDate: new Date("1975-11-09"),
@@ -268,7 +252,6 @@ const PATIENTS = [
     existingConditions: "Type 2 Diabetes",
   },
   {
-    patientNo: "PT-2026-0019",
     firstName: "Carlos",
     lastName: "Garcia",
     birthDate: new Date("1991-11-04"),
@@ -280,7 +263,6 @@ const PATIENTS = [
     bloodType: "AB+",
   },
   {
-    patientNo: "PT-2026-0020",
     firstName: "Diego",
     lastName: "Silang",
     birthDate: new Date("1988-12-16"),
@@ -427,11 +409,18 @@ async function main() {
   console.log("4️⃣  Seeding 20 Fictional Patients…");
   const seededPatients = [];
   for (const p of PATIENTS) {
-    let patient = await prisma.patient.findUnique({ where: { patientNo: p.patientNo } });
+    // Matched by name + birth date, so re-running the seed never duplicates a patient.
+    let patient = await prisma.patient.findFirst({
+      where: { firstName: p.firstName, lastName: p.lastName, birthDate: p.birthDate },
+    });
     if (!patient) {
+      const patientNo = await recordNumberGenerator.next(RECORD_PREFIXES.PATIENT, async (candidate) =>
+        Boolean(await prisma.patient.findUnique({ where: { patientNo: candidate }, select: { id: true } }))
+      );
       patient = await prisma.patient.create({
         data: {
           ...p,
+          patientNo,
           consentGivenAt: new Date(),
         },
       });
@@ -560,18 +549,6 @@ async function main() {
   } else {
     console.log("   ℹ️ Sample patient login already exists (or no online visit to link).");
   }
-
-  // 8. Seed Counters
-  await prisma.counter.upsert({
-    where: { key: "PT-2026" },
-    update: {},
-    create: { key: "PT-2026", value: 20 },
-  });
-  await prisma.counter.upsert({
-    where: { key: "RX-2026" },
-    update: {},
-    create: { key: "RX-2026", value: 0 },
-  });
 
   console.log("\n🎉 CliniQ Database Seed completed successfully!\n");
 }

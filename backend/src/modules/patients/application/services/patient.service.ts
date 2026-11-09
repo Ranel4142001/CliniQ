@@ -10,7 +10,8 @@ import {
 import { formatFullName } from "@backend/shared/domain/person-name";
 import type { PatientRepositoryPort } from "@backend/modules/patients/application/ports/outbound/patient-repository.port";
 import type { AuditLogPort } from "@backend/shared/application/ports/audit-log.port";
-import type { SequenceGeneratorPort } from "@backend/shared/application/ports/sequence-generator.port";
+import type { RecordNumberGeneratorPort } from "@backend/shared/application/ports/record-number-generator.port";
+import { RECORD_PREFIXES } from "@backend/shared/domain/record-number";
 import type { TransactionRunner } from "@backend/shared/application/ports/transaction.port";
 import type {
   CreatePatientInput,
@@ -109,7 +110,7 @@ function toListItem(row: {
 export interface PatientServiceDeps {
   patientRepository: PatientRepositoryPort;
   transactions: TransactionRunner;
-  sequences: SequenceGeneratorPort;
+  recordNumbers: RecordNumberGeneratorPort;
   auditRepository: AuditLogPort;
 }
 
@@ -118,7 +119,7 @@ export type PatientService = ReturnType<typeof createPatientService>;
 export function createPatientService({
   patientRepository,
   transactions,
-  sequences,
+  recordNumbers,
   auditRepository,
 }: PatientServiceDeps) {
   return {
@@ -165,10 +166,11 @@ export function createPatientService({
         );
       }
 
-      // Generate patient number inside a transaction with counter update
+      // Assign the patient number inside the transaction that creates the patient
       const patient = await transactions.run(async (tx) => {
-        const year = new Date().getFullYear();
-        const patientNo = await sequences.next(`PT-${year}`, tx);
+        const patientNo = await recordNumbers.next(RECORD_PREFIXES.PATIENT, (candidate) =>
+          patientRepository.isPatientNoTaken(candidate, tx)
+        );
 
         const created = await patientRepository.create(
           {
