@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { getSeenMessageId, groupMessages, type ChatMessageView } from "@/features/consultations/utils/group-messages";
+import {
+  formatChatTimestamp,
+  getReceipt,
+  groupMessages,
+  type ChatMessageView,
+} from "@/features/consultations/utils/group-messages";
+import { getPresenceLabel } from "@/features/consultations/utils/presence-label";
 import { sendMessageSchema } from "@backend/contracts";
 
 const ME = { id: "me", fullName: "Dr. Cruz", role: "CLINICIAN" as const };
@@ -40,15 +46,56 @@ describe("groupMessages", () => {
     );
     expect(items.map((i) => i.kind)).toEqual(["divider", "group", "divider", "group"]);
   });
+
+  it("adds a centered timestamp after a long pause on the same day", () => {
+    const items = groupMessages(
+      [msg("a", THEM, "2026-10-29T02:00:00Z"), msg("b", ME, "2026-10-29T02:05:00Z"), msg("c", THEM, "2026-10-29T03:00:00Z")],
+      ME.id
+    );
+    expect(items.map((i) => i.kind)).toEqual(["divider", "group", "group", "divider", "group"]);
+  });
 });
 
-describe("getSeenMessageId", () => {
-  it("returns my latest message only when it has been read", () => {
+describe("formatChatTimestamp", () => {
+  const NOW = "2026-10-29T06:00:00Z"; // Thu 2:00 PM Manila
+
+  it("shows only the time today, the weekday this week, and the full date before that", () => {
+    expect(formatChatTimestamp("2026-10-29T02:00:00Z", NOW)).toBe("10:00 AM");
+    expect(formatChatTimestamp("2026-10-26T02:00:00Z", NOW)).toBe("Mon 10:00 AM");
+    expect(formatChatTimestamp("2026-10-01T02:00:00Z", NOW)).toBe("Oct 1, 2026, 10:00 AM");
+  });
+});
+
+describe("getReceipt", () => {
+  it("marks my latest message as sent until it is read, then seen", () => {
     const unread = [msg("a", ME, "2026-10-29T02:00:00Z", "2026-10-29T02:01:00Z"), msg("b", ME, "2026-10-29T02:02:00Z")];
-    expect(getSeenMessageId(unread, ME.id)).toBeNull();
+    expect(getReceipt(unread, ME.id)).toEqual({ messageId: "b", isSeen: false });
 
     const read = [msg("a", ME, "2026-10-29T02:00:00Z", "2026-10-29T02:01:00Z"), msg("b", THEM, "2026-10-29T02:02:00Z")];
-    expect(getSeenMessageId(read, ME.id)).toBe("a");
+    expect(getReceipt(read, ME.id)).toEqual({ messageId: "a", isSeen: true });
+  });
+
+  it("ignores messages still being sent and chats where I have not written", () => {
+    const pending = [msg("a", ME, "2026-10-29T02:00:00Z"), { ...msg("b", ME, "2026-10-29T02:01:00Z"), isPending: true }];
+    expect(getReceipt(pending, ME.id)?.messageId).toBe("a");
+    expect(getReceipt([msg("a", THEM, "2026-10-29T02:00:00Z")], ME.id)).toBeNull();
+  });
+});
+
+describe("getPresenceLabel", () => {
+  const NOW = new Date("2026-10-29T06:00:00Z");
+  const status = (minutesAgo: number, isActive = false) => ({
+    lastSeenAt: new Date(NOW.getTime() - minutesAgo * 60_000).toISOString(),
+    isActive,
+    isTyping: false,
+  });
+
+  it("reads like Messenger and hides stale or unknown presence", () => {
+    expect(getPresenceLabel(status(0, true), NOW)).toBe("Active now");
+    expect(getPresenceLabel(status(5), NOW)).toBe("Active 5m ago");
+    expect(getPresenceLabel(status(180), NOW)).toBe("Active 3h ago");
+    expect(getPresenceLabel(status(60 * 30), NOW)).toBeNull();
+    expect(getPresenceLabel({ lastSeenAt: null, isActive: false, isTyping: false }, NOW)).toBeNull();
   });
 });
 

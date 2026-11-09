@@ -15,9 +15,11 @@ const QUICK_REPLY = "👍";
 interface ChatComposerProps {
   canSend: boolean;
   onSend: (body: string) => void;
+  /** Called on each keystroke with text in the box (throttled by the caller). */
+  onTyping?: () => void;
 }
 
-export function ChatComposer({ canSend, onSend }: ChatComposerProps) {
+export function ChatComposer({ canSend, onSend, onTyping }: ChatComposerProps) {
   const [draft, setDraft] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -70,7 +72,10 @@ export function ChatComposer({ canSend, onSend }: ChatComposerProps) {
           ref={textareaRef}
           rows={1}
           value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => {
+            setDraft(event.target.value);
+            if (event.target.value.trim()) onTyping?.();
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Aa"
           aria-label="Type a message"

@@ -20,4 +20,16 @@ export const CHAT_CONFIG = {
   POLL_INTERVAL_MS: 3000,
   /** Consecutive messages from the same sender within this window are visually grouped. */
   GROUP_WINDOW_MINUTES: 5,
+  /** A centered timestamp is shown when messages are further apart than this. */
+  TIMESTAMP_GAP_MINUTES: 15,
+  /** Seen in the chat (any poll) within this window counts as "Active now". */
+  ACTIVE_WINDOW_SECONDS: 30,
+  /** A typing ping keeps the "typing…" dots visible for this long. */
+  TYPING_WINDOW_SECONDS: 6,
+  /** The composer sends at most one typing ping per interval while the user types. */
+  TYPING_PING_INTERVAL_MS: 3000,
+  /** Most recent online appointments listed in the Messages inbox. */
+  INBOX_LIMIT: 50,
+  /** How often the inbox and the sidebar's unread badge refresh. */
+  INBOX_POLL_INTERVAL_MS: 10000,
 } as const;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { notify } from "@/lib/notify";
@@ -56,18 +56,40 @@ export function useSendChatMessage(appointmentId: string, currentUser: ChatParti
       if (ctx?.previous) queryClient.setQueryData(queryKey, ctx.previous);
       notify.error(error instanceof Error ? error.message : "Message could not be sent");
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONSULTATIONS.conversations });
+    },
   });
+}
+
+/** Returns a callback for each keystroke; it tells the server "typing" at most once per interval. */
+export function useTypingPing(appointmentId: string) {
+  const lastPingRef = useRef(0);
+
+  return useCallback(() => {
+    const now = Date.now();
+    if (now - lastPingRef.current < CHAT_CONFIG.TYPING_PING_INTERVAL_MS) return;
+    lastPingRef.current = now;
+    apiClient.post(`${chatUrl(appointmentId)}/typing`).catch(() => {
+      // Typing status is best-effort; the next keystroke retries.
+    });
+  }, [appointmentId]);
 }
 
 /** Marks the other participant's messages as read whenever unread ones are on screen. */
 export function useMarkChatRead(appointmentId: string, messages: ChatMessageView[], currentUserId: string) {
+  const queryClient = useQueryClient();
   const hasUnread = messages.some((m) => m.sender.id !== currentUserId && !m.readAt);
 
   useEffect(() => {
     if (!hasUnread || document.visibilityState !== "visible") return;
-    apiClient.post(`${chatUrl(appointmentId)}/read`).catch(() => {
-      // Read receipts are best-effort; the next poll retries.
-    });
-  }, [appointmentId, hasUnread, messages.length]);
+    apiClient
+      .post(`${chatUrl(appointmentId)}/read`)
+      // Clears this chat's unread count in the inbox and the sidebar badge right away.
+      .then(() => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONSULTATIONS.conversations }))
+      .catch(() => {
+        // Read receipts are best-effort; the next poll retries.
+      });
+  }, [appointmentId, hasUnread, messages.length, queryClient]);
 }

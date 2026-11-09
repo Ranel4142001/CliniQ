@@ -16,6 +16,7 @@ export const QUERY_KEYS = {
     all: ["consultations"] as const,
     detail: (appointmentId: string) => ["consultations", "detail", appointmentId] as const,
     chat: (appointmentId: string) => ["consultations", "chat", appointmentId] as const,
+    conversations: ["consultations", "conversations"] as const,
   },
   MEDICINES: {
     all: ["medicines"] as const,

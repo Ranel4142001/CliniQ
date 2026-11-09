@@ -6,6 +6,7 @@ import {
   Calendar,
   Pill,
   FileText,
+  MessageCircle,
   BarChart3,
   ShieldCheck,
   LucideIcon,
@@ -32,6 +33,7 @@ export const NAVIGATION_ITEMS: Record<Role, NavItem[]> = {
     { title: "Dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard },
     { title: "Patients", href: ROUTES.PATIENTS, icon: Users },
     { title: "Appointments", href: ROUTES.APPOINTMENTS, icon: Calendar },
+    { title: "Messages", href: ROUTES.MESSAGES, icon: MessageCircle },
     { title: "Prescriptions", href: ROUTES.PRESCRIPTIONS, icon: FileText },
   ],
   [ROLES.STAFF]: [
@@ -45,6 +47,7 @@ export const NAVIGATION_ITEMS: Record<Role, NavItem[]> = {
   [ROLES.PATIENT]: [
     { title: "Dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard },
     { title: "My Appointments", href: ROUTES.APPOINTMENTS, icon: Calendar },
+    { title: "Messages", href: ROUTES.MESSAGES, icon: MessageCircle },
     { title: "My Prescriptions", href: ROUTES.PRESCRIPTIONS, icon: FileText },
   ],
 };

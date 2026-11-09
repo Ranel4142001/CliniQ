@@ -9,3 +9,7 @@ export * from "@/features/consultations/components/chat/ConsultationChat";
 export * from "@/features/consultations/hooks/useConsultationChat";
 export * from "@/features/consultations/utils/group-messages";
 export * from "./components/chat/PrivateChatNotice";
+export * from "./components/inbox/ConversationList";
+export * from "./components/inbox/ChatThread";
+export * from "./hooks/useConversations";
+export * from "./utils/chat-roles";

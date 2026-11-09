@@ -11,6 +11,15 @@ const CHAT_ROLES = [ROLES.CLINICIAN, ROLES.PATIENT];
 export const consultationChatController = new Hono();
 
 consultationChatController.get(
+  "/api/conversations",
+  withApiHandler(async () => {
+    const user = await requireAuth(CHAT_ROLES);
+    const conversations = await consultationMessageService.listConversations(user);
+    return { data: conversations };
+  })
+);
+
+consultationChatController.get(
   "/api/appointments/:id/messages",
   withApiHandler(async (_req: Request, context) => {
     const user = await requireAuth(CHAT_ROLES);
@@ -26,6 +35,15 @@ consultationChatController.post(
     const input = sendMessageSchema.parse(await req.json());
     const message = await consultationMessageService.sendMessage(user, getIdParam(context), input);
     return { data: message };
+  })
+);
+
+consultationChatController.post(
+  "/api/appointments/:id/messages/typing",
+  withApiHandler(async (_req: Request, context) => {
+    const user = await requireAuth(CHAT_ROLES);
+    await consultationMessageService.markTyping(user, getIdParam(context));
+    return { data: { isTyping: true } };
   })
 );
 

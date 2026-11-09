@@ -4,6 +4,7 @@ import React from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ErrorState } from "@/components/feedback/ErrorState";
+import { ROUTES } from "@/constants/routes";
 import type { ChatParticipant } from "@backend/contracts";
 import { ChatComposer } from "@/features/consultations/components/chat/ChatComposer";
 import { ChatHeader } from "@/features/consultations/components/chat/ChatHeader";
@@ -12,6 +13,7 @@ import {
   useConsultationChat,
   useMarkChatRead,
   useSendChatMessage,
+  useTypingPing,
 } from "@/features/consultations/hooks/useConsultationChat";
 
 interface ConsultationChatProps {
@@ -22,9 +24,13 @@ interface ConsultationChatProps {
   subtitle?: string;
   meetingUrl?: string | null;
   scheduledAt?: string | Date;
-  /** "panel": fixed-height box inside a page. "page": fills its container (full-screen chat). */
-  variant?: "panel" | "page";
+  /**
+   * "panel": fixed-height box inside a page. "page": fills its container (full-screen chat).
+   * "inbox": borderless, fills the right pane of the Messages page.
+   */
+  variant?: "panel" | "page" | "inbox";
   backHref?: string;
+  backClassName?: string;
   className?: string;
 }
 
@@ -38,10 +44,12 @@ export function ConsultationChat({
   scheduledAt,
   variant = "panel",
   backHref,
+  backClassName,
   className,
 }: ConsultationChatProps) {
   const { data, isLoading, error, refetch } = useConsultationChat(appointmentId);
   const sendMutation = useSendChatMessage(appointmentId, currentUser);
+  const pingTyping = useTypingPing(appointmentId);
   const messages = data?.messages ?? [];
 
   useMarkChatRead(appointmentId, messages, currentUser.id);
@@ -50,20 +58,22 @@ export function ConsultationChat({
     <section
       aria-label={`Chat with ${counterpartName}`}
       className={cn(
-        "flex flex-col overflow-hidden border bg-card",
-        variant === "panel"
-          ? "h-[520px] rounded-xl shadow-sm"
-          : "h-full rounded-2xl shadow-lg shadow-primary/5",
+        "flex flex-col overflow-hidden bg-card",
+        variant === "panel" && "h-[520px] rounded-xl border shadow-sm",
+        variant === "page" && "h-full rounded-2xl border shadow-lg shadow-primary/5",
+        variant === "inbox" && "h-full",
         className
       )}
     >
       <ChatHeader
         counterpartName={counterpartName}
         subtitle={subtitle}
+        status={data?.counterpart}
         meetingUrl={meetingUrl}
         scheduledAt={scheduledAt}
-        backHref={variant === "page" ? backHref : undefined}
-        expandHref={variant === "panel" ? `/consultations/${appointmentId}/chat` : undefined}
+        backHref={variant === "panel" ? undefined : backHref}
+        backClassName={backClassName}
+        expandHref={variant === "panel" ? ROUTES.MESSAGE_THREAD(appointmentId) : undefined}
       />
 
       {isLoading ? (
@@ -83,10 +93,17 @@ export function ConsultationChat({
           messages={messages}
           currentUserId={currentUser.id}
           counterpartName={counterpartName}
+          isCounterpartTyping={data?.counterpart.isTyping ?? false}
         />
       )}
 
-      {data && <ChatComposer canSend={data.canSend} onSend={(body) => sendMutation.mutate(body)} />}
+      {data && (
+        <ChatComposer
+          canSend={data.canSend}
+          onSend={(body) => sendMutation.mutate(body)}
+          onTyping={pingTyping}
+        />
+      )}
     </section>
   );
 }

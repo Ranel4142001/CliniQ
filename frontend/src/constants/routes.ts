@@ -8,6 +8,8 @@ export const ROUTES = {
   PATIENT_DETAILS: (id: string) => `/patients/${id}`,
   APPOINTMENTS: "/appointments",
   CONSULTATION: (appointmentId: string) => `/consultations/${appointmentId}`,
+  MESSAGES: "/messages",
+  MESSAGE_THREAD: (appointmentId: string) => `/messages/${appointmentId}`,
   MEDICINES: "/medicines",
   PRESCRIPTIONS: "/prescriptions",
   REPORTS: "/reports",

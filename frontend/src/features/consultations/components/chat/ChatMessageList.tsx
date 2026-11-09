@@ -4,8 +4,9 @@ import React, { useLayoutEffect, useMemo, useRef } from "react";
 import { Lock } from "lucide-react";
 import { getInitials } from "@/lib/format";
 import { ChatBubbleGroup } from "@/features/consultations/components/chat/ChatBubbleGroup";
+import { TypingIndicator } from "@/features/consultations/components/chat/TypingIndicator";
 import {
-  getSeenMessageId,
+  getReceipt,
   groupMessages,
   type ChatMessageView,
 } from "@/features/consultations/utils/group-messages";
@@ -17,21 +18,20 @@ interface ChatMessageListProps {
   messages: ChatMessageView[];
   currentUserId: string;
   counterpartName: string;
+  isCounterpartTyping: boolean;
 }
 
 export function ChatMessageList({
   messages,
   currentUserId,
   counterpartName,
+  isCounterpartTyping,
 }: ChatMessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isFollowingRef = useRef(true);
 
   const items = useMemo(() => groupMessages(messages, currentUserId), [messages, currentUserId]);
-  const seenMessageId = useMemo(
-    () => getSeenMessageId(messages, currentUserId),
-    [messages, currentUserId]
-  );
+  const receipt = useMemo(() => getReceipt(messages, currentUserId), [messages, currentUserId]);
   const lastMessage = messages[messages.length - 1];
 
   const handleScroll = () => {
@@ -49,9 +49,9 @@ export function ChatMessageList({
     if (isFollowingRef.current || lastMessage.sender.id === currentUserId) {
       el.scrollTop = el.scrollHeight;
     }
-  }, [lastMessage, currentUserId]);
+  }, [lastMessage, currentUserId, isCounterpartTyping]);
 
-  if (messages.length === 0) {
+  if (messages.length === 0 && !isCounterpartTyping) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-semibold text-primary">
@@ -73,29 +73,28 @@ export function ChatMessageList({
       role="log"
       aria-live="polite"
       aria-label={`Conversation with ${counterpartName}`}
-      className="flex flex-1 flex-col gap-3 overflow-y-auto px-3 py-4"
+      className="flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-4"
     >
       {items.map((item) =>
         item.kind === "divider" ? (
-          <div
+          <p
             key={item.key}
-            className="my-1 flex items-center gap-3 text-[11px] text-muted-foreground"
+            className="mb-1 mt-3 text-center text-[11px] font-medium text-muted-foreground first:mt-0"
           >
-            <span className="h-px flex-1 bg-border" />
             {item.label}
-            <span className="h-px flex-1 bg-border" />
-          </div>
+          </p>
         ) : (
           <ChatBubbleGroup
             key={item.key}
             sender={item.sender}
             messages={item.messages}
             isMine={item.isMine}
-            seenMessageId={seenMessageId}
+            receipt={receipt}
             counterpartName={counterpartName}
           />
         )
       )}
+      {isCounterpartTyping && <TypingIndicator name={counterpartName} />}
     </div>
   );
 }

@@ -10,10 +10,13 @@ import {
 const notImplemented = () => Promise.reject(new Error("not stubbed in this test"));
 
 const consultationMessageRepository: ConsultationMessageRepositoryPort = {
+  listConversations: notImplemented,
   findChatContext: notImplemented,
   listRecent: notImplemented,
   create: notImplemented,
   markReadFor: notImplemented,
+  findPresence: () => Promise.resolve(null),
+  savePresence: () => Promise.resolve(),
 };
 
 const consultationMessageService = createConsultationMessageService({
@@ -123,5 +126,84 @@ describe("Consultation chat access rules", () => {
     );
     expect(markSpy).toHaveBeenCalledWith(APPOINTMENT_ID, CLINICIAN_ID);
     expect(result.updated).toBe(2);
+  });
+});
+
+describe("Consultation chat presence", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("marks the caller as seen on every poll and reports the other participant's status", async () => {
+    mockContext();
+    vi.spyOn(consultationMessageRepository, "listRecent").mockResolvedValue([]);
+    const findSpy = vi.spyOn(consultationMessageRepository, "findPresence").mockResolvedValue({
+      lastSeenAt: new Date(),
+      typingAt: new Date(),
+    });
+    const saveSpy = vi.spyOn(consultationMessageRepository, "savePresence");
+
+    const chat = await consultationMessageService.getChat({ id: CLINICIAN_ID }, APPOINTMENT_ID);
+
+    expect(findSpy).toHaveBeenCalledWith(APPOINTMENT_ID, PATIENT_PROFILE_ID);
+    expect(saveSpy).toHaveBeenCalledWith(APPOINTMENT_ID, CLINICIAN_ID, {
+      lastSeenAt: expect.any(Date),
+    });
+    expect(chat.counterpart).toMatchObject({ isActive: true, isTyping: true });
+  });
+
+  it("records typing only for participants of an open chat", async () => {
+    mockContext({ status: "COMPLETED" });
+    const saveSpy = vi.spyOn(consultationMessageRepository, "savePresence");
+
+    await expect(
+      consultationMessageService.markTyping({ id: "other-clinician" }, APPOINTMENT_ID)
+    ).rejects.toThrow(ForbiddenError);
+    await expect(
+      consultationMessageService.markTyping({ id: PATIENT_PROFILE_ID }, APPOINTMENT_ID)
+    ).rejects.toThrow(ConflictError);
+    expect(saveSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("Messages inbox", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const row = (id: string, lastMessageAt: string | null, scheduledAt: string) => ({
+    appointmentId: id,
+    scheduledAt: new Date(scheduledAt),
+    status: "CONFIRMED" as const,
+    clinicianId: CLINICIAN_ID,
+    clinicianName: "Dr. Alberto Cruz, MD",
+    patient: { firstName: "Juan", middleName: null, lastName: "Dela Cruz" },
+    lastMessage: lastMessageAt
+      ? { body: "Hi", createdAt: new Date(lastMessageAt), senderId: PATIENT_PROFILE_ID }
+      : null,
+    unreadCount: 1,
+  });
+
+  it("names the other participant and orders chats by latest message", async () => {
+    const listSpy = vi.spyOn(consultationMessageRepository, "listConversations").mockResolvedValue([
+      row("no-messages", null, "2026-11-20T02:00:00Z"),
+      row("older", "2026-11-01T02:00:00Z", "2026-11-01T02:00:00Z"),
+      row("newer", "2026-11-05T02:00:00Z", "2026-10-01T02:00:00Z"),
+    ]);
+
+    const asClinician = await consultationMessageService.listConversations({ id: CLINICIAN_ID });
+    expect(listSpy).toHaveBeenCalledWith(CLINICIAN_ID, expect.any(Number));
+    expect(asClinician.map((c) => c.appointmentId)).toEqual(["newer", "older", "no-messages"]);
+    expect(asClinician[0]).toMatchObject({
+      counterpartName: "Juan Dela Cruz",
+      canSend: true,
+      lastMessage: { isMine: false },
+    });
+
+    const asPatient = await consultationMessageService.listConversations({ id: PATIENT_PROFILE_ID });
+    expect(asPatient[0]).toMatchObject({
+      counterpartName: "Dr. Alberto Cruz, MD",
+      lastMessage: { isMine: true },
+    });
   });
 });

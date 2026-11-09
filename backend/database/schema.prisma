@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   // Load `include`/`select` relations with SQL joins in one query instead of one
   // follow-up query per relation: every round trip to the database costs real latency.
   previewFeatures = ["relationJoins"]
@@ -62,12 +62,13 @@ model Profile {
   updatedAt DateTime @updatedAt
 
   patient                 Patient?
-  clinicianAppointments   Appointment[]         @relation("ClinicianAppointments")
-  clinicianConsultations  Consultation[]        @relation("ClinicianConsultations")
-  clinicianPrescriptions  Prescription[]        @relation("ClinicianPrescriptions")
+  clinicianAppointments   Appointment[]              @relation("ClinicianAppointments")
+  clinicianConsultations  Consultation[]             @relation("ClinicianConsultations")
+  clinicianPrescriptions  Prescription[]             @relation("ClinicianPrescriptions")
   performedStockMovements StockMovement[]
   auditLogs               AuditLog[]
-  sentMessages            ConsultationMessage[] @relation("SentConsultationMessages")
+  sentMessages            ConsultationMessage[]      @relation("SentConsultationMessages")
+  chatPresences           ConsultationChatPresence[]
 }
 
 model Patient {
@@ -117,8 +118,9 @@ model Appointment {
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
-  consultation Consultation?
-  messages     ConsultationMessage[]
+  consultation  Consultation?
+  messages      ConsultationMessage[]
+  chatPresences ConsultationChatPresence[]
 
   @@index([clinicianId, scheduledAt])
   @@index([patientId, scheduledAt])
@@ -160,6 +162,18 @@ model ConsultationMessage {
   createdAt     DateTime    @default(now())
 
   @@index([appointmentId, createdAt])
+}
+
+/// When each participant was last seen in, and last typed into, a consultation chat.
+model ConsultationChatPresence {
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  userId        String
+  user          Profile     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastSeenAt    DateTime    @default(now())
+  typingAt      DateTime?
+
+  @@id([appointmentId, userId])
 }
 
 model Medicine {
