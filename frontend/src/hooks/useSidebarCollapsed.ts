@@ -3,8 +3,19 @@
 import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "cliniq.sidebar-collapsed";
+/** Ctrl+B (⌘B on Mac), the usual "toggle sidebar" shortcut. */
+const SHORTCUT_KEY = "b";
+export const SIDEBAR_SHORTCUT_LABEL = "Ctrl+B";
 
-/** Desktop sidebar collapsed to icons, remembered per browser. */
+function saveCollapsed(value: boolean) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, String(value));
+  } catch {
+    // Not remembered, but the toggle still works for this visit.
+  }
+}
+
+/** Desktop sidebar collapsed to icons, remembered per browser and toggled with Ctrl+B. */
 export function useSidebarCollapsed() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -18,15 +29,22 @@ export function useSidebarCollapsed() {
 
   const toggle = useCallback(() => {
     setIsCollapsed((current) => {
-      const next = !current;
-      try {
-        window.localStorage.setItem(STORAGE_KEY, String(next));
-      } catch {
-        // Not remembered, but the toggle still works for this visit.
-      }
-      return next;
+      saveCollapsed(!current);
+      return !current;
     });
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isShortcut =
+        (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === SHORTCUT_KEY;
+      if (!isShortcut) return;
+      event.preventDefault();
+      toggle();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [toggle]);
 
   return { isCollapsed, toggle };
 }

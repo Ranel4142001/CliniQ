@@ -39,6 +39,7 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
           className="w-full"
           isCollapsed={isCollapsed}
           badges={navBadges}
+          onToggleCollapse={toggle}
         />
       </div>
 

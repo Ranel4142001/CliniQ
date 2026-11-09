@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Role } from "@backend/contracts";
+import { SIDEBAR_SHORTCUT_LABEL } from "@/hooks/useSidebarCollapsed";
 
 interface TopbarProps {
   onOpenMobileMenu?: () => void;
@@ -101,7 +102,7 @@ export function Topbar({
             className="hidden text-muted-foreground hover:text-foreground md:inline-flex"
             aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-expanded={!isSidebarCollapsed}
-            title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={`${isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} (${SIDEBAR_SHORTCUT_LABEL})`}
           >
             {isSidebarCollapsed ? (
               <PanelLeftOpen className="h-5 w-5" />
