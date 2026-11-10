@@ -54,8 +54,8 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={onSubmit} noValidate className="space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <form onSubmit={onSubmit} noValidate>
+        <div className="flex flex-col gap-4 border-b border-border/80 pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               Settings
@@ -73,55 +73,53 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
           </Button>
         </div>
 
-        <div className="rounded-2xl border border-border/80 bg-card">
-          <SettingsSection
-            title="Profile information"
-            description="Your name and the email you sign in with."
-          >
-            <SettingsRow label="Profile">
-              <div className="flex items-center gap-3">
-                <InitialsAvatar name={user.fullName} className="h-12 w-12 text-base" />
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                  {ROLE_LABELS[user.role] ?? user.role}
-                </span>
-              </div>
-            </SettingsRow>
-            <SettingsField name="fullName" label="Name" autoComplete="name" />
-            <SettingsField
-              name="email"
-              label="Email"
-              type="email"
-              autoComplete="email"
-              hint="Changing it sends a confirmation link to the new address."
-            />
-          </SettingsSection>
+        <SettingsSection
+          title="Profile information"
+          description="Your name and the email you sign in with."
+        >
+          <SettingsRow label="Profile">
+            <div className="flex items-center gap-3">
+              <InitialsAvatar name={user.fullName} className="h-12 w-12 text-base" />
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                {ROLE_LABELS[user.role] ?? user.role}
+              </span>
+            </div>
+          </SettingsRow>
+          <SettingsField name="fullName" label="Name" autoComplete="name" />
+          <SettingsField
+            name="email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            hint="Changing it sends a confirmation link to the new address."
+          />
+        </SettingsSection>
 
-          <SettingsSection
-            title="Password"
-            description="Leave the new password empty to keep your current one."
-          >
-            <SettingsField
-              name="currentPassword"
-              label="Current password"
-              type="password"
-              autoComplete="current-password"
-              hint="Needed to change your email or password."
-            />
-            <SettingsField
-              name="newPassword"
-              label="New password"
-              type="password"
-              autoComplete="new-password"
-              hint="At least 8 characters, with an uppercase letter and a number."
-            />
-            <SettingsField
-              name="confirmPassword"
-              label="Confirm new password"
-              type="password"
-              autoComplete="new-password"
-            />
-          </SettingsSection>
-        </div>
+        <SettingsSection
+          title="Password"
+          description="Leave the new password empty to keep your current one."
+        >
+          <SettingsField
+            name="currentPassword"
+            label="Current password"
+            type="password"
+            autoComplete="current-password"
+            hint="Needed to change your email or password."
+          />
+          <SettingsField
+            name="newPassword"
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            hint="At least 8 characters, with an uppercase letter and a number."
+          />
+          <SettingsField
+            name="confirmPassword"
+            label="Confirm new password"
+            type="password"
+            autoComplete="new-password"
+          />
+        </SettingsSection>
       </form>
     </FormProvider>
   );

@@ -17,8 +17,8 @@ export function SettingsRow({
   children: ReactNode;
 }) {
   return (
-    <div className="grid gap-2 py-4 sm:grid-cols-[200px_minmax(0,1fr)] sm:items-start sm:gap-6">
-      <label htmlFor={htmlFor} className="pt-2.5 text-sm font-medium text-foreground">
+    <div className="grid gap-2 py-3 sm:grid-cols-[200px_minmax(0,1fr)] sm:items-start sm:gap-6">
+      <label htmlFor={htmlFor} className="pt-2.5 text-sm text-foreground">
         {label}
       </label>
       <div className="max-w-md">{children}</div>
@@ -60,7 +60,7 @@ export function SettingsField({
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy}
         className={cn(
-          "h-11 rounded-xl",
+          "h-10 rounded-lg bg-card",
           error && "border-destructive focus-visible:ring-destructive"
         )}
         {...register(name)}
@@ -91,10 +91,10 @@ export function SettingsSection({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-border/60 px-5 py-6 last:border-b-0 sm:px-8">
+    <section className="border-b border-border/80 py-6 last:border-b-0">
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
       <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
-      <div className="mt-2 divide-y divide-border/40">{children}</div>
+      <div className="mt-3">{children}</div>
     </section>
   );
 }
