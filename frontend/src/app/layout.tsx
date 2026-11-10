@@ -28,10 +28,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${plusJakartaSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
-      >
+    // Font variables live on <html>: Tailwind sets font-family there, and it must resolve them.
+    <html lang="en" className={`${plusJakartaSans.variable} ${geistMono.variable}`}>
+      <body className="bg-background font-sans text-foreground antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
