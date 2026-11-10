@@ -146,7 +146,7 @@ export function PatientTable({
         onSearchChange={onSearchChange}
         searchPlaceholder="Search by name or patient no…"
         emptyTitle="No patients found"
-        emptyMessage="Try adjusting your search query or register a new patient."
+        emptyMessage="Try another search, or register a patient."
         pagination={{
           page,
           pageSize,

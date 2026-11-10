@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { useStockMovements } from "@/features/medicines/hooks/use-medicines";
@@ -53,9 +48,7 @@ export function MovementHistoryTable({
           ADJUSTMENT: "bg-amber-600 text-white",
         };
         return (
-          <Badge className={variants[item.type] || "bg-muted text-foreground"}>
-            {item.type}
-          </Badge>
+          <Badge className={variants[item.type] || "bg-muted text-foreground"}>{item.type}</Badge>
         );
       },
     },
@@ -91,7 +84,7 @@ export function MovementHistoryTable({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-h-[85vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             Stock Movement History {medicineTitle ? `• ${medicineTitle}` : ""}
@@ -106,7 +99,7 @@ export function MovementHistoryTable({
             error={error as Error}
             onRetry={refetch}
             emptyTitle="No movements recorded"
-            emptyMessage="Stock movement logs will appear here when stock is added, deducted, or adjusted."
+            emptyMessage="Stock changes will appear here."
             pagination={{
               page: data?.meta?.page ?? page,
               pageSize: data?.meta?.pageSize ?? pageSize,

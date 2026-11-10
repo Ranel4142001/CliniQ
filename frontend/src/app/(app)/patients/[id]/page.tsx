@@ -71,7 +71,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
     <div className="space-y-6">
       <PageHeader
         title={patient.fullName}
-        description={`Record No. ${patient.patientNo}`}
+        description={`Patient No. ${patient.patientNo}`}
         breadcrumbs={[
           { label: "Dashboard", href: "/dashboard" },
           { label: "Patients", href: "/patients" },

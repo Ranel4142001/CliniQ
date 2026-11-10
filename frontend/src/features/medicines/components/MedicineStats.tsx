@@ -20,30 +20,30 @@ export function MedicineStats({
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title="Total Medicines"
+        title="Total medicines"
         value={totalMedicines}
-        description="Active catalog items"
+        description="In the catalog"
         icon={<Package className="h-5 w-5" />}
         tone="blue"
       />
       <StatCard
-        title="Low Stock Alerts"
+        title="Low stock"
         value={lowStockCount}
         description="Below reorder level"
         icon={<AlertTriangle className="h-5 w-5" />}
         tone="amber"
       />
       <StatCard
-        title="Expiring Soon"
+        title="Expiring soon"
         value={expiringSoonCount}
-        description="Within next 60 days"
+        description="Within 60 days"
         icon={<Clock className="h-5 w-5" />}
         tone="amber"
       />
       <StatCard
-        title="Expired Batches"
+        title="Expired batches"
         value={expiredCount}
-        description="Cannot be dispensed"
+        description="Can't be dispensed"
         icon={<ShieldAlert className="h-5 w-5" />}
         tone="red"
       />

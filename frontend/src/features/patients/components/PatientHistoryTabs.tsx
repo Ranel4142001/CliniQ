@@ -131,7 +131,7 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
           error={error}
           onRetry={refetch}
           emptyTitle="No appointment history"
-          emptyMessage="This patient has no recorded appointments."
+          emptyMessage="No appointments yet."
           pagination={{
             page: apptPage,
             pageSize,
@@ -148,7 +148,7 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
           error={error}
           onRetry={refetch}
           emptyTitle="No consultation records"
-          emptyMessage="No completed clinical consultations found for this patient."
+          emptyMessage="No completed consultations yet."
           pagination={{
             page: consPage,
             pageSize,

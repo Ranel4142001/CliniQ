@@ -15,35 +15,35 @@ export function PrescriptionStats({ stats }: PrescriptionStatsProps) {
       <StatCard
         title="Total Prescriptions"
         value={stats?.total ?? 0}
-        description="All recorded orders"
+        description="All prescriptions"
         icon={<FileText className="h-5 w-5" />}
         tone="blue"
       />
       <StatCard
         title="Draft"
         value={stats?.draft ?? 0}
-        description="Editable clinician drafts"
+        description="Not yet issued"
         icon={<Clock className="h-5 w-5" />}
         tone="blue"
       />
       <StatCard
         title="Issued"
         value={stats?.issued ?? 0}
-        description="Awaiting pharmacy dispensing"
+        description="Waiting to be dispensed"
         icon={<CheckCircle2 className="h-5 w-5" />}
         tone="blue"
       />
       <StatCard
         title="Dispensed"
         value={stats?.dispensed ?? 0}
-        description="Completed & stock deducted"
+        description="Given to the patient"
         icon={<PackageCheck className="h-5 w-5" />}
         tone="teal"
       />
       <StatCard
         title="Voided"
         value={stats?.voided ?? 0}
-        description="Cancelled orders"
+        description="Cancelled"
         icon={<Ban className="h-5 w-5" />}
         tone="red"
       />

@@ -58,21 +58,21 @@ export function PatientDashboard({ data, userName }: PatientDashboardProps) {
           value={stats.upcomingAppointmentsCount}
           icon={<Calendar className="h-5 w-5" />}
           tone="blue"
-          description="Confirmed and pending visits"
+          description="Confirmed or pending"
         />
         <StatCard
           title="Active Prescriptions"
           value={stats.activePrescriptionsCount}
           icon={<FileText className="h-5 w-5" />}
           tone="teal"
-          description="Issued or ready to dispense"
+          description="Ready to dispense"
         />
         <StatCard
           title="Completed Visits"
           value={stats.totalConsultationsCount}
           icon={<CheckCircle2 className="h-5 w-5" />}
           tone="violet"
-          description="Past clinical consultations"
+          description="Past consultations"
         />
       </div>
 

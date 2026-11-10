@@ -9,7 +9,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle, MinusCircle, SlidersHorizontal, History, Edit, Archive } from "lucide-react";
+import {
+  MoreHorizontal,
+  PlusCircle,
+  MinusCircle,
+  SlidersHorizontal,
+  History,
+  Edit,
+  Archive,
+} from "lucide-react";
 import { StatusBadge } from "@/components/feedback/StatusBadge";
 import { STOCK_STATUS_MAP } from "@backend/contracts";
 import type { MedicineWithStock } from "@backend/contracts";
@@ -82,9 +90,7 @@ export function MedicineTable({
     },
     {
       header: "Status",
-      cell: (item) => (
-        <StatusBadge status={item.stockStatus} statusMap={STOCK_STATUS_MAP} />
-      ),
+      cell: (item) => <StatusBadge status={item.stockStatus} statusMap={STOCK_STATUS_MAP} />,
     },
     {
       header: "Actions",
@@ -137,7 +143,7 @@ export function MedicineTable({
       onSearchChange={onSearchChange}
       searchPlaceholder="Search by brand or generic name..."
       emptyTitle="No medicines found"
-      emptyMessage="No medicines registered in the inventory yet."
+      emptyMessage="Add a medicine to get started."
       pagination={pagination}
     />
   );

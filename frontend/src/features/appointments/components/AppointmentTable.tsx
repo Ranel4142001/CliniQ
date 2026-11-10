@@ -159,7 +159,7 @@ export function AppointmentTable({
       error={error}
       onRetry={onRetry}
       emptyTitle="No appointments scheduled"
-      emptyMessage="Book a new consultation using the button above."
+      emptyMessage="Use Book Appointment to add one."
       pagination={{
         page,
         pageSize,

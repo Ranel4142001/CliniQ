@@ -148,8 +148,8 @@ export default function ConsultationPage({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeader
-          title="Clinical Consultation"
-          description={`Scheduled: ${formatDateTime(appointment.scheduledAt)} • ${appointment.type}`}
+          title="Consultation"
+          description={`${formatDateTime(appointment.scheduledAt)} · ${appointment.type === "ONLINE" ? "Online" : "In-person"}`}
           breadcrumbs={[
             { label: "Dashboard", href: "/dashboard" },
             { label: "Appointments", href: "/appointments" },
@@ -287,7 +287,7 @@ export default function ConsultationPage({
       <ConfirmDialog
         open={completeOpen}
         onOpenChange={setCompleteOpen}
-        title="Complete Clinical Consultation?"
+        title="Complete consultation?"
         description="This will lock the consultation notes and mark the appointment as COMPLETED. Ensure your diagnosis and patient instructions are finalized."
         confirmLabel="Finalize & Complete"
         variant="default"

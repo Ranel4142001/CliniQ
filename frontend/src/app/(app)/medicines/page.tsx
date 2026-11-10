@@ -68,8 +68,8 @@ export default function MedicinesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Medicines & Stock Inventory"
-        description="Catalog management, FEFO dispensing, batch tracking, and stock movements"
+        title="Medicines"
+        description="Track stock, batches, and expiry dates."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Medicines" }]}
         actions={
           <Button

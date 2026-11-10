@@ -10,7 +10,7 @@ import type {
 export const appointmentsReportConfig: ReportConfig<AppointmentReportRow> = {
   key: "appointments",
   title: "Appointments Report",
-  description: "Scheduled and completed appointments by date range and status",
+  description: "Appointments by date and status.",
   supportsDateRange: true,
   columns: [
     { header: "Scheduled Date & Time", accessorKey: "scheduledAt" },
@@ -44,7 +44,7 @@ export const appointmentsReportConfig: ReportConfig<AppointmentReportRow> = {
 export const consultationsReportConfig: ReportConfig<ConsultationReportRow> = {
   key: "consultations",
   title: "Patient Visits Report",
-  description: "Completed clinical consultations, chief complaints, and diagnoses",
+  description: "Completed visits with complaints and diagnoses.",
   supportsDateRange: true,
   columns: [
     { header: "Date", accessorKey: "consultationDate" },
@@ -77,8 +77,8 @@ export const consultationsReportConfig: ReportConfig<ConsultationReportRow> = {
 
 export const inventoryReportConfig: ReportConfig<InventoryReportRow> = {
   key: "inventory",
-  title: "Medicine Inventory Report",
-  description: "Active medication stock levels, reorder thresholds, and status",
+  title: "Inventory Report",
+  description: "Current stock levels and reorder status.",
   supportsDateRange: false,
   columns: [
     { header: "Medicine Name", accessorKey: "name" },
@@ -112,7 +112,7 @@ export const inventoryReportConfig: ReportConfig<InventoryReportRow> = {
 export const movementsReportConfig: ReportConfig<MovementReportRow> = {
   key: "movements",
   title: "Stock Movements Report",
-  description: "Audit trail of all incoming batches, deductions, and adjustments",
+  description: "Every stock in, out, and adjustment.",
   supportsDateRange: true,
   columns: [
     { header: "Date & Time", accessorKey: "date" },
@@ -146,7 +146,7 @@ export const movementsReportConfig: ReportConfig<MovementReportRow> = {
 export const prescriptionsReportConfig: ReportConfig<PrescriptionReportRow> = {
   key: "prescriptions",
   title: "Prescriptions Report",
-  description: "Digital prescriptions issued by clinicians and dispensed by staff",
+  description: "Prescriptions issued and dispensed.",
   supportsDateRange: true,
   columns: [
     { header: "Rx Number", accessorKey: "prescriptionNo" },

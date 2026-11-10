@@ -69,8 +69,8 @@ export default function PrescriptionsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Digital Prescriptions"
-        description="Prescription lifecycle (Draft ➔ Issued ➔ Dispensed), PDF generation, and FEFO stock integration"
+        title="Prescriptions"
+        description="Write, issue, and dispense prescriptions."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Prescriptions" }]}
         actions={
           <Button onClick={handleNewPrescription}>

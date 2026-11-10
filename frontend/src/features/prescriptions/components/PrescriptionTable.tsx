@@ -59,7 +59,9 @@ export function PrescriptionTable({
       header: "Patient",
       cell: (item) => (
         <div>
-          <div className="font-medium">{item.patient?.firstName} {item.patient?.lastName}</div>
+          <div className="font-medium">
+            {item.patient?.firstName} {item.patient?.lastName}
+          </div>
           <div className="text-xs text-muted-foreground">{item.patient?.patientNo}</div>
         </div>
       ),
@@ -74,7 +76,8 @@ export function PrescriptionTable({
     },
     {
       header: "Date",
-      cell: (item) => (item.issuedAt ? new Date(item.issuedAt) : new Date(item.createdAt)).toLocaleDateString(),
+      cell: (item) =>
+        (item.issuedAt ? new Date(item.issuedAt) : new Date(item.createdAt)).toLocaleDateString(),
     },
     {
       header: "Status",
@@ -85,21 +88,33 @@ export function PrescriptionTable({
       cell: (item) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem onClick={() => onView(item)}><Eye className="mr-2 h-4 w-4 text-blue-600" /> View Details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onView(item)}>
+              <Eye className="mr-2 h-4 w-4 text-blue-600" /> View Details
+            </DropdownMenuItem>
             {item.status === "DRAFT" && (
               <>
-                <DropdownMenuItem onClick={() => onEdit(item)}><Edit className="mr-2 h-4 w-4 text-slate-600" /> Edit Draft</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onIssue(item)}><CheckCircle2 className="mr-2 h-4 w-4 text-blue-600" /> Issue Prescription</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEdit(item)}>
+                  <Edit className="mr-2 h-4 w-4 text-slate-600" /> Edit Draft
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onIssue(item)}>
+                  <CheckCircle2 className="mr-2 h-4 w-4 text-blue-600" /> Issue Prescription
+                </DropdownMenuItem>
               </>
             )}
             {item.status === "ISSUED" && (
-              <DropdownMenuItem onClick={() => onDispense(item)}><PackageCheck className="mr-2 h-4 w-4 text-emerald-600" /> Dispense Meds</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDispense(item)}>
+                <PackageCheck className="mr-2 h-4 w-4 text-emerald-600" /> Dispense Meds
+              </DropdownMenuItem>
             )}
             {(item.status === "DRAFT" || item.status === "ISSUED") && (
-              <DropdownMenuItem onClick={() => onVoid(item)}><Ban className="mr-2 h-4 w-4 text-rose-600" /> Void Prescription</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onVoid(item)}>
+                <Ban className="mr-2 h-4 w-4 text-rose-600" /> Void Prescription
+              </DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -118,7 +133,7 @@ export function PrescriptionTable({
       onSearchChange={onSearchChange}
       searchPlaceholder="Search by Rx number, patient name or ID..."
       emptyTitle="No prescriptions recorded"
-      emptyMessage="Prescriptions issued by clinicians during consultations will appear here."
+      emptyMessage="Prescriptions from consultations will appear here."
       pagination={pagination}
     />
   );

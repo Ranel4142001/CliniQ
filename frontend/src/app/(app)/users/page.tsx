@@ -132,7 +132,7 @@ export default function UsersPage() {
     <div className="space-y-6">
       <PageHeader
         title="User Management"
-        description="Manage clinic staff, clinicians, and administrator accounts"
+        description="Manage staff, clinician, and admin accounts."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Users" }]}
         actions={
           <Button onClick={() => setIsCreateOpen(true)} className="gap-2">

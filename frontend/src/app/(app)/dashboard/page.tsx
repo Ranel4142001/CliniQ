@@ -16,12 +16,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {!data && (
-        <PageHeader
-          title="Dashboard"
-          description="Clinic activity, appointments, and inventory at a glance"
-        />
-      )}
+      {!data && <PageHeader title="Dashboard" description="Today's clinic activity at a glance." />}
 
       {isLoading && <LoadingState message="Loading dashboard overview..." />}
 

@@ -49,7 +49,7 @@ export default function PatientsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Patients"
-        description="Register and manage clinic patient records"
+        description="Register and manage patient records."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Patients" }]}
         actions={
           canManage ? (

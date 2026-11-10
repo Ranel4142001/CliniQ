@@ -81,7 +81,7 @@ export default function AppointmentsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Appointments"
-        description="Schedule, confirm, and manage clinic patient consultations"
+        description="Book, confirm, and manage patient visits."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Appointments" }]}
         actions={
           <div className="flex flex-wrap items-center gap-2">

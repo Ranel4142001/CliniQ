@@ -34,7 +34,11 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
     if (!search.trim()) return data;
     const q = search.toLowerCase();
     return data.filter((item) =>
-      Object.values(item).some((val) => String(val ?? "").toLowerCase().includes(q))
+      Object.values(item).some((val) =>
+        String(val ?? "")
+          .toLowerCase()
+          .includes(q)
+      )
     );
   }, [data, search]);
 
@@ -46,7 +50,11 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
   const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
 
   const handleExportCsv = () => {
-    exportToCsv(filteredData, config.csvColumns, `${config.key}-report-${new Date().toISOString().slice(0, 10)}.csv`);
+    exportToCsv(
+      filteredData,
+      config.csvColumns,
+      `${config.key}-report-${new Date().toISOString().slice(0, 10)}.csv`
+    );
   };
 
   const handleExportPdf = async () => {
@@ -78,39 +86,93 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-4 p-4 rounded-lg border bg-card text-card-foreground">
+      <div className="flex flex-wrap items-end justify-between gap-4 rounded-lg border bg-card p-4 text-card-foreground">
         {config.supportsDateRange ? (
           <div className="flex flex-wrap items-center gap-3">
             <div>
               <Label className="text-xs">From Date</Label>
-              <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-8 text-xs" />
+              <Input
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                className="h-8 text-xs"
+              />
             </div>
             <div>
               <Label className="text-xs">To Date</Label>
-              <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-8 text-xs" />
+              <Input
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="h-8 text-xs"
+              />
             </div>
             <div className="flex items-center gap-1.5 pt-4">
-              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => {
-                const d = new Date(); d.setDate(d.getDate() - 7);
-                setFrom(d.toISOString().slice(0, 10)); setTo(new Date().toISOString().slice(0, 10));
-              }}>Last 7d</Button>
-              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => {
-                const d = new Date(); d.setDate(d.getDate() - 30);
-                setFrom(d.toISOString().slice(0, 10)); setTo(new Date().toISOString().slice(0, 10));
-              }}>Last 30d</Button>
-              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setFrom(""); setTo(""); }}>Reset</Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs"
+                onClick={() => {
+                  const d = new Date();
+                  d.setDate(d.getDate() - 7);
+                  setFrom(d.toISOString().slice(0, 10));
+                  setTo(new Date().toISOString().slice(0, 10));
+                }}
+              >
+                Last 7d
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs"
+                onClick={() => {
+                  const d = new Date();
+                  d.setDate(d.getDate() - 30);
+                  setFrom(d.toISOString().slice(0, 10));
+                  setTo(new Date().toISOString().slice(0, 10));
+                }}
+              >
+                Last 30d
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs"
+                onClick={() => {
+                  setFrom("");
+                  setTo("");
+                }}
+              >
+                Reset
+              </Button>
             </div>
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground">This report reflects real-time medicine inventory stock and statuses.</p>
+          <p className="text-xs text-muted-foreground">
+            This report reflects real-time medicine inventory stock and statuses.
+          </p>
         )}
 
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={handleExportCsv} disabled={filteredData.length === 0}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+          >
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" variant="outline" onClick={handleExportPdf} disabled={isPdfLoading || filteredData.length === 0}>
-            {isPdfLoading ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <FileText className="mr-1.5 h-3.5 w-3.5" />}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleExportPdf}
+            disabled={isPdfLoading || filteredData.length === 0}
+          >
+            {isPdfLoading ? (
+              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <FileText className="mr-1.5 h-3.5 w-3.5" />
+            )}
             Export PDF
           </Button>
         </div>
@@ -125,8 +187,8 @@ export function ReportViewer<T extends Record<string, unknown>>({ config }: Repo
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder={`Search ${config.title.toLowerCase()}...`}
-        emptyTitle={`No records found`}
-        emptyMessage={`No data matches the selected criteria for ${config.title}.`}
+        emptyTitle="No records found"
+        emptyMessage="Try a different date range or filter."
         pagination={{
           page,
           pageSize,
