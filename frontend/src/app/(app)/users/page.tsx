@@ -135,7 +135,6 @@ export default function UsersPage() {
         feature={ROUTES.USERS}
         title="User Management"
         description="Manage staff, clinician, and admin accounts."
-        breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Users" }]}
         actions={
           <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
             <UserPlus className="h-4 w-4" /> Add User

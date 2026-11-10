@@ -150,11 +150,7 @@ export default function ConsultationPage({
         <PageHeader
           title="Consultation"
           description={`${formatDateTime(appointment.scheduledAt)} · ${appointment.type === "ONLINE" ? "Online" : "In-person"}`}
-          breadcrumbs={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Appointments", href: "/appointments" },
-            { label: "Consultation" },
-          ]}
+          back={{ label: "Appointments", href: "/appointments" }}
         />
         <div className="flex items-center gap-2">
           <StatusBadge status={statusKey} statusMap={CONSULTATION_STATUS_MAP} />

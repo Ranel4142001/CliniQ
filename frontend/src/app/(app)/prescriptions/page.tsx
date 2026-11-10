@@ -73,7 +73,6 @@ export default function PrescriptionsPage() {
         feature={ROUTES.PRESCRIPTIONS}
         title="Prescriptions"
         description="Write, issue, and dispense prescriptions."
-        breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Prescriptions" }]}
         actions={
           <Button onClick={handleNewPrescription}>
             <Plus className="mr-2 h-4 w-4" /> New Prescription

@@ -1,18 +1,14 @@
 import React, { ReactNode } from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { FEATURE_STYLES } from "@/config/feature-colors";
 import { cn } from "@/lib/utils";
-
-export interface BreadcrumbItem {
-  label: string;
-  href?: string;
-}
 
 interface PageHeaderProps {
   title: string;
   description?: string;
-  breadcrumbs?: BreadcrumbItem[];
+  /** Detail pages only: a small link back to the list they came from. */
+  back?: { label: string; href: string };
   actions?: ReactNode;
   className?: string;
   /** Route of the feature, e.g. ROUTES.MEDICINES; shows its coloured icon beside the title. */
@@ -22,7 +18,7 @@ interface PageHeaderProps {
 export function PageHeader({
   title,
   description,
-  breadcrumbs,
+  back,
   actions,
   className = "",
   feature,
@@ -32,27 +28,14 @@ export function PageHeader({
 
   return (
     <div className={`mb-6 space-y-2 ${className}`}>
-      {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav
-          aria-label="Breadcrumbs"
-          className="flex items-center space-x-1.5 text-xs text-muted-foreground"
+      {back && (
+        <Link
+          href={back.href}
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
-          {breadcrumbs.map((crumb, idx) => {
-            const isLast = idx === breadcrumbs.length - 1;
-            return (
-              <React.Fragment key={idx}>
-                {idx > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
-                {crumb.href && !isLast ? (
-                  <Link href={crumb.href} className="transition-colors hover:text-foreground">
-                    {crumb.label}
-                  </Link>
-                ) : (
-                  <span className={isLast ? "font-medium text-foreground" : ""}>{crumb.label}</span>
-                )}
-              </React.Fragment>
-            );
-          })}
-        </nav>
+          <ArrowLeft className="h-4 w-4" />
+          {back.label}
+        </Link>
       )}
 
       <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">

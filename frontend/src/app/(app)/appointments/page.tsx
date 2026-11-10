@@ -84,7 +84,6 @@ export default function AppointmentsPage() {
         feature={ROUTES.APPOINTMENTS}
         title="Appointments"
         description="Book, confirm, and manage patient visits."
-        breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Appointments" }]}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center rounded-lg border bg-muted p-0.5">

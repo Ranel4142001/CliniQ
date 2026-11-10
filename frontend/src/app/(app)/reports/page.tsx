@@ -56,7 +56,6 @@ export default function ReportsPage() {
         feature={ROUTES.REPORTS}
         title="Reports"
         description="Filter clinic reports by date and export them as CSV or PDF."
-        breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Reports" }]}
       />
 
       <div className="flex flex-wrap items-center gap-2 border-b pb-3">

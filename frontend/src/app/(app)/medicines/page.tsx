@@ -72,7 +72,6 @@ export default function MedicinesPage() {
         feature={ROUTES.MEDICINES}
         title="Medicines"
         description="Track stock, batches, and expiry dates."
-        breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Medicines" }]}
         actions={
           <Button
             onClick={() => {

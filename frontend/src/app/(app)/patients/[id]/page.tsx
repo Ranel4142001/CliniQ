@@ -72,11 +72,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
       <PageHeader
         title={patient.fullName}
         description={`Patient No. ${patient.patientNo}`}
-        breadcrumbs={[
-          { label: "Dashboard", href: "/dashboard" },
-          { label: "Patients", href: "/patients" },
-          { label: patient.patientNo },
-        ]}
+        back={{ label: "Patients", href: "/patients" }}
         actions={
           canMessage && (
             <Button asChild size="sm" className="gap-1.5 rounded-full">

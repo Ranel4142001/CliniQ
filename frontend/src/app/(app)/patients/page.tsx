@@ -52,7 +52,6 @@ export default function PatientsPage() {
         feature={ROUTES.PATIENTS}
         title="Patients"
         description="Register and manage patient records."
-        breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Patients" }]}
         actions={
           canManage ? (
             <Button onClick={() => setIsRegisterOpen(true)} className="gap-2">
