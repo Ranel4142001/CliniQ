@@ -90,7 +90,11 @@ export const listPatientsSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   pageSize: z.coerce.number().int().positive().max(100).default(10),
   search: z.string().trim().optional(),
-  isArchived: z.coerce.boolean().default(false),
+  // Query strings are text: only "true" means archived. (z.coerce.boolean would read "false" as true.)
+  isArchived: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
 });
 
 export type ListPatientsInput = z.infer<typeof listPatientsSchema>;

@@ -42,18 +42,21 @@ export function AsyncSelect({
   const [searchTerm, setSearchTerm] = useState("");
   const [options, setOptions] = useState<AsyncSelectOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   const fetchOptions = useCallback(
     async (query: string) => {
       setIsLoading(true);
+      setLoadFailed(false);
       try {
         const results = await loadOptions(query);
         setOptions(results);
       } catch (err) {
         console.error("Failed to load options", err);
         setOptions([]);
+        setLoadFailed(true);
       } finally {
         setIsLoading(false);
       }
@@ -97,6 +100,10 @@ export function AsyncSelect({
           <div className="flex items-center justify-center p-4 text-xs text-muted-foreground">
             <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
             Searching...
+          </div>
+        ) : loadFailed ? (
+          <div className="p-4 text-center text-xs text-destructive">
+            Couldn&apos;t load the list. Close and open it to try again.
           </div>
         ) : options.length === 0 ? (
           <div className="p-4 text-center text-xs text-muted-foreground">No results found</div>

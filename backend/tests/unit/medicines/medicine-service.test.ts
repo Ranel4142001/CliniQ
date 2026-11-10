@@ -50,7 +50,8 @@ describe("MedicineService Business Rules", () => {
         id: "batch-1",
         medicineId: "med-1",
         batchNo: "BATCH001",
-        expiryDate: new Date("2026-12-01"),
+        // Always a year ahead, so the batch never expires under the tests.
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         quantity: 50,
         createdAt: new Date(),
       },
@@ -108,6 +109,8 @@ describe("MedicineService Business Rules", () => {
   });
 
   it("deducts stock via FEFO when dispensing medicine", async () => {
+    // Relative dates: fixed ones expire as time passes, and FEFO rightly skips expired batches.
+    const inDays = (days: number) => new Date(Date.now() + days * 24 * 60 * 60 * 1000);
     const medWithMultipleBatches = {
       ...mockMedicine,
       batches: [
@@ -115,14 +118,14 @@ describe("MedicineService Business Rules", () => {
           id: "batch-soon",
           medicineId: "med-1",
           batchNo: "B-SOON",
-          expiryDate: new Date("2026-11-01"),
+          expiryDate: inDays(30),
           quantity: 10,
         },
         {
           id: "batch-later",
           medicineId: "med-1",
           batchNo: "B-LATER",
-          expiryDate: new Date("2027-01-01"),
+          expiryDate: inDays(90),
           quantity: 30,
         },
       ],
