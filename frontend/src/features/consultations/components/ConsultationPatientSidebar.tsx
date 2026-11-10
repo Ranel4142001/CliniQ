@@ -4,6 +4,7 @@ import React from "react";
 import { User, Phone, AlertCircle, HeartPulse } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/date";
+import { RecordNumber } from "@/components/feedback/RecordNumber";
 
 interface PatientSummaryProps {
   patient: {
@@ -27,14 +28,14 @@ export function ConsultationPatientSidebar({ patient }: PatientSummaryProps) {
   const fullName = `${patient.firstName} ${patient.middleName ? patient.middleName + " " : ""}${patient.lastName}`;
 
   return (
-    <div className="rounded-xl border bg-card p-5 shadow-sm space-y-5">
+    <div className="space-y-5 rounded-xl border bg-card p-5 shadow-sm">
       <div className="flex items-center gap-3 border-b pb-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-lg">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
           <User className="h-6 w-6" />
         </div>
         <div>
-          <h3 className="font-bold text-foreground text-base leading-tight">{fullName}</h3>
-          <p className="font-mono text-xs text-primary font-semibold mt-0.5">{patient.patientNo}</p>
+          <h3 className="text-base font-bold leading-tight text-foreground">{fullName}</h3>
+          <RecordNumber value={patient.patientNo} variant="accent" className="mt-0.5 block" />
         </div>
       </div>
 
@@ -63,9 +64,9 @@ export function ConsultationPatientSidebar({ patient }: PatientSummaryProps) {
         )}
 
         {patient.contactNumber && (
-          <div className="flex justify-between border-b pb-2 items-center">
+          <div className="flex items-center justify-between border-b pb-2">
             <span className="text-muted-foreground">Contact</span>
-            <span className="font-medium text-foreground flex items-center gap-1">
+            <span className="flex items-center gap-1 font-medium text-foreground">
               <Phone className="h-3 w-3 text-muted-foreground" />
               {patient.contactNumber}
             </span>
@@ -75,22 +76,22 @@ export function ConsultationPatientSidebar({ patient }: PatientSummaryProps) {
 
       {/* Medical Alerts */}
       <div className="space-y-3 pt-1">
-        <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 space-y-1">
-          <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-semibold text-xs">
+        <div className="space-y-1 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
             <span>Allergies</span>
           </div>
-          <p className="text-xs text-foreground font-medium pl-5">
+          <p className="pl-5 text-xs font-medium text-foreground">
             {patient.allergies || "None reported"}
           </p>
         </div>
 
-        <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 space-y-1">
-          <div className="flex items-center gap-1.5 text-blue-700 dark:text-blue-400 font-semibold text-xs">
+        <div className="space-y-1 rounded-lg border border-blue-500/20 bg-blue-500/10 p-3">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-400">
             <HeartPulse className="h-3.5 w-3.5 shrink-0" />
             <span>Existing Conditions</span>
           </div>
-          <p className="text-xs text-foreground font-medium pl-5">
+          <p className="pl-5 text-xs font-medium text-foreground">
             {patient.existingConditions || "None recorded"}
           </p>
         </div>

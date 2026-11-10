@@ -10,6 +10,7 @@ import { InitialsAvatar } from "@/components/feedback/InitialsAvatar";
 import { Button } from "@/components/ui/button";
 import type { PatientListItem } from "@backend/contracts";
 import { SEX_LABELS } from "@backend/contracts";
+import { RecordNumber } from "@/components/feedback/RecordNumber";
 
 interface PatientTableProps {
   data: PatientListItem[];
@@ -77,11 +78,7 @@ export function PatientTable({
     {
       header: "Patient No.",
       accessorKey: "patientNo",
-      cell: (p) => (
-        <span className="whitespace-nowrap rounded-lg bg-blue-50 px-2 py-1 font-mono text-xs font-medium text-blue-900 dark:bg-blue-500/10 dark:text-blue-200">
-          {p.patientNo}
-        </span>
-      ),
+      cell: (p) => <RecordNumber value={p.patientNo} variant="chip" />,
     },
     {
       header: "Age / Sex",

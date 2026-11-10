@@ -104,11 +104,11 @@ export function DataTable<T extends Record<string, unknown>>({
           <EmptyState title={emptyTitle} description={emptyMessage} />
         ) : (
           <>
-            {/* Phones and tablets: one card per row. Laptops and up: the full table. */}
-            <div className="lg:hidden">
+            {/* Phones, tablets and narrow windows: one card per row. Wide screens: the full table. */}
+            <div className="xl:hidden">
               <DataTableCards data={data} columns={columns} onRowClick={onRowClick} />
             </div>
-            <div className="hidden lg:block">
+            <div className="hidden xl:block">
               <Table>
                 <TableHeader className="border-b border-border/80 bg-slate-50/80 dark:bg-muted/40">
                   <TableRow className="hover:bg-transparent">

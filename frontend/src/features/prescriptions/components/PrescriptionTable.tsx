@@ -13,6 +13,7 @@ import { MoreHorizontal, Eye, CheckCircle2, PackageCheck, Ban, Edit } from "luci
 import { StatusBadge } from "@/components/feedback/StatusBadge";
 import { PRESCRIPTION_STATUS_MAP } from "@backend/contracts";
 import type { PrescriptionWithRelations } from "@backend/contracts";
+import { RecordNumber } from "@/components/feedback/RecordNumber";
 
 interface PrescriptionTableProps {
   prescriptions?: PrescriptionWithRelations[];
@@ -53,7 +54,7 @@ export function PrescriptionTable({
     {
       header: "Rx Number",
       accessorKey: "prescriptionNo",
-      cell: (item) => <span className="font-semibold">{item.prescriptionNo || "DRAFT"}</span>,
+      cell: (item) => <RecordNumber value={item.prescriptionNo || "DRAFT"} variant="chip" />,
     },
     {
       header: "Patient",
@@ -62,13 +63,15 @@ export function PrescriptionTable({
           <div className="font-medium">
             {item.patient?.firstName} {item.patient?.lastName}
           </div>
-          <div className="text-xs text-muted-foreground">{item.patient?.patientNo}</div>
+          <RecordNumber value={item.patient?.patientNo} />
         </div>
       ),
     },
     {
       header: "Prescribed By",
-      cell: (item) => `Dr. ${item.clinician?.fullName || "Clinician"}`,
+      cell: (item) => (
+        <span className="whitespace-nowrap">{item.clinician?.fullName || "Clinician"}</span>
+      ),
     },
     {
       header: "Items",

@@ -14,6 +14,7 @@ import { APPOINTMENT_STATUS_MAP } from "@/features/appointments/constants/appoin
 import { AppointmentActions } from "@/features/appointments/components/AppointmentActions";
 import type { AppointmentListItem } from "@backend/contracts";
 import type { Role } from "@prisma/client";
+import { RecordNumber } from "@/components/feedback/RecordNumber";
 
 /** Pill around the "Online" / "In-person" label. */
 const TYPE_CHIP = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-semibold";
@@ -88,10 +89,10 @@ export function AppointmentTable({
         <Link href={`/patients/${item.patientId}`} className="group flex items-center gap-3">
           <InitialsAvatar name={item.patientName} />
           <span className="flex flex-col">
-            <span className="text-sm font-semibold text-foreground group-hover:text-primary">
+            <span className="whitespace-nowrap text-sm font-semibold text-foreground group-hover:text-primary">
               {item.patientName}
             </span>
-            <span className="font-mono text-[11px] text-muted-foreground">{item.patientNo}</span>
+            <RecordNumber value={item.patientNo} />
           </span>
         </Link>
       ),
@@ -99,7 +100,9 @@ export function AppointmentTable({
     {
       header: "Clinician",
       cell: (item) => (
-        <span className="text-sm text-slate-600 dark:text-slate-400">{item.clinicianName}</span>
+        <span className="whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">
+          {item.clinicianName}
+        </span>
       ),
     },
     {
