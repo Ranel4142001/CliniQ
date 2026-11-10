@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -68,6 +69,7 @@ export default function MedicinesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        feature={ROUTES.MEDICINES}
         title="Medicines"
         description="Track stock, batches, and expiry dates."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Medicines" }]}

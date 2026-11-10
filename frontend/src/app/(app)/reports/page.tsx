@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ReportViewer } from "@/features/reports/components/ReportViewer";
@@ -52,6 +53,7 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        feature={ROUTES.REPORTS}
         title="Reports"
         description="Filter clinic reports by date and export them as CSV or PDF."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Reports" }]}

@@ -70,6 +70,10 @@ export function Topbar({ onOpenMobileMenu, hasNavBadge = false, user, onLogout }
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border/80 bg-card/85 px-4 backdrop-blur-md sm:px-6">
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-teal-400"
+      />
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"

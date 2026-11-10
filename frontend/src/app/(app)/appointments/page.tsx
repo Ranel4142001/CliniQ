@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Plus, List, Calendar as CalendarIcon } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -80,6 +81,7 @@ export default function AppointmentsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        feature={ROUTES.APPOINTMENTS}
         title="Appointments"
         description="Book, confirm, and manage patient visits."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Appointments" }]}

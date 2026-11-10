@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { UserPlus } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -48,6 +49,7 @@ export default function PatientsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        feature={ROUTES.PATIENTS}
         title="Patients"
         description="Register and manage patient records."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Patients" }]}

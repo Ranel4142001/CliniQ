@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
@@ -16,7 +17,13 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {!data && <PageHeader title="Dashboard" description="Today's clinic activity at a glance." />}
+      {!data && (
+        <PageHeader
+          feature={ROUTES.DASHBOARD}
+          title="Dashboard"
+          description="Today's clinic activity at a glance."
+        />
+      )}
 
       {isLoading && <LoadingState message="Loading dashboard overview..." />}
 

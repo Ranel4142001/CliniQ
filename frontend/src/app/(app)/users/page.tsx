@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -131,6 +132,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        feature={ROUTES.USERS}
         title="User Management"
         description="Manage staff, clinician, and admin accounts."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Users" }]}

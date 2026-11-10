@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatBadgeCount } from "@/lib/format";
+import { featureTile } from "@/config/feature-colors";
 import type { NavItem } from "@/config/navigation";
 
 interface SidebarNavLinkProps {
@@ -31,22 +32,23 @@ export function SidebarNavLink({
       aria-label={isCollapsed ? label : undefined}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "group relative flex min-h-11 items-center gap-3 rounded-xl py-2.5 text-[15px] font-medium transition-all duration-150",
-        isCollapsed ? "justify-center px-0" : "px-3.5",
+        "group relative flex min-h-11 items-center gap-3 rounded-xl py-1.5 text-[15px] font-medium transition-all duration-150",
+        isCollapsed ? "justify-center px-0" : "px-2",
         isActive
           ? "bg-gradient-to-r from-blue-600 to-indigo-500 font-semibold text-white shadow-md shadow-blue-600/20"
           : "text-slate-600 hover:bg-muted/70 hover:text-foreground dark:text-slate-300"
       )}
     >
-      <span className="relative">
-        <Icon
-          className={cn(
-            "h-5 w-5 shrink-0 transition-transform duration-150",
-            isActive ? "scale-105" : "group-hover:scale-105"
-          )}
-        />
+      <span
+        className={cn(
+          "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-transform duration-150",
+          isActive ? "bg-white/20 text-white" : featureTile(item.href),
+          !isActive && "group-hover:scale-105"
+        )}
+      >
+        <Icon className="h-[18px] w-[18px]" />
         {isCollapsed && hasBadge && (
-          <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-card" />
+          <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-card" />
         )}
       </span>
       {!isCollapsed && <span className="truncate">{item.title}</span>}

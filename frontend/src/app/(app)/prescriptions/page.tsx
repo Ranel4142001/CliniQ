@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -69,6 +70,7 @@ export default function PrescriptionsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        feature={ROUTES.PRESCRIPTIONS}
         title="Prescriptions"
         description="Write, issue, and dispense prescriptions."
         breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Prescriptions" }]}
