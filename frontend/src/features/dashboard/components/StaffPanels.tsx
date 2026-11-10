@@ -9,6 +9,7 @@ import { DashboardPanel, PanelEmpty } from "@/features/dashboard/components/Dash
 import { APPOINTMENT_STATUS_MAP } from "@/features/appointments/constants/appointment-status.constants";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
+import { TONE_TILES } from "@/lib/tones";
 import type { AdminStaffDashboardData } from "@backend/contracts";
 
 type Data = AdminStaffDashboardData;
@@ -71,7 +72,7 @@ export function TodayAppointmentsPanel({ items }: { items: Data["todayAppointmen
       {items.length === 0 ? (
         <PanelEmpty
           icon={<CalendarCheck className="h-7 w-7" />}
-          tone="bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300"
+          tone="blue"
           title="No appointments today"
           description="New bookings will appear here automatically."
           action={
@@ -98,7 +99,12 @@ export function PendingPanel({ items }: { items: Data["pendingAppointments"] }) 
     <DashboardPanel title="Pending confirmations" linkLabel="Manage" href={ROUTES.APPOINTMENTS}>
       {items.length === 0 ? (
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
+          <span
+            className={cn(
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
+              TONE_TILES.teal
+            )}
+          >
             <CheckCircle2 className="h-5 w-5" />
           </span>
           <div>

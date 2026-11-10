@@ -7,11 +7,16 @@ import { DataTable, DataTableColumn } from "@/components/data-table/DataTable";
 import { StatusBadge } from "@/components/feedback/StatusBadge";
 import { InitialsAvatar } from "@/components/feedback/InitialsAvatar";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { TONE_TILES } from "@/lib/tones";
 import { formatDateTime } from "@/lib/date";
 import { APPOINTMENT_STATUS_MAP } from "@/features/appointments/constants/appointment-status.constants";
 import { AppointmentActions } from "@/features/appointments/components/AppointmentActions";
 import type { AppointmentListItem } from "@backend/contracts";
 import type { Role } from "@prisma/client";
+
+/** Pill around the "Online" / "In-person" label. */
+const TYPE_CHIP = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-semibold";
 
 interface AppointmentTableProps {
   data: AppointmentListItem[];
@@ -53,7 +58,12 @@ export function AppointmentTable({
       header: "When",
       cell: (item) => (
         <div className="flex items-center gap-3" title={formatDateTime(item.scheduledAt)}>
-          <span className="flex w-12 shrink-0 flex-col items-center rounded-xl bg-blue-50 py-1 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+          <span
+            className={cn(
+              "flex w-12 shrink-0 flex-col items-center rounded-xl py-1",
+              TONE_TILES.blue
+            )}
+          >
             <span className="text-[10px] font-semibold uppercase">
               {format(new Date(item.scheduledAt), "MMM")}
             </span>
@@ -98,7 +108,7 @@ export function AppointmentTable({
         <div className="flex items-center gap-1.5 text-xs">
           {item.type === "ONLINE" ? (
             <>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">
+              <span className={cn(TYPE_CHIP, TONE_TILES.violet)}>
                 <Video className="h-3.5 w-3.5" /> Online
               </span>
               {item.meetingUrl && (
@@ -115,7 +125,7 @@ export function AppointmentTable({
             </>
           ) : (
             <>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-700 dark:bg-slate-500/10 dark:text-slate-300">
+              <span className={cn(TYPE_CHIP, TONE_TILES.slate)}>
                 <User className="h-3.5 w-3.5" /> In-person
               </span>
             </>

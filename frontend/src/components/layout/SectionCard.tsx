@@ -1,19 +1,12 @@
 import React, { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-
-/** Icon tile colours, matching StatCard. */
-const SECTION_TONES = {
-  blue: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300",
-  teal: "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300",
-  amber: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
-  red: "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300",
-} as const;
+import { TONE_TILES, type Tone } from "@/lib/tones";
 
 interface SectionCardProps {
   title: string;
   subtitle?: string;
   icon: ReactNode;
-  tone?: keyof typeof SECTION_TONES;
+  tone?: Tone;
   /** Shown as a small count chip next to the title. */
   count?: number;
   children: ReactNode;
@@ -41,7 +34,7 @@ export function SectionCard({
         <span
           className={cn(
             "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-            SECTION_TONES[tone]
+            TONE_TILES[tone]
           )}
         >
           {icon}

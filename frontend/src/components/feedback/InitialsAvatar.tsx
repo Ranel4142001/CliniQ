@@ -1,26 +1,16 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { getInitials } from "@/lib/format";
+import { TONE_TILES } from "@/lib/tones";
 
 /** Soft tints that rotate by name, so neighbouring rows are easy to tell apart. */
 const AVATAR_TINTS = [
-  "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300",
-  "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300",
-  "bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300",
-  "bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300",
-  "bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300",
+  TONE_TILES.blue,
+  TONE_TILES.teal,
+  TONE_TILES.amber,
+  TONE_TILES.red,
+  TONE_TILES.violet,
 ] as const;
-
-export function initialsOf(name: string): string {
-  const words = name
-    .split(",")[0]
-    .trim()
-    .split(/\s+/)
-    .filter((w) => !/^dr\.?$/i.test(w));
-  if (words.length === 0) return "?";
-  const first = words[0][0] ?? "";
-  const last = words.length > 1 ? words[words.length - 1][0] : "";
-  return `${first}${last}`.toUpperCase();
-}
 
 function tintFor(name: string): string {
   let hash = 0;
@@ -39,7 +29,7 @@ export function InitialsAvatar({ name, className }: { name: string; className?: 
         className
       )}
     >
-      {initialsOf(name)}
+      {getInitials(name)}
     </span>
   );
 }

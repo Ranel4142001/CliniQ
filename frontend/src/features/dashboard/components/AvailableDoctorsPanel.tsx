@@ -68,7 +68,7 @@ export function AvailableDoctorsPanel() {
       ) : !doctors || doctors.length === 0 ? (
         <PanelEmpty
           icon={<Stethoscope className="h-7 w-7" />}
-          tone="bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300"
+          tone="blue"
           title="No doctors yet"
           description="Active clinician accounts will appear here."
         />

@@ -3,22 +3,14 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { TONE_TILES, type Tone } from "@/lib/tones";
 
-/** Icon tile colours; `blue` matches the primary brand colour. */
-const ICON_TONES = {
-  blue: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300",
-  teal: "bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300",
-  amber: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
-  red: "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300",
-  violet: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300",
-} as const;
-
-const ALERT_TEXT: Partial<Record<keyof typeof ICON_TONES, string>> = {
+const ALERT_TEXT: Partial<Record<Tone, string>> = {
   red: "text-rose-600 dark:text-rose-400",
   amber: "text-amber-700 dark:text-amber-400",
 };
 
-export type StatTone = keyof typeof ICON_TONES;
+export type StatTone = Tone;
 
 interface StatCardProps {
   title: string;
@@ -67,7 +59,7 @@ export function StatCard({
             <span
               className={cn(
                 "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg [&_svg]:h-4 [&_svg]:w-4",
-                ICON_TONES[tone]
+                TONE_TILES[tone]
               )}
             >
               {icon}

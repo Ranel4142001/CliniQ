@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { TONE_TILES, type Tone } from "@/lib/tones";
 
 interface DashboardPanelProps {
   title: string;
@@ -31,8 +32,7 @@ interface PanelEmptyProps {
   icon: ReactNode;
   title: string;
   description?: string;
-  /** e.g. "bg-blue-50 text-blue-600" */
-  tone: string;
+  tone: Tone;
   action?: ReactNode;
 }
 
@@ -40,7 +40,9 @@ interface PanelEmptyProps {
 export function PanelEmpty({ icon, title, description, tone, action }: PanelEmptyProps) {
   return (
     <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
-      <span className={`mb-1 flex h-14 w-14 items-center justify-center rounded-full ${tone}`}>
+      <span
+        className={`mb-1 flex h-14 w-14 items-center justify-center rounded-full ${TONE_TILES[tone]}`}
+      >
         {icon}
       </span>
       <p className="text-[15px] font-semibold text-foreground">{title}</p>

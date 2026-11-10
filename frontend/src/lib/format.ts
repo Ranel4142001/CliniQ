@@ -20,10 +20,14 @@ export function formatBadgeCount(count: number): string {
   return count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : String(count);
 }
 
-/** Two-letter initials for avatars ("Maria Elena Reyes" → "MR"). */
+/** Two-letter initials for avatars ("Maria Elena Reyes" → "MR", "Dr. Alberto Cruz, MD" → "AC"). */
 export function getInitials(name?: string | null): string {
-  if (!name) return "CQ";
-  const parts = name.trim().split(/\s+/);
+  const parts = (name ?? "")
+    .split(",")[0]
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word && !/^dr\.?$/i.test(word));
+  if (parts.length === 0) return "CQ";
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
