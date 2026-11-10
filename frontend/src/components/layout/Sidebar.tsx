@@ -9,7 +9,6 @@ import { getNavigationForRole } from "@/config/navigation";
 import { ROUTES } from "@/constants/routes";
 import { SidebarNavLink } from "@/components/layout/SidebarNavLink";
 import { SidebarUserCard } from "@/components/layout/SidebarUserCard";
-import { SidebarCollapseButton } from "@/components/layout/SidebarCollapseButton";
 
 interface SidebarProps {
   role?: Role | null;
@@ -26,8 +25,6 @@ interface SidebarProps {
   onClose?: () => void;
   /** Unread counts keyed by nav href, e.g. { "/messages": 3 }. */
   badges?: Partial<Record<string, number>>;
-  /** Shows the Collapse / Expand control (desktop). */
-  onToggleCollapse?: () => void;
 }
 
 function isActiveHref(pathname: string, href: string): boolean {
@@ -42,7 +39,6 @@ export function Sidebar({
   isCollapsed = false,
   onClose,
   badges,
-  onToggleCollapse,
 }: SidebarProps) {
   const pathname = usePathname();
   const navItems = getNavigationForRole(role);
@@ -67,15 +63,8 @@ export function Sidebar({
         </div>
         {!isCollapsed && (
           <div className="flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="text-base font-bold tracking-tight text-foreground">CliniQ</span>
-              <span className="py-0.2 rounded-full bg-primary/10 px-1.5 text-[9px] font-semibold text-primary">
-                Pro
-              </span>
-            </div>
-            <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              Healthcare OS
-            </span>
+            <span className="text-base font-bold tracking-tight text-foreground">CliniQ</span>
+            <span className="text-xs text-muted-foreground">Clinic management</span>
           </div>
         )}
         {onClose && (
@@ -110,10 +99,7 @@ export function Sidebar({
       </nav>
 
       {/* User Info & Portal Card */}
-      <div className={cn("space-y-2 border-t border-border/80", isCollapsed ? "p-2" : "p-3")}>
-        {onToggleCollapse && (
-          <SidebarCollapseButton isCollapsed={isCollapsed} onToggle={onToggleCollapse} />
-        )}
+      <div className={cn("border-t border-border/80", isCollapsed ? "p-2" : "p-3")}>
         {user ? (
           <SidebarUserCard fullName={user.fullName} role={userRole} isCollapsed={isCollapsed} />
         ) : (
