@@ -30,7 +30,7 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
       <div
         className={cn(
           "hidden transition-[width] duration-200 ease-out md:flex md:shrink-0",
-          isCollapsed ? "md:w-[4.5rem]" : "md:w-64"
+          isCollapsed ? "md:w-[5.5rem]" : "md:w-64"
         )}
       >
         <Sidebar
@@ -39,6 +39,7 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
           className="w-full"
           isCollapsed={isCollapsed}
           badges={navBadges}
+          onToggleCollapse={toggle}
         />
       </div>
 
@@ -58,8 +59,6 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
       <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar
           onOpenMobileMenu={() => setMobileOpen(true)}
-          onToggleSidebar={toggle}
-          isSidebarCollapsed={isCollapsed}
           hasNavBadge={Object.values(navBadges ?? {}).some((count) => (count ?? 0) > 0)}
           user={user}
           onLogout={onLogout}

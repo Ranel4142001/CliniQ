@@ -2,7 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Stethoscope, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Stethoscope, X } from "lucide-react";
 import { Role } from "@backend/contracts";
 import { cn } from "@/lib/utils";
 import { getNavigationForRole } from "@/config/navigation";
@@ -25,6 +25,25 @@ interface SidebarProps {
   onClose?: () => void;
   /** Unread counts keyed by nav href, e.g. { "/messages": 3 }. */
   badges?: Partial<Record<string, number>>;
+  /** Shows the open / close arrow next to the logo (desktop). */
+  onToggleCollapse?: () => void;
+}
+
+/** Small arrow button beside the logo: ‹ closes the sidebar to icons, › opens it again. */
+function SidebarToggle({ isCollapsed, onToggle }: { isCollapsed: boolean; onToggle: () => void }) {
+  const label = isCollapsed ? "Open sidebar" : "Close sidebar";
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={label}
+      aria-expanded={!isCollapsed}
+      title={label}
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-500 text-white shadow-sm transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+    </button>
+  );
 }
 
 function isActiveHref(pathname: string, href: string): boolean {
@@ -39,6 +58,7 @@ export function Sidebar({
   isCollapsed = false,
   onClose,
   badges,
+  onToggleCollapse,
 }: SidebarProps) {
   const pathname = usePathname();
   const navItems = getNavigationForRole(role);
@@ -55,10 +75,15 @@ export function Sidebar({
       <div
         className={cn(
           "flex h-16 shrink-0 items-center gap-3 border-b border-border/80",
-          isCollapsed ? "justify-center px-2" : "px-5"
+          isCollapsed ? "justify-center gap-2 px-2" : "px-5"
         )}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+        <div
+          className={cn(
+            "flex shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm",
+            isCollapsed ? "h-9 w-9" : "h-10 w-10"
+          )}
+        >
           <Stethoscope className="h-5 w-5" />
         </div>
         {!isCollapsed && (
@@ -66,6 +91,9 @@ export function Sidebar({
             <span className="text-base font-bold tracking-tight text-foreground">CliniQ</span>
             <span className="text-xs text-muted-foreground">Clinic management</span>
           </div>
+        )}
+        {onToggleCollapse && (
+          <SidebarToggle isCollapsed={isCollapsed} onToggle={onToggleCollapse} />
         )}
         {onClose && (
           <button
@@ -80,7 +108,7 @@ export function Sidebar({
       </div>
 
       {/* Navigation Links */}
-      <nav className={cn("flex-1 space-y-1 overflow-y-auto py-4", isCollapsed ? "px-2" : "px-3")}>
+      <nav className={cn("flex-1 space-y-1.5 overflow-y-auto py-4", isCollapsed ? "px-3" : "px-3")}>
         {!isCollapsed && (
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Menu
