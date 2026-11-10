@@ -3,7 +3,8 @@ import { ROLES } from "@backend/shared/domain/roles";
 
 const emailSchema = z.string().trim().toLowerCase().email("Please enter a valid email address");
 
-const passwordSchema = z
+/** Password strength rules, shared by sign-up, admin-created accounts and Settings. */
+export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")
   .max(72, "Password must be at most 72 characters")
