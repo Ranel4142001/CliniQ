@@ -32,6 +32,31 @@ export const STATUS_TONES = {
 
 export type StatusTone = keyof typeof STATUS_TONES;
 
+/** A soft tinted pill with a dot, for statuses that have no status map. */
+export function TonePill({
+  tone,
+  label,
+  className,
+}: {
+  tone: StatusTone;
+  label: string;
+  className?: string;
+}) {
+  const colors = STATUS_TONES[tone];
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset",
+        colors.pill,
+        className
+      )}
+    >
+      <span aria-hidden="true" className={cn("h-1.5 w-1.5 rounded-full", colors.dot)} />
+      {label}
+    </span>
+  );
+}
+
 export interface StatusConfig {
   label: string;
   /** Preferred: a soft pill with a dot. */
@@ -56,19 +81,7 @@ export function StatusBadge<T extends string>({
   const config: StatusConfig = statusMap[status] || { label: status, tone: "neutral" };
 
   if (config.tone) {
-    const tone = STATUS_TONES[config.tone];
-    return (
-      <span
-        className={cn(
-          "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset",
-          tone.pill,
-          className
-        )}
-      >
-        <span aria-hidden="true" className={cn("h-1.5 w-1.5 rounded-full", tone.dot)} />
-        {config.label}
-      </span>
-    );
+    return <TonePill tone={config.tone} label={config.label} className={className} />;
   }
 
   return (

@@ -151,12 +151,12 @@ export function InventoryPanel({ items }: { items: Data["lowStockMedicines"] }) 
                   aria-hidden="true"
                 >
                   <div
-                    className="h-full rounded-full bg-rose-500"
+                    className="h-full rounded-full bg-amber-500"
                     style={{ width: `${percent}%` }}
                   />
                 </div>
                 <p className="text-[13px] text-muted-foreground">
-                  <span className="font-semibold text-rose-600 dark:text-rose-400">
+                  <span className="font-semibold text-amber-700 dark:text-amber-400">
                     {med.totalStock} {med.unit}
                   </span>{" "}
                   on hand · reorder at {med.reorderLevel}

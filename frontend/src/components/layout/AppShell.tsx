@@ -25,7 +25,7 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
   const { isCollapsed, toggle } = useSidebarCollapsed();
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="relative flex h-dvh w-full overflow-hidden bg-background">
       {/* Desktop sidebar */}
       <div
         className={cn(
@@ -56,7 +56,7 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
       </MobileNavDrawer>
 
       {/* Main app body */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar
           onOpenMobileMenu={() => setMobileOpen(true)}
           onToggleSidebar={toggle}
@@ -65,7 +65,7 @@ export function AppShell({ children, user, onLogout, navBadges }: AppShellProps)
           user={user}
           onLogout={onLogout}
         />
-        <main className="flex-1 overflow-y-auto bg-canvas p-4 sm:p-6 lg:p-8">
+        <main className="relative flex-1 overflow-y-auto bg-canvas p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>

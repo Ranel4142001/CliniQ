@@ -42,7 +42,7 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        "overflow-hidden rounded-2xl border border-border/80 bg-card shadow-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "overflow-hidden rounded-2xl border border-border/80 bg-card shadow-none",
         className
       )}
     >

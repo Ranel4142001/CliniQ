@@ -70,7 +70,7 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
           title="Low stock items"
           value={stats.lowStockCount}
           icon={<AlertTriangle className="h-5 w-5" />}
-          tone="red"
+          tone="amber"
           isAlert
           description={stats.lowStockCount > 0 ? "Needs restocking" : "At or below reorder"}
         />

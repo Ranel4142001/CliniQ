@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, ShieldAlert } from "lucide-react";
+import { Clock } from "lucide-react";
+import { TonePill } from "@/components/feedback/StatusBadge";
+import { SectionCard, SectionEmpty, SectionList } from "@/components/layout/SectionCard";
 import type { MedicineBatchWithMedicine } from "@backend/contracts";
 
 interface ExpiringPanelProps {
@@ -12,73 +12,66 @@ interface ExpiringPanelProps {
   onStockAdjustment?: (medicineId: string) => void;
 }
 
+const DAY_MS = 1000 * 60 * 60 * 24;
+
+function daysLeft(date: Date | string): number {
+  return Math.ceil((new Date(date).getTime() - new Date().setHours(0, 0, 0, 0)) / DAY_MS);
+}
+
+function BatchRow({ batch, isExpired }: { batch: MedicineBatchWithMedicine; isExpired: boolean }) {
+  const expiry = new Date(batch.expiryDate).toLocaleDateString();
+  const days = daysLeft(batch.expiryDate);
+  return (
+    <li className="flex flex-wrap items-center justify-between gap-3 py-3.5">
+      <div className="min-w-0">
+        <p className="truncate text-[15px] font-semibold text-foreground">
+          {batch.medicine.name}{" "}
+          <span className="text-[13px] font-normal text-muted-foreground">
+            {batch.medicine.strength} · Batch {batch.batchNo}
+          </span>
+        </p>
+        <p className="mt-0.5 text-[13px] text-muted-foreground">
+          {isExpired ? (
+            <span className="font-semibold text-rose-600 dark:text-rose-400">Expired {expiry}</span>
+          ) : (
+            <span className="font-semibold text-amber-700 dark:text-amber-400">
+              Expires {expiry} · {days} day{days === 1 ? "" : "s"} left
+            </span>
+          )}{" "}
+          · {batch.quantity} {batch.medicine.unit}
+        </p>
+      </div>
+      <TonePill
+        tone={isExpired ? "red" : "amber"}
+        label={isExpired ? "Expired" : "Expiring soon"}
+      />
+    </li>
+  );
+}
+
 export function ExpiringPanel({ expiringSoon, expired }: ExpiringPanelProps) {
-  const totalAlerts = expiringSoon.length + expired.length;
-
-  if (totalAlerts === 0) {
-    return (
-      <Card className="border-dashed">
-        <CardContent className="p-6 text-center text-sm text-muted-foreground">
-          No expiry alerts. All inventory batches have healthy shelf life.
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const getDaysLeft = (date: Date | string) => {
-    const diffTime = new Date(date).getTime() - new Date().setHours(0, 0, 0, 0);
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
+  const total = expiringSoon.length + expired.length;
 
   return (
-    <Card className="border-rose-200 dark:border-rose-900 bg-rose-50/40 dark:bg-rose-950/20">
-      <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-base font-semibold flex items-center gap-2 text-rose-800 dark:text-rose-400">
-          <Clock className="h-5 w-5" />
-          Expiry Alerts ({totalAlerts})
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {expired.map((batch) => (
-          <div
-            key={batch.id}
-            className="flex items-center justify-between p-3 rounded-md bg-white dark:bg-slate-900 border border-rose-300 dark:border-rose-800 shadow-sm"
-          >
-            <div>
-              <div className="font-medium text-sm text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
-                <ShieldAlert className="h-4 w-4" />
-                {batch.medicine.name} {batch.medicine.strength} • Batch: {batch.batchNo}
-              </div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                Expired on {new Date(batch.expiryDate).toLocaleDateString()} • {batch.quantity} {batch.medicine.unit} remaining
-              </div>
-            </div>
-            <Badge variant="destructive">EXPIRED</Badge>
-          </div>
-        ))}
-
-        {expiringSoon.map((batch) => {
-          const days = getDaysLeft(batch.expiryDate);
-          return (
-            <div
-              key={batch.id}
-              className="flex items-center justify-between p-3 rounded-md bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 shadow-sm"
-            >
-              <div>
-                <div className="font-medium text-sm">
-                  {batch.medicine.name} {batch.medicine.strength} • Batch: {batch.batchNo}
-                </div>
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  Expires {new Date(batch.expiryDate).toLocaleDateString()} ({days} days left) • {batch.quantity} {batch.medicine.unit}
-                </div>
-              </div>
-              <Badge variant="outline" className="border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-950/40">
-                Expiring Soon
-              </Badge>
-            </div>
-          );
-        })}
-      </CardContent>
-    </Card>
+    <SectionCard
+      title="Expiry alerts"
+      subtitle="Expired or expiring within 60 days"
+      icon={<Clock className="h-5 w-5" />}
+      tone="red"
+      count={total}
+    >
+      {total === 0 ? (
+        <SectionEmpty>All batches have a healthy shelf life.</SectionEmpty>
+      ) : (
+        <SectionList>
+          {expired.map((batch) => (
+            <BatchRow key={batch.id} batch={batch} isExpired />
+          ))}
+          {expiringSoon.map((batch) => (
+            <BatchRow key={batch.id} batch={batch} isExpired={false} />
+          ))}
+        </SectionList>
+      )}
+    </SectionCard>
   );
 }
