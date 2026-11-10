@@ -4,27 +4,17 @@ import { ArrowRight } from "lucide-react";
 
 interface DashboardPanelProps {
   title: string;
-  subtitle: string;
   linkLabel: string;
   href: string;
   children: ReactNode;
 }
 
-/** White card with a title row and a "see more" link, used for each dashboard list. */
-export function DashboardPanel({
-  title,
-  subtitle,
-  linkLabel,
-  href,
-  children,
-}: DashboardPanelProps) {
+/** White card with a title and a "see more" link, used for each dashboard list. */
+export function DashboardPanel({ title, linkLabel, href, children }: DashboardPanelProps) {
   return (
     <section className="overflow-hidden rounded-2xl border border-border/80 bg-card">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-5 py-4 sm:px-6">
-        <div>
-          <h2 className="text-base font-semibold text-foreground sm:text-lg">{title}</h2>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">{subtitle}</p>
-        </div>
+      <div className="flex items-center justify-between gap-2 border-b border-border/60 px-5 py-3.5">
+        <h2 className="text-base font-semibold text-foreground sm:text-lg">{title}</h2>
         <Link
           href={href}
           className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -49,7 +39,7 @@ interface PanelEmptyProps {
 /** Friendly empty state inside a dashboard panel. */
 export function PanelEmpty({ icon, title, description, tone, action }: PanelEmptyProps) {
   return (
-    <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+    <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
       <span className={`mb-1 flex h-14 w-14 items-center justify-center rounded-full ${tone}`}>
         {icon}
       </span>

@@ -6,7 +6,7 @@ import { StatCard } from "@/components/layout/StatCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/feedback/StatusBadge";
-import { BANNER_BUTTON, WelcomeBanner } from "@/features/dashboard/components/WelcomeBanner";
+import { DashboardHeader, HEADER_BUTTON } from "@/features/dashboard/components/DashboardHeader";
 import {
   Calendar,
   FileText,
@@ -36,15 +36,15 @@ export function PatientDashboard({ data, userName }: PatientDashboardProps) {
 
   return (
     <div className="space-y-6">
-      <WelcomeBanner
+      <DashboardHeader
         fullName={userName}
         summary={patientSummary(stats.upcomingAppointmentsCount)}
         actions={
           <>
-            <Link href={ROUTES.APPOINTMENTS} className={BANNER_BUTTON.primary}>
+            <Link href={ROUTES.APPOINTMENTS} className={HEADER_BUTTON.primary}>
               <Plus className="h-4 w-4" /> Book appointment
             </Link>
-            <Link href={ROUTES.MESSAGES} className={BANNER_BUTTON.secondary}>
+            <Link href={ROUTES.MESSAGES} className={HEADER_BUTTON.secondary}>
               <MessageCircle className="h-4 w-4" /> Message the clinic
             </Link>
           </>

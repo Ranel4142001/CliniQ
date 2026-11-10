@@ -6,13 +6,13 @@ import {
   AlertTriangle,
   CalendarClock,
   CalendarPlus,
+  Clock,
   Hourglass,
   Users,
   UserPlus,
-  Clock,
 } from "lucide-react";
 import { StatCard } from "@/components/layout/StatCard";
-import { BANNER_BUTTON, WelcomeBanner } from "@/features/dashboard/components/WelcomeBanner";
+import { DashboardHeader, HEADER_BUTTON } from "@/features/dashboard/components/DashboardHeader";
 import { QuickActionTiles } from "@/features/dashboard/components/QuickActionTiles";
 import {
   InventoryPanel,
@@ -32,21 +32,23 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
   const { stats, todayAppointments, pendingAppointments, lowStockMedicines } = data;
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <WelcomeBanner
+    <div className="space-y-6">
+      <DashboardHeader
         fullName={userName}
         summary={clinicSummary(stats)}
         actions={
           <>
-            <Link href={ROUTES.APPOINTMENTS} className={BANNER_BUTTON.primary}>
-              <CalendarPlus className="h-4 w-4" /> Book appointment
-            </Link>
-            <Link href={ROUTES.PATIENTS} className={BANNER_BUTTON.secondary}>
+            <Link href={ROUTES.PATIENTS} className={HEADER_BUTTON.secondary}>
               <UserPlus className="h-4 w-4" /> Register patient
+            </Link>
+            <Link href={ROUTES.APPOINTMENTS} className={HEADER_BUTTON.primary}>
+              <CalendarPlus className="h-4 w-4" /> Book appointment
             </Link>
           </>
         }
       />
+
+      <QuickActionTiles />
 
       <section
         aria-label="Today at a glance"
@@ -55,21 +57,21 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
         <StatCard
           title="Today's schedule"
           value={stats.todayAppointmentsCount}
-          icon={<CalendarClock className="h-5 w-5" />}
+          icon={<CalendarClock />}
           tone="blue"
           description="Scheduled visits today"
         />
         <StatCard
           title="Pending requests"
           value={stats.pendingAppointmentsCount}
-          icon={<Clock className="h-5 w-5" />}
+          icon={<Clock />}
           tone="teal"
           description="Awaiting confirmation"
         />
         <StatCard
           title="Low stock items"
           value={stats.lowStockCount}
-          icon={<AlertTriangle className="h-5 w-5" />}
+          icon={<AlertTriangle />}
           tone="amber"
           isAlert
           description={stats.lowStockCount > 0 ? "Needs restocking" : "At or below reorder"}
@@ -77,27 +79,25 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
         <StatCard
           title="Expiring soon"
           value={stats.expiringCount}
-          icon={<Hourglass className="h-5 w-5" />}
+          icon={<Hourglass />}
           tone="amber"
           isAlert
-          description="Batches expiring in 60 days"
+          description="Within 60 days"
         />
         <StatCard
           title="Total patients"
           value={stats.totalPatientsCount}
-          icon={<Users className="h-5 w-5" />}
+          icon={<Users />}
           tone="blue"
-          description="Active registered records"
+          description="Active records"
         />
       </section>
 
-      <QuickActionTiles />
-
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
           <TodayAppointmentsPanel items={todayAppointments} />
         </div>
-        <div className="space-y-6 lg:col-span-2">
+        <div className="space-y-6">
           <PendingPanel items={pendingAppointments} />
           <InventoryPanel items={lowStockMedicines} />
         </div>

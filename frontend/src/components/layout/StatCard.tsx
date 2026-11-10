@@ -11,6 +11,11 @@ const ICON_TONES = {
   violet: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300",
 } as const;
 
+const ALERT_TEXT: Partial<Record<keyof typeof ICON_TONES, string>> = {
+  red: "text-rose-600 dark:text-rose-400",
+  amber: "text-amber-700 dark:text-amber-400",
+};
+
 export type StatTone = keyof typeof ICON_TONES;
 
 interface StatCardProps {
@@ -19,7 +24,7 @@ interface StatCardProps {
   description?: string;
   icon?: ReactNode;
   tone?: StatTone;
-  /** Colours the description to draw the eye, e.g. "Needs restocking". */
+  /** Colours the description to draw the eye when the value is not zero. */
   isAlert?: boolean;
   trend?: {
     value: string | number;
@@ -29,6 +34,7 @@ interface StatCardProps {
   className?: string;
 }
 
+/** Title and icon on top, a large number, then one short line of context. */
 export function StatCard({
   title,
   value,
@@ -39,53 +45,42 @@ export function StatCard({
   trend,
   className = "",
 }: StatCardProps) {
+  const showAlert = isAlert && value !== 0;
+
   return (
-    <Card
-      className={cn(
-        "overflow-hidden rounded-2xl border border-border/80 bg-card shadow-none",
-        className
-      )}
-    >
-      <CardContent className="p-5">
+    <Card className={cn("rounded-2xl border border-border/80 bg-card shadow-none", className)}>
+      <CardContent className="flex h-full flex-col p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{title}</p>
+          <p className="truncate text-[13px] font-semibold text-foreground">{title}</p>
           {icon && (
-            <div
+            <span
               className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg [&_svg]:h-4 [&_svg]:w-4",
                 ICON_TONES[tone]
               )}
             >
               {icon}
-            </div>
+            </span>
           )}
         </div>
-        <div className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          {value}
-        </div>
+        <p className="mt-4 text-3xl font-bold tracking-tight text-foreground">{value}</p>
         {(description || trend) && (
-          <div className="mt-2 flex items-center text-[13px] text-muted-foreground">
+          <p className="mt-1.5 truncate text-xs text-muted-foreground">
             {trend && (
               <span
-                className={`mr-1.5 font-semibold ${
+                className={cn(
+                  "mr-1.5 font-semibold",
                   trend.isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
-                }`}
+                )}
               >
                 {trend.isPositive ? "+" : ""}
                 {trend.value}
               </span>
             )}
-            <span
-              className={cn(
-                "truncate",
-                isAlert && value !== 0 && "font-semibold",
-                isAlert && value !== 0 && tone === "red" && "text-rose-600 dark:text-rose-400",
-                isAlert && value !== 0 && tone === "amber" && "text-amber-700 dark:text-amber-400"
-              )}
-            >
+            <span className={cn(showAlert && "font-semibold", showAlert && ALERT_TEXT[tone])}>
               {description || trend?.label}
             </span>
-          </div>
+          </p>
         )}
       </CardContent>
     </Card>
