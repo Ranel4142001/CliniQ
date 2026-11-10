@@ -48,3 +48,41 @@ export const updateUserSchema = z.object({
 });
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+// ---------- Account settings (every role, own account only) ----------
+
+const currentPasswordSchema = z.string().min(1, "Enter your current password");
+
+export const updateOwnProfileSchema = z.object({
+  fullName: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be at most 100 characters"),
+});
+
+export type UpdateOwnProfileInput = z.infer<typeof updateOwnProfileSchema>;
+
+export const changeEmailSchema = z.object({
+  newEmail: emailSchema,
+  currentPassword: currentPasswordSchema,
+});
+
+export type ChangeEmailInput = z.infer<typeof changeEmailSchema>;
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: currentPasswordSchema,
+    newPassword: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: "Choose a password different from your current one",
+    path: ["newPassword"],
+  });
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

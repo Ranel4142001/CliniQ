@@ -2,7 +2,9 @@
 
 import { getInitials } from "@/lib/format";
 import React, { useState, useEffect } from "react";
-import { Menu, LogOut, Calendar, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Menu, LogOut, Calendar, ShieldCheck, Settings } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -137,6 +139,15 @@ export function Topbar({ onOpenMobileMenu, hasNavBadge = false, user, onLogout }
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem
+                asChild
+                className="cursor-pointer rounded-md p-2 text-xs font-medium"
+              >
+                <Link href={ROUTES.SETTINGS}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </Link>
+              </DropdownMenuItem>
               {onLogout && (
                 <DropdownMenuItem
                   onClick={onLogout}

@@ -43,6 +43,9 @@ function setup(
     signUp: vi.fn().mockResolvedValue(null),
     signOut: vi.fn().mockResolvedValue(undefined),
     createConfirmedUser: vi.fn().mockResolvedValue(null),
+    verifyPassword: vi.fn().mockResolvedValue(true),
+    requestEmailChange: vi.fn().mockResolvedValue({ ok: true }),
+    setPassword: vi.fn().mockResolvedValue(true),
     ...overrides.identity,
   } satisfies IdentityProviderPort;
   return {
@@ -138,5 +141,83 @@ describe("Auth Service Business Rules", () => {
     await expect(service.login({ email: baseProfile.email, password: "x" })).rejects.toThrow(
       "Invalid email or password"
     );
+  });
+});
+
+describe("Account settings (own account, every role)", () => {
+  const clinician = { ...baseProfile, role: "CLINICIAN" as const, email: "dr@test.local" };
+
+  it("renames only the caller's own profile", async () => {
+    const { service, authRepository } = setup();
+    await service.updateOwnProfile(clinician, { fullName: "Dr. New Name" });
+    expect(authRepository.updateProfile).toHaveBeenCalledWith("prof-1", {
+      fullName: "Dr. New Name",
+    });
+  });
+
+  it("refuses an email change when the current password is wrong", async () => {
+    const { service, identityProvider } = setup({
+      identity: { verifyPassword: vi.fn().mockResolvedValue(false) },
+    });
+    await expect(
+      service.changeEmail(clinician, { newEmail: "new@test.local", currentPassword: "bad" })
+    ).rejects.toThrow(ValidationError);
+    expect(identityProvider.requestEmailChange).not.toHaveBeenCalled();
+  });
+
+  it("refuses an email another account already uses", async () => {
+    const { service, identityProvider } = setup({
+      repo: { findByEmail: vi.fn().mockResolvedValue({ ...baseProfile, id: "other" }) },
+    });
+    await expect(
+      service.changeEmail(clinician, { newEmail: "taken@test.local", currentPassword: "ok" })
+    ).rejects.toThrow(ConflictError);
+    expect(identityProvider.requestEmailChange).not.toHaveBeenCalled();
+  });
+
+  it("starts the email change but leaves the profile email until it is confirmed", async () => {
+    const { service, authRepository } = setup();
+    const result = await service.changeEmail(clinician, {
+      newEmail: "new@test.local",
+      currentPassword: "ok",
+    });
+    expect(result).toEqual({ pendingEmail: "new@test.local" });
+    expect(authRepository.updateProfile).not.toHaveBeenCalled();
+  });
+
+  it("copies a confirmed email change onto the profile at the next request", async () => {
+    const { service, authRepository } = setup({
+      repo: { findByAuthId: vi.fn().mockResolvedValue({ ...clinician, patient: null }) },
+    });
+    const profile = await service.getOrCreateProfile({ id: "auth-1", email: "New@Test.local" });
+    expect(authRepository.updateProfile).toHaveBeenCalledWith("prof-1", {
+      email: "new@test.local",
+    });
+    expect(profile.email).toBe("new@test.local");
+  });
+
+  it("changes the password only after checking the current one", async () => {
+    const { service, identityProvider } = setup();
+    await service.changePassword(clinician, {
+      currentPassword: "Old-pass1",
+      newPassword: "New-pass1",
+      confirmPassword: "New-pass1",
+    });
+    expect(identityProvider.verifyPassword).toHaveBeenCalledWith("dr@test.local", "Old-pass1");
+    expect(identityProvider.setPassword).toHaveBeenCalledWith("auth-1", "New-pass1");
+  });
+
+  it("does not change the password when the current one is wrong", async () => {
+    const { service, identityProvider } = setup({
+      identity: { verifyPassword: vi.fn().mockResolvedValue(false) },
+    });
+    await expect(
+      service.changePassword(clinician, {
+        currentPassword: "wrong",
+        newPassword: "New-pass1",
+        confirmPassword: "New-pass1",
+      })
+    ).rejects.toThrow(ValidationError);
+    expect(identityProvider.setPassword).not.toHaveBeenCalled();
   });
 });

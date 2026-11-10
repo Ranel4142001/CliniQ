@@ -1,9 +1,12 @@
 import { Hono } from "hono";
 import { requireAuth } from "@backend/modules/auth/adapters/inbound/http/require-auth";
 import {
+  changeEmailSchema,
+  changePasswordSchema,
   createUserSchema,
   loginSchema,
   registerSchema,
+  updateOwnProfileSchema,
   updateUserSchema,
 } from "@backend/modules/auth/application/dto/auth.schema";
 import { authService } from "@backend/modules/auth/auth.module";
@@ -61,6 +64,36 @@ authController.get(
   withApiHandler(async () => {
     const profile = await requireAuth();
     return { data: profile };
+  })
+);
+
+// Account settings: any signed-in role, always the caller's own account.
+
+authController.patch(
+  "/api/me",
+  withApiHandler(async (req: Request) => {
+    const profile = await requireAuth();
+    const input = updateOwnProfileSchema.parse(await req.json());
+    return { data: await authService.updateOwnProfile(profile, input) };
+  })
+);
+
+authController.post(
+  "/api/me/email",
+  withApiHandler(async (req: Request) => {
+    const profile = await requireAuth();
+    const input = changeEmailSchema.parse(await req.json());
+    return { data: await authService.changeEmail(profile, input) };
+  })
+);
+
+authController.post(
+  "/api/me/password",
+  withApiHandler(async (req: Request) => {
+    const profile = await requireAuth();
+    const input = changePasswordSchema.parse(await req.json());
+    await authService.changePassword(profile, input);
+    return { data: { success: true } };
   })
 );
 

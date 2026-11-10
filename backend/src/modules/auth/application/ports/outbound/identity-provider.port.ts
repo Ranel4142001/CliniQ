@@ -29,4 +29,15 @@ export interface IdentityProviderPort {
     password: string;
     fullName: string;
   }): Promise<string | null>;
+  /** Checks a password without starting or changing any session. */
+  verifyPassword(email: string, password: string): Promise<boolean>;
+  /**
+   * Starts an email change for the signed-in user. The provider emails a confirmation
+   * link; the address changes only once it is followed.
+   */
+  requestEmailChange(
+    newEmail: string
+  ): Promise<{ ok: true } | { ok: false; reason: "email_taken" | "failed" }>;
+  /** Sets a new password for an identity (call only after verifying the current one). */
+  setPassword(identityId: string, newPassword: string): Promise<boolean>;
 }

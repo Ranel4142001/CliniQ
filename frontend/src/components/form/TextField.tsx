@@ -15,6 +15,7 @@ interface TextFieldProps<TFieldValues extends FieldValues> {
   required?: boolean;
   disabled?: boolean;
   className?: string;
+  autoComplete?: string;
 }
 
 export function TextField<TFieldValues extends FieldValues>({
@@ -27,6 +28,7 @@ export function TextField<TFieldValues extends FieldValues>({
   required,
   disabled,
   className = "",
+  autoComplete,
 }: TextFieldProps<TFieldValues>) {
   const formContext = useFormContext<TFieldValues>();
   const effectiveControl = control || formContext?.control;
@@ -51,6 +53,7 @@ export function TextField<TFieldValues extends FieldValues>({
             {...field}
             id={name}
             type={type}
+            autoComplete={autoComplete}
             placeholder={placeholder}
             disabled={disabled}
             value={field.value ?? ""}

@@ -15,4 +15,5 @@ export const ROUTES = {
   PRESCRIPTIONS: "/prescriptions",
   REPORTS: "/reports",
   USERS: "/users",
+  SETTINGS: "/settings",
 } as const;

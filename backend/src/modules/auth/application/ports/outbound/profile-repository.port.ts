@@ -21,7 +21,7 @@ export interface ProfileRepositoryPort {
   }): Promise<Profile>;
   updateProfile(
     id: string,
-    data: { fullName?: string; role?: Role; isActive?: boolean }
+    data: { fullName?: string; email?: string; role?: Role; isActive?: boolean }
   ): Promise<Profile>;
   listProfiles(query: ProfileListQuery): Promise<Profile[]>;
   countProfiles(query: Pick<ProfileListQuery, "search" | "role">): Promise<number>;

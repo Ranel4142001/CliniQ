@@ -37,7 +37,10 @@ export const authRepository = {
     return prisma.profile.create({ data: { ...data, isActive: true } });
   },
 
-  async updateProfile(id: string, data: { fullName?: string; role?: Role; isActive?: boolean }) {
+  async updateProfile(
+    id: string,
+    data: { fullName?: string; email?: string; role?: Role; isActive?: boolean }
+  ) {
     return prisma.profile.update({ where: { id }, data });
   },
 

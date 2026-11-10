@@ -9,6 +9,7 @@ import {
   MessageCircle,
   BarChart3,
   ShieldCheck,
+  Settings,
   LucideIcon,
 } from "lucide-react";
 
@@ -54,9 +55,11 @@ export const NAVIGATION_ITEMS: Record<Role, NavItem[]> = {
   ],
 };
 
+/** Every role can manage their own account. */
+const SETTINGS_ITEM: NavItem = { title: "Settings", href: ROUTES.SETTINGS, icon: Settings };
+
 export function getNavigationForRole(role?: Role | null): NavItem[] {
-  if (!role || !NAVIGATION_ITEMS[role]) {
-    return NAVIGATION_ITEMS[ROLES.PATIENT];
-  }
-  return NAVIGATION_ITEMS[role];
+  const items =
+    role && NAVIGATION_ITEMS[role] ? NAVIGATION_ITEMS[role] : NAVIGATION_ITEMS[ROLES.PATIENT];
+  return [...items, SETTINGS_ITEM];
 }

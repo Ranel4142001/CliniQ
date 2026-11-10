@@ -1,4 +1,5 @@
-import type { User } from "@supabase/supabase-js";
+import { createClient as createSupabaseClient, type User } from "@supabase/supabase-js";
+import { getEnv } from "@backend/shared/infrastructure/config/env";
 import { createClient } from "./server-client";
 import { createAdminClient } from "./admin-client";
 import type {
@@ -58,5 +59,29 @@ export const supabaseIdentityProvider: IdentityProviderPort = {
       user_metadata: { full_name: fullName },
     });
     return error || !data.user ? null : data.user.id;
+  },
+
+  async verifyPassword(email, password) {
+    // A throwaway client with no cookie storage, so the check never touches the live session.
+    const { SUPABASE_URL, SUPABASE_ANON_KEY } = getEnv();
+    const client = createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (data.session) await client.auth.signOut({ scope: "local" });
+    return !error && Boolean(data.user);
+  },
+
+  async requestEmailChange(newEmail) {
+    const { error } = await createClient().auth.updateUser({ email: newEmail });
+    if (!error) return { ok: true };
+    return { ok: false, reason: error.code === "email_exists" ? "email_taken" : "failed" };
+  },
+
+  async setPassword(identityId, newPassword) {
+    const { error } = await createAdminClient().auth.admin.updateUserById(identityId, {
+      password: newPassword,
+    });
+    return !error;
   },
 };

@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   MessageCircle,
   Pill,
+  Settings,
   ShieldCheck,
   Users,
   type LucideIcon,
@@ -50,6 +51,10 @@ export const FEATURE_STYLES: Record<string, FeatureStyle> = {
   [ROUTES.REPORTS]: {
     icon: BarChart3,
     tile: "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300",
+  },
+  [ROUTES.SETTINGS]: {
+    icon: Settings,
+    tile: "bg-zinc-100 text-zinc-700 dark:bg-zinc-500/15 dark:text-zinc-300",
   },
   [ROUTES.USERS]: {
     icon: ShieldCheck,

@@ -18,8 +18,11 @@ import {
   buildPaginatedResponse,
 } from "@backend/shared/application/pagination";
 import {
+  ChangeEmailInput,
+  ChangePasswordInput,
   CreateUserInput,
   LoginInput,
+  UpdateOwnProfileInput,
   RegisterInput,
   UpdateUserInput,
 } from "@backend/modules/auth/application/dto/auth.schema";
@@ -38,6 +41,8 @@ function assertCanManageUsers(role: Role) {
   }
 }
 
+const WRONG_PASSWORD_MESSAGE = "Your current password is incorrect.";
+
 export interface AuthServiceDeps {
   authRepository: ProfileRepositoryPort;
   identityProvider: IdentityProviderPort;
@@ -53,7 +58,7 @@ export function createAuthService({ authRepository, identityProvider }: AuthServ
      */
     async getOrCreateProfile(authUser: AuthIdentity): Promise<UserProfile> {
       const existing = await authRepository.findByAuthId(authUser.id);
-      if (existing) return assertActive(existing);
+      if (existing) return assertActive(await this.syncConfirmedEmail(existing, authUser));
 
       if (!authUser.email) {
         throw new UnauthorizedError("Your account has no email address on record");
@@ -71,6 +76,22 @@ export function createAuthService({ authRepository, identityProvider }: AuthServ
         fullName: authUser.fullName || authUser.email.split("@")[0],
         role: "PATIENT",
       });
+    },
+
+    /**
+     * After a user confirms an email change, the identity provider reports the new address;
+     * copy it onto the profile so the app shows (and signs in with) the same email.
+     */
+    async syncConfirmedEmail<T extends UserProfile>(
+      profile: T,
+      authUser: AuthIdentity
+    ): Promise<T> {
+      const confirmed = authUser.email?.toLowerCase();
+      if (!confirmed || confirmed === profile.email) return profile;
+      const owner = await authRepository.findByEmail(confirmed);
+      if (owner && owner.id !== profile.id) return profile;
+      await authRepository.updateProfile(profile.id, { email: confirmed });
+      return { ...profile, email: confirmed };
     },
 
     /** The profile behind the current session. Throws when signed out or deactivated. */
@@ -193,6 +214,51 @@ export function createAuthService({ authRepository, identityProvider }: AuthServ
         role: input.role,
         isActive: input.isActive,
       });
+    },
+
+    // ---------- Account settings: every role, own account only ----------
+
+    async updateOwnProfile(profile: UserProfile, input: UpdateOwnProfileInput) {
+      return authRepository.updateProfile(profile.id, { fullName: input.fullName });
+    },
+
+    async assertCurrentPassword(profile: UserProfile, password: string): Promise<void> {
+      if (!(await identityProvider.verifyPassword(profile.email, password))) {
+        throw new ValidationError(WRONG_PASSWORD_MESSAGE);
+      }
+    },
+
+    /** Sends a confirmation link to the new address; the email changes once it is followed. */
+    async changeEmail(profile: UserProfile, { newEmail, currentPassword }: ChangeEmailInput) {
+      if (newEmail === profile.email) {
+        throw new ValidationError("That is already your email address.");
+      }
+      await this.assertCurrentPassword(profile, currentPassword);
+      if (await authRepository.findByEmail(newEmail)) {
+        throw new ConflictError("This email is already used by another account.");
+      }
+
+      const result = await identityProvider.requestEmailChange(newEmail);
+      if (result.ok) return { pendingEmail: newEmail };
+      if (result.reason === "email_taken") {
+        throw new ConflictError("This email is already used by another account.");
+      }
+      throw new AppError(
+        "Could not start the email change. Please try again.",
+        502,
+        "AUTH_PROVIDER_ERROR"
+      );
+    },
+
+    async changePassword(profile: UserProfile, input: ChangePasswordInput): Promise<void> {
+      await this.assertCurrentPassword(profile, input.currentPassword);
+      if (!(await identityProvider.setPassword(profile.authId, input.newPassword))) {
+        throw new AppError(
+          "Could not change the password. Please try again.",
+          502,
+          "AUTH_PROVIDER_ERROR"
+        );
+      }
     },
   };
 }
