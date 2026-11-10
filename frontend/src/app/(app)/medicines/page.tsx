@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -20,6 +20,9 @@ import { ExpiringPanel } from "@/features/medicines/components/ExpiringPanel";
 import { MedicineStats } from "@/features/medicines/components/MedicineStats";
 import type { MedicineWithStock } from "@backend/contracts";
 
+/** Anchor for dashboard shortcuts (/medicines#stock-alerts). */
+const STOCK_ALERTS_ID = "stock-alerts";
+
 export default function MedicinesPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -33,6 +36,14 @@ export default function MedicinesPage() {
 
   const { data, isLoading, error, refetch } = useMedicines({ search, page, pageSize: 10 });
   const { data: alerts } = useMedicineAlerts();
+
+  // The alerts load after the page, so scroll to them once they exist.
+  useEffect(() => {
+    if (!alerts || window.location.hash !== `#${STOCK_ALERTS_ID}`) return;
+    document
+      .getElementById(STOCK_ALERTS_ID)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [alerts]);
   const updateMutation = useUpdateMedicine(selectedMed?.id || "");
 
   const handleOpenAction = (
@@ -83,7 +94,7 @@ export default function MedicinesPage() {
         (alerts.lowStock.length > 0 ||
           alerts.expiringSoon.length > 0 ||
           alerts.expired.length > 0) && (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div id={STOCK_ALERTS_ID} className="grid scroll-mt-6 grid-cols-1 gap-4 lg:grid-cols-2">
             <LowStockPanel
               medicines={alerts.lowStock}
               onStockIn={(m) => handleOpenAction(m, "in")}

@@ -14,11 +14,9 @@ import {
 import { StatCard } from "@/components/layout/StatCard";
 import { DashboardHeader, HEADER_BUTTON } from "@/features/dashboard/components/DashboardHeader";
 import { QuickActionTiles } from "@/features/dashboard/components/QuickActionTiles";
-import {
-  InventoryPanel,
-  PendingPanel,
-  TodayAppointmentsPanel,
-} from "@/features/dashboard/components/StaffPanels";
+import { PendingPanel, TodayAppointmentsPanel } from "@/features/dashboard/components/StaffPanels";
+import { AvailableDoctorsPanel } from "@/features/dashboard/components/AvailableDoctorsPanel";
+import { DASHBOARD_LINKS } from "@/features/dashboard/constants/dashboard-links";
 import { clinicSummary } from "@/features/dashboard/utils/greeting";
 import { ROUTES } from "@/constants/routes";
 import type { AdminStaffDashboardData } from "@backend/contracts";
@@ -29,7 +27,7 @@ interface AdminStaffDashboardProps {
 }
 
 export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps) {
-  const { stats, todayAppointments, pendingAppointments, lowStockMedicines } = data;
+  const { stats, todayAppointments, pendingAppointments } = data;
 
   return (
     <div className="space-y-6">
@@ -56,6 +54,7 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
       >
         <StatCard
           title="Today's schedule"
+          href={DASHBOARD_LINKS.TODAY}
           value={stats.todayAppointmentsCount}
           icon={<CalendarClock />}
           tone="blue"
@@ -63,6 +62,7 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
         />
         <StatCard
           title="Pending requests"
+          href={DASHBOARD_LINKS.PENDING}
           value={stats.pendingAppointmentsCount}
           icon={<Clock />}
           tone="teal"
@@ -70,6 +70,7 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
         />
         <StatCard
           title="Low stock items"
+          href={DASHBOARD_LINKS.LOW_STOCK}
           value={stats.lowStockCount}
           icon={<AlertTriangle />}
           tone="amber"
@@ -78,6 +79,7 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
         />
         <StatCard
           title="Expiring soon"
+          href={DASHBOARD_LINKS.EXPIRING}
           value={stats.expiringCount}
           icon={<Hourglass />}
           tone="amber"
@@ -86,6 +88,7 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
         />
         <StatCard
           title="Total patients"
+          href={DASHBOARD_LINKS.PATIENTS}
           value={stats.totalPatientsCount}
           icon={<Users />}
           tone="blue"
@@ -99,7 +102,7 @@ export function AdminStaffDashboard({ data, userName }: AdminStaffDashboardProps
         </div>
         <div className="space-y-6">
           <PendingPanel items={pendingAppointments} />
-          <InventoryPanel items={lowStockMedicines} />
+          <AvailableDoctorsPanel />
         </div>
       </div>
     </div>

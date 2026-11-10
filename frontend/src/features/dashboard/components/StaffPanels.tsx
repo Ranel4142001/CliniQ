@@ -1,13 +1,12 @@
 import React from "react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { CalendarCheck, CheckCircle2, Package, Plus, ShieldCheck, Video } from "lucide-react";
+import { CalendarCheck, CheckCircle2, Plus, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/feedback/StatusBadge";
 import { InitialsAvatar } from "@/components/feedback/InitialsAvatar";
 import { DashboardPanel, PanelEmpty } from "@/features/dashboard/components/DashboardPanel";
 import { APPOINTMENT_STATUS_MAP } from "@/features/appointments/constants/appointment-status.constants";
-import { STOCK_STATUS_MAP } from "@backend/contracts";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 import type { AdminStaffDashboardData } from "@backend/contracts";
@@ -123,48 +122,6 @@ export function PendingPanel({ items }: { items: Data["pendingAppointments"] }) 
               <Button asChild size="sm" variant="outline" className="h-9 rounded-lg font-semibold">
                 <Link href={ROUTES.APPOINTMENTS}>Review</Link>
               </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </DashboardPanel>
-  );
-}
-
-export function InventoryPanel({ items }: { items: Data["lowStockMedicines"] }) {
-  return (
-    <DashboardPanel title="Inventory alerts" linkLabel="Inventory" href={ROUTES.MEDICINES}>
-      {items.length === 0 ? (
-        <PanelEmpty
-          icon={<ShieldCheck className="h-7 w-7" />}
-          tone="bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300"
-          title="Stock levels look good"
-          description="No medicine is below its reorder level."
-        />
-      ) : (
-        <ul className="space-y-3">
-          {items.map((med) => (
-            <li key={med.id} className="rounded-xl border border-border/80 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate text-[15px] font-semibold text-foreground">{med.name}</p>
-                  <p className="text-[13px] text-muted-foreground">
-                    {med.strength} · {med.dosageForm}
-                  </p>
-                </div>
-                <StatusBadge status={med.stockStatus} statusMap={STOCK_STATUS_MAP} />
-              </div>
-              <div className="mt-3 flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-[13px]">
-                <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <Package className="h-4 w-4" />
-                  <span className="font-semibold text-amber-700 dark:text-amber-400">
-                    {med.totalStock} {med.unit}
-                  </span>
-                </span>
-                <span className="rounded-lg border border-primary/20 bg-primary/5 px-2.5 py-1 font-medium text-primary">
-                  Reorder at {med.reorderLevel}
-                </span>
-              </div>
             </li>
           ))}
         </ul>

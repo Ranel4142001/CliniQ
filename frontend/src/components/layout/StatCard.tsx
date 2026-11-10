@@ -1,4 +1,6 @@
 import React, { ReactNode } from "react";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +34,8 @@ interface StatCardProps {
     label?: string;
   };
   className?: string;
+  /** Makes the whole card a shortcut to the matching page. */
+  href?: string;
 }
 
 /** Title and icon on top, a large number, then one short line of context. */
@@ -44,11 +48,18 @@ export function StatCard({
   isAlert = false,
   trend,
   className = "",
+  href,
 }: StatCardProps) {
   const showAlert = isAlert && value !== 0;
 
-  return (
-    <Card className={cn("rounded-2xl border border-border/80 bg-card shadow-none", className)}>
+  const card = (
+    <Card
+      className={cn(
+        "h-full rounded-2xl border border-border/80 bg-card shadow-none",
+        href && "transition group-hover:border-primary/40 group-hover:shadow-md",
+        className
+      )}
+    >
       <CardContent className="flex h-full flex-col p-5">
         <div className="flex items-center justify-between gap-3">
           <p className="truncate text-[13px] font-semibold text-foreground">{title}</p>
@@ -82,7 +93,23 @@ export function StatCard({
             </span>
           </p>
         )}
+        {href && (
+          <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-80 group-hover:opacity-100">
+            Open <ChevronRight className="h-3.5 w-3.5" />
+          </span>
+        )}
       </CardContent>
     </Card>
+  );
+
+  if (!href) return card;
+  return (
+    <Link
+      href={href}
+      aria-label={`${title}: ${value}. Open`}
+      className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {card}
+    </Link>
   );
 }

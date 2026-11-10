@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, List, Calendar as CalendarIcon } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,22 @@ import {
 import type { BookAppointmentInput } from "@backend/contracts";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 
+const FILTERABLE_STATUSES = new Set(["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"]);
+
 export default function AppointmentsPage() {
   const { user } = useCurrentUser();
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<"table" | "calendar">("table");
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const [isBookOpen, setIsBookOpen] = useState(false);
+
+  // Dashboard shortcuts open this page on a view or status, e.g. ?status=PENDING or ?view=calendar.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
+    if (status && FILTERABLE_STATUSES.has(status)) setStatusFilter(status);
+    if (params.get("view") === "calendar") setViewMode("calendar");
+  }, []);
 
   const { data, isLoading, error, refetch } = useAppointments({
     page,
