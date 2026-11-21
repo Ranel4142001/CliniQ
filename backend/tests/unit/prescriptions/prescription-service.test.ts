@@ -259,3 +259,63 @@ describe("PrescriptionService Business Rules", () => {
     ).rejects.toThrow(ValidationError);
   });
 });
+
+describe("PrescriptionService patient scoping", () => {
+  const service = new PrescriptionService({
+    prescriptionRepository,
+    stock,
+    transactions: fakeTransactions(),
+    recordNumbers: fakeRecordNumbers("RX-261110-291"),
+    auditLog: fakeAuditLog(),
+  });
+
+  const issued = { id: "rx-1", patientId: "patient-1", status: "ISSUED" } as any;
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("lets a patient view their own issued prescription", async () => {
+    vi.spyOn(prescriptionRepository, "findById").mockResolvedValue(issued);
+    await expect(
+      service.getPrescription({ id: "profile-1", role: "PATIENT", patientId: "patient-1" }, "rx-1")
+    ).resolves.toBe(issued);
+  });
+
+  it("blocks a patient with no patient record from viewing any prescription", async () => {
+    vi.spyOn(prescriptionRepository, "findById").mockResolvedValue(issued);
+    await expect(
+      service.getPrescription({ id: "profile-1", role: "PATIENT" }, "rx-1")
+    ).rejects.toThrow(ForbiddenError);
+  });
+
+  it("lists only the patient's own prescriptions and never drafts", async () => {
+    const findAll = vi.spyOn(prescriptionRepository, "findAll").mockResolvedValue([]);
+    vi.spyOn(prescriptionRepository, "countAll").mockResolvedValue(0);
+
+    await service.listPrescriptions(
+      { id: "profile-1", role: "PATIENT", patientId: "patient-1" },
+      { page: 1, pageSize: 10, patientId: "someone-else", status: "DRAFT" } as any
+    );
+
+    expect(findAll).toHaveBeenCalledWith(
+      expect.objectContaining({ patientId: "patient-1", status: "ISSUED" })
+    );
+  });
+
+  it("returns empty lists and zero stats for a patient with no patient record", async () => {
+    const findAll = vi.spyOn(prescriptionRepository, "findAll");
+    const countByStatus = vi.spyOn(prescriptionRepository, "countByStatus");
+
+    const list = await service.listPrescriptions({ id: "profile-1", role: "PATIENT" }, {
+      page: 1,
+      pageSize: 10,
+    } as any);
+    const stats = await service.getStats({ id: "profile-1", role: "PATIENT" });
+
+    expect(list.items).toEqual([]);
+    expect(stats.total).toBe(0);
+    expect(findAll).not.toHaveBeenCalled();
+    expect(countByStatus).not.toHaveBeenCalled();
+  });
+});

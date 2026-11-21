@@ -87,6 +87,15 @@ function toListItem(row: AppointmentRecord): AppointmentListItem {
   };
 }
 
+/** The clinic sets meeting links; a patient must not be able to point the clinician elsewhere. */
+function resolveMeetingUrl(
+  role: Role,
+  requested: string | null | undefined,
+  current: string | null
+): string | null {
+  return role !== "PATIENT" && requested !== undefined ? requested : current;
+}
+
 export interface AppointmentServiceDeps {
   appointmentRepository: AppointmentRepositoryPort;
   patientDirectory: PatientLookupPort;
@@ -285,6 +294,7 @@ export function createAppointmentService({
 
       const start = new Date(input.scheduledAt);
       const end = addMinutes(start, APPOINTMENT_CONFIG.SLOT_DURATION_MINUTES);
+      const meetingUrl = resolveMeetingUrl(currentRole, input.meetingUrl, appt.meetingUrl);
 
       const updated = await transactions.run(async (tx) => {
         const conflicts = await appointmentRepository.findOverlapping(
@@ -305,7 +315,7 @@ export function createAppointmentService({
           {
             scheduledAt: start,
             endsAt: end,
-            meetingUrl: input.meetingUrl !== undefined ? input.meetingUrl : appt.meetingUrl,
+            meetingUrl,
           },
           tx
         );
@@ -345,11 +355,13 @@ export function createAppointmentService({
         }
       }
 
+      const meetingUrl = resolveMeetingUrl(currentRole, input.meetingUrl, appt.meetingUrl);
+
       const validation = validateStatusTransition({
         currentStatus: appt.status,
         nextStatus: input.status,
         type: appt.type,
-        meetingUrl: input.meetingUrl ?? appt.meetingUrl,
+        meetingUrl,
         scheduledAt: appt.scheduledAt,
         role: currentRole,
         cancelReason: input.cancelReason,
@@ -361,7 +373,7 @@ export function createAppointmentService({
 
       const updated = await appointmentRepository.update(id, {
         status: input.status,
-        meetingUrl: input.meetingUrl !== undefined ? input.meetingUrl : appt.meetingUrl,
+        meetingUrl,
         cancelReason: input.cancelReason ?? appt.cancelReason,
       });
 

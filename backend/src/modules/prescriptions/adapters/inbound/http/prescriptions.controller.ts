@@ -21,7 +21,7 @@ prescriptionsController.get(
     const query = listPrescriptionsSchema.parse(Object.fromEntries(url.searchParams));
 
     const result = await prescriptionService.listPrescriptions(
-      { id: user.id, role: user.role, patientId: user.id },
+      { id: user.id, role: user.role, patientId: user.patient?.id },
       query
     );
 
@@ -61,7 +61,7 @@ prescriptionsController.get(
       const stats = await prescriptionService.getStats({
         id: user.id,
         role: user.role,
-        patientId: user.id,
+        patientId: user.patient?.id,
       });
 
       return { data: stats };
@@ -77,7 +77,7 @@ prescriptionsController.get(
     const id = getIdParam(context);
 
     const prescription = await prescriptionService.getPrescription(
-      { id: user.id, role: user.role, patientId: user.id },
+      { id: user.id, role: user.role, patientId: user.patient?.id },
       id
     );
 

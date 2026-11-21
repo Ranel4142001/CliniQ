@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+/** Meeting links are opened by the other party, so only plain web (http/https) links are accepted. */
+const meetingUrlSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z
+    .string()
+    .trim()
+    .url("Meeting link must be a valid URL")
+    .refine((url) => /^https?:\/\//i.test(url), "Meeting link must start with http:// or https://")
+    .optional()
+    .nullable()
+);
+
 export const bookAppointmentSchema = z.object({
   patientId: z.string().uuid("Invalid patient ID").optional(),
   clinicianId: z.string().uuid("Please select a clinician"),
@@ -18,14 +30,14 @@ export const rescheduleAppointmentSchema = z.object({
     .string()
     .datetime({ message: "Invalid scheduled date/time" })
     .refine((dt) => new Date(dt) > new Date(), "Cannot reschedule to a past date/time"),
-  meetingUrl: z.string().trim().optional().nullable(),
+  meetingUrl: meetingUrlSchema,
 });
 
 export type RescheduleAppointmentInput = z.infer<typeof rescheduleAppointmentSchema>;
 
 export const updateAppointmentStatusSchema = z.object({
   status: z.enum(["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "NO_SHOW"]),
-  meetingUrl: z.string().trim().optional().nullable(),
+  meetingUrl: meetingUrlSchema,
   cancelReason: z.string().trim().optional().nullable(),
 });
 

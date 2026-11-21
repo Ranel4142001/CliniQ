@@ -82,7 +82,7 @@ export class PrescriptionService {
     if (!prescription) throw new NotFoundError("Prescription not found.");
 
     if (user.role === "PATIENT") {
-      if (user.patientId && prescription.patientId !== user.patientId) {
+      if (!user.patientId || prescription.patientId !== user.patientId) {
         throw new ForbiddenError("You are not authorized to view this prescription.");
       }
       if (prescription.status === "DRAFT") {
@@ -253,17 +253,21 @@ export class PrescriptionService {
     params: ListPrescriptionsInput
   ) {
     const { skip, take } = getPaginationSkipTake(params.page, params.pageSize);
-    let patientId = params.patientId;
-
-    if (user.role === "PATIENT") {
-      patientId = user.patientId;
+    const isPatient = user.role === "PATIENT";
+    // Patients only ever see their own record; with no patient record there is nothing to show.
+    if (isPatient && !user.patientId) {
+      return buildPaginatedResponse([], 0, params.page, params.pageSize);
     }
+    const patientId = isPatient ? user.patientId : params.patientId;
+    // Drafts are the clinician's work in progress: never listed to patients.
+    const status =
+      isPatient && (!params.status || params.status === "DRAFT") ? "ISSUED" : params.status;
 
     const [items, total] = await Promise.all([
       this.deps.prescriptionRepository.findAll({
         patientId,
         consultationId: params.consultationId,
-        status: user.role === "PATIENT" ? params.status || "ISSUED" : params.status,
+        status,
         search: params.search,
         skip,
         take,
@@ -271,7 +275,7 @@ export class PrescriptionService {
       this.deps.prescriptionRepository.countAll({
         patientId,
         consultationId: params.consultationId,
-        status: user.role === "PATIENT" ? params.status || "ISSUED" : params.status,
+        status,
         search: params.search,
       }),
     ]);
@@ -280,8 +284,9 @@ export class PrescriptionService {
   }
 
   async getStats(user: { id: string; role: Role; patientId?: string }) {
-    const filterPatientId = user.role === "PATIENT" ? user.patientId : undefined;
-    return this.deps.prescriptionRepository.countByStatus(filterPatientId);
+    if (user.role !== "PATIENT") return this.deps.prescriptionRepository.countByStatus();
+    if (!user.patientId) return { total: 0, draft: 0, issued: 0, dispensed: 0, voided: 0 };
+    return this.deps.prescriptionRepository.countByStatus(user.patientId);
   }
 
   private async validateMedicinesActive(medicineIds: string[]): Promise<void> {

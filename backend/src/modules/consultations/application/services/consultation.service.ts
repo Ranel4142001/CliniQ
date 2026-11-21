@@ -192,13 +192,17 @@ export class ConsultationService {
   }
 
   async listConsultations(
-    user: { id: string; role: Role },
+    user: { id: string; role: Role; patientId?: string | null },
     params: { page?: number; pageSize?: number; patientId?: string }
   ) {
     const { page = 1, pageSize = 10, patientId } = params;
     const { skip, take } = getPaginationSkipTake(page, pageSize);
 
-    const targetPatientId = user.role === "PATIENT" ? undefined : patientId;
+    // Patients only ever see their own record; with no patient record there is nothing to show.
+    if (user.role === "PATIENT" && !user.patientId) {
+      return buildPaginatedResponse([], 0, page, pageSize);
+    }
+    const targetPatientId = user.role === "PATIENT" ? user.patientId! : patientId;
     const targetClinicianId = user.role === "CLINICIAN" ? user.id : undefined;
 
     const [items, total] = await Promise.all([

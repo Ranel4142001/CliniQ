@@ -208,3 +208,41 @@ describe("ConsultationService Business Rules", () => {
     });
   });
 });
+
+describe("ConsultationService.listConsultations scoping", () => {
+  const service = new ConsultationService({
+    consultationRepository,
+    appointments: appointmentService,
+    meetingProvider: manualLinkProvider,
+    auditLog: fakeAuditLog(),
+  });
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("limits a patient to their own patient record, ignoring any patientId they pass", async () => {
+    const list = vi.spyOn(consultationRepository, "list").mockResolvedValue([]);
+    vi.spyOn(consultationRepository, "count").mockResolvedValue(0);
+
+    await service.listConsultations(
+      { id: "profile-patient-1", role: "PATIENT", patientId: "patient-1" },
+      { patientId: "someone-else" }
+    );
+
+    expect(list).toHaveBeenCalledWith(expect.objectContaining({ patientId: "patient-1" }));
+  });
+
+  it("returns nothing, without querying, for a patient with no patient record", async () => {
+    const list = vi.spyOn(consultationRepository, "list");
+
+    const result = await service.listConsultations(
+      { id: "profile-new", role: "PATIENT", patientId: null },
+      {}
+    );
+
+    expect(result.items).toEqual([]);
+    expect(result.total).toBe(0);
+    expect(list).not.toHaveBeenCalled();
+  });
+});

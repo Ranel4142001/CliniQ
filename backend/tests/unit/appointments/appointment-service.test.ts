@@ -128,4 +128,30 @@ describe("Appointment Service", () => {
       })
     ).rejects.toThrow(ValidationError);
   });
+
+  it("ignores a meeting link sent by a PATIENT when they cancel", async () => {
+    vi.mocked(appointmentRepository.findById).mockResolvedValueOnce({
+      id: "appt-1",
+      patientId: "pt-1",
+      patient: { profileId: "my-profile-id" },
+      status: "CONFIRMED",
+      type: "ONLINE",
+      meetingUrl: "https://meet.example.com/real",
+      scheduledAt: new Date(futureDate),
+    } as any);
+    vi.mocked(appointmentRepository.update).mockImplementationOnce(async (_id, data) => data as any);
+
+    await appointmentService
+      .updateStatus("PATIENT", "my-profile-id", "appt-1", {
+        status: "CANCELLED",
+        cancelReason: "Can't make it",
+        meetingUrl: "https://evil.example.com/phish",
+      })
+      .catch(() => undefined);
+
+    expect(appointmentRepository.update).toHaveBeenCalledWith(
+      "appt-1",
+      expect.objectContaining({ meetingUrl: "https://meet.example.com/real" })
+    );
+  });
 });

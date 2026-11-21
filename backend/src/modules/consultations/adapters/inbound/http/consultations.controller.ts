@@ -38,7 +38,7 @@ consultationsController.get(
       }
 
       const result = await consultationService.listConsultations(
-        { id: user.id, role: user.role },
+        { id: user.id, role: user.role, patientId: user.patient?.id },
         {
           page: query.page,
           pageSize: query.pageSize,
