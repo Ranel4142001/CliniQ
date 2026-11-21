@@ -35,14 +35,14 @@ export function SidebarNavLink({
         "group relative flex min-h-11 items-center gap-3 rounded-xl py-1.5 text-[15px] font-medium transition-all duration-150",
         isCollapsed ? "justify-center px-0" : "px-2",
         isActive
-          ? "bg-gradient-to-r from-blue-600 to-indigo-500 font-semibold text-white shadow-md shadow-blue-600/20"
-          : "text-slate-600 hover:bg-muted/70 hover:text-foreground dark:text-slate-300"
+          ? "bg-primary/10 font-semibold text-primary"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
     >
       <span
         className={cn(
           "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-transform duration-150",
-          isActive ? "bg-white/20 text-white" : featureTile(item.href),
+          isActive ? "bg-primary text-primary-foreground shadow-sm" : featureTile(item.href),
           !isActive && "group-hover:scale-105"
         )}
       >
@@ -56,7 +56,7 @@ export function SidebarNavLink({
         <span
           className={cn(
             "ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold",
-            isActive ? "bg-white text-blue-700" : "bg-rose-500 text-white"
+            isActive ? "bg-primary text-primary-foreground" : "bg-rose-500 text-white"
           )}
         >
           {formatBadgeCount(badgeCount)}

@@ -47,8 +47,9 @@ export function StatCard({
   const card = (
     <Card
       className={cn(
-        "h-full rounded-2xl border border-border/80 bg-card shadow-none",
-        href && "transition group-hover:border-primary/40 group-hover:shadow-md",
+        "h-full rounded-2xl border border-border/80 bg-card shadow-card",
+        href &&
+          "transition duration-200 group-hover:-translate-y-0.5 group-hover:border-primary/40 group-hover:shadow-card-hover",
         className
       )}
     >

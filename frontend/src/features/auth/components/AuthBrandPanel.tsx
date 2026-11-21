@@ -21,7 +21,7 @@ const HIGHLIGHTS = [
 /** Decorative brand side of the auth screens (large screens only). */
 export function AuthBrandPanel() {
   return (
-    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-primary via-primary to-blue-900 text-white lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
+    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-primary via-primary to-teal-950 text-white lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
       {/* Texture & light */}
       <div aria-hidden className="auth-grid absolute inset-0" />
       <div
@@ -30,7 +30,7 @@ export function AuthBrandPanel() {
       />
       <div
         aria-hidden
-        className="absolute -bottom-32 right-0 h-[28rem] w-[28rem] rounded-full bg-sky-300/20 blur-3xl"
+        className="absolute -bottom-32 right-0 h-[28rem] w-[28rem] rounded-full bg-emerald-300/20 blur-3xl"
       />
 
       <div className="relative flex items-center gap-3">
@@ -48,7 +48,7 @@ export function AuthBrandPanel() {
       <div className="relative max-w-md">
         <h2 className="text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
           Care, coordinated
-          <span className="block text-blue-100/90">from check-in to prescription.</span>
+          <span className="block text-white/80">from check-in to prescription.</span>
         </h2>
         <ul className="mt-10 space-y-5">
           {HIGHLIGHTS.map(({ icon: Icon, title, text }) => (

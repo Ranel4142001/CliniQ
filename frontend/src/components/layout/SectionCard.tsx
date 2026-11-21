@@ -26,7 +26,7 @@ export function SectionCard({
   return (
     <section
       className={cn(
-        "flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card",
+        "flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-card",
         className
       )}
     >
@@ -43,7 +43,7 @@ export function SectionCard({
           <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
             {title}
             {count !== undefined && (
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:bg-muted dark:text-slate-300">
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
                 {count}
               </span>
             )}
