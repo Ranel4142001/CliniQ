@@ -9,6 +9,7 @@ import { fakeAuditLog, fakeTransactions } from "../../support/fakes";
 
 const appointmentRepository = {
   findById: vi.fn(),
+  isActiveClinician: vi.fn(),
   findOverlapping: vi.fn(),
   findByClinicianAndDate: vi.fn(),
   list: vi.fn(),
@@ -32,6 +33,7 @@ const appointmentService = createAppointmentService({
 describe("Appointment Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(appointmentRepository.isActiveClinician).mockResolvedValue(true);
   });
 
   const futureDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 3).toISOString(); // 3 days in future
@@ -139,7 +141,9 @@ describe("Appointment Service", () => {
       meetingUrl: "https://meet.example.com/real",
       scheduledAt: new Date(futureDate),
     } as any);
-    vi.mocked(appointmentRepository.update).mockImplementationOnce(async (_id, data) => data as any);
+    vi.mocked(appointmentRepository.update).mockImplementationOnce(
+      async (_id, data) => data as any
+    );
 
     await appointmentService
       .updateStatus("PATIENT", "my-profile-id", "appt-1", {
@@ -153,5 +157,24 @@ describe("Appointment Service", () => {
       "appt-1",
       expect.objectContaining({ meetingUrl: "https://meet.example.com/real" })
     );
+  });
+
+  it("refuses a booking whose clinician is not an active clinician", async () => {
+    vi.mocked(patientRepository.findById).mockResolvedValueOnce({
+      id: "pt-1",
+      isArchived: false,
+    } as any);
+    vi.mocked(appointmentRepository.isActiveClinician).mockResolvedValueOnce(false);
+
+    await expect(
+      appointmentService.bookAppointment("STAFF", "staff-1", {
+        patientId: "pt-1",
+        clinicianId: "not-a-doctor",
+        scheduledAt: futureDate,
+        type: "IN_PERSON",
+        reason: "Fever checkup",
+      })
+    ).rejects.toThrow(ValidationError);
+    expect(appointmentRepository.create).not.toHaveBeenCalled();
   });
 });

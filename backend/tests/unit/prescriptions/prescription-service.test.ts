@@ -293,10 +293,12 @@ describe("PrescriptionService patient scoping", () => {
     const findAll = vi.spyOn(prescriptionRepository, "findAll").mockResolvedValue([]);
     vi.spyOn(prescriptionRepository, "countAll").mockResolvedValue(0);
 
-    await service.listPrescriptions(
-      { id: "profile-1", role: "PATIENT", patientId: "patient-1" },
-      { page: 1, pageSize: 10, patientId: "someone-else", status: "DRAFT" } as any
-    );
+    await service.listPrescriptions({ id: "profile-1", role: "PATIENT", patientId: "patient-1" }, {
+      page: 1,
+      pageSize: 10,
+      patientId: "someone-else",
+      status: "DRAFT",
+    } as any);
 
     expect(findAll).toHaveBeenCalledWith(
       expect.objectContaining({ patientId: "patient-1", status: "ISSUED" })

@@ -1,4 +1,4 @@
-import { Role, ROLES } from "@backend/shared/domain/roles";
+import { Role, ROLES } from "./roles";
 
 export type AuthAction =
   | "manage_users"

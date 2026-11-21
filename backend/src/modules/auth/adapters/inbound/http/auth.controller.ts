@@ -11,6 +11,7 @@ import {
 } from "@backend/modules/auth/application/dto/auth.schema";
 import { authService } from "@backend/modules/auth/auth.module";
 import { withApiHandler } from "@backend/shared/adapters/http/api-handler";
+import { getBodyEmail, rateLimit } from "@backend/shared/adapters/http/rate-limit";
 import { getIdParam } from "@backend/shared/adapters/http/route-params";
 import { paginationSchema } from "@backend/shared/application/pagination";
 import { ROLES } from "@backend/shared/domain/roles";
@@ -21,8 +22,26 @@ const roleFilterSchema = z.nativeEnum(Role).optional();
 
 export const authController = new Hono();
 
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
+const ONE_HOUR = 60 * 60 * 1000;
+
+// Limit password guessing per address and per targeted account.
+const loginLimit = rateLimit({
+  name: "login",
+  max: 10,
+  windowMs: FIFTEEN_MINUTES,
+  extraKeys: async (c) => {
+    const email = await getBodyEmail(c);
+    return [email && `email:${email}`];
+  },
+});
+const registerLimit = rateLimit({ name: "register", max: 5, windowMs: ONE_HOUR });
+// Email and password changes re-check the current password, so they are guessable too.
+const passwordCheckLimit = rateLimit({ name: "password-check", max: 5, windowMs: FIFTEEN_MINUTES });
+
 authController.post(
   "/api/auth/login",
+  loginLimit,
   withApiHandler(async (req: Request) => {
     const input = loginSchema.parse(await req.json());
     const profile = await authService.login(input);
@@ -40,6 +59,7 @@ authController.post(
 
 authController.post(
   "/api/auth/register",
+  registerLimit,
   withApiHandler(async (req: Request) => {
     const input = registerSchema.parse(await req.json());
     const profile = await authService.register(input);
@@ -80,6 +100,7 @@ authController.patch(
 
 authController.post(
   "/api/me/email",
+  passwordCheckLimit,
   withApiHandler(async (req: Request) => {
     const profile = await requireAuth();
     const input = changeEmailSchema.parse(await req.json());
@@ -89,6 +110,7 @@ authController.post(
 
 authController.post(
   "/api/me/password",
+  passwordCheckLimit,
   withApiHandler(async (req: Request) => {
     const profile = await requireAuth();
     const input = changePasswordSchema.parse(await req.json());

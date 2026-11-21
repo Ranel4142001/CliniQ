@@ -1,15 +1,26 @@
 import type { ReportsQueryPort } from "@backend/modules/reports/application/ports/outbound/reports-query.port";
 import { calculateStockStatus } from "@backend/modules/medicines";
-import { ValidationError } from "@backend/shared/domain/errors/app-error";
-import type {
-  ReportKey,
-  ReportFilterParams,
-  AppointmentReportRow,
-  ConsultationReportRow,
-  InventoryReportRow,
-  MovementReportRow,
-  PrescriptionReportRow,
+import { ForbiddenError, ValidationError } from "@backend/shared/domain/errors/app-error";
+import type { Role } from "@backend/shared/domain/roles";
+import {
+  canViewReport,
+  isReportKey,
+  type ReportKey,
+  type ReportFilterParams,
+  type AppointmentReportRow,
+  type ConsultationReportRow,
+  type InventoryReportRow,
+  type MovementReportRow,
+  type PrescriptionReportRow,
 } from "@backend/modules/reports/application/dto/reports.types";
+
+function parseFilterDate(value: string, field: "from" | "to"): Date {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    throw new ValidationError(`The "${field}" date is not a valid date.`);
+  }
+  return date;
+}
 
 export interface ReportsServiceDeps {
   reportsRepository: ReportsQueryPort;
@@ -19,9 +30,16 @@ export class ReportsService {
   constructor(private readonly deps: ReportsServiceDeps) {}
 
   async generateReport(
+    role: Role,
     reportKey: ReportKey,
     filters: ReportFilterParams
   ): Promise<Record<string, unknown>[]> {
+    if (!isReportKey(reportKey)) {
+      throw new ValidationError(`Unknown report key: ${reportKey}`);
+    }
+    if (!canViewReport(role, reportKey)) {
+      throw new ForbiddenError("Your role does not have access to this report.");
+    }
     const { fromDate, toDate } = this.parseDateRange(filters.from, filters.to);
 
     switch (reportKey) {
@@ -35,8 +53,6 @@ export class ReportsService {
         return this.getMovementsReport(fromDate, toDate);
       case "prescriptions":
         return this.getPrescriptionsReport(fromDate, toDate, filters.status);
-      default:
-        throw new ValidationError(`Unknown report key: ${reportKey}`);
     }
   }
 
@@ -45,14 +61,17 @@ export class ReportsService {
     let toDate: Date | undefined;
 
     if (from) {
-      fromDate = new Date(from);
+      fromDate = parseFilterDate(from, "from");
       fromDate.setHours(0, 0, 0, 0);
     }
     if (to) {
-      toDate = new Date(to);
+      toDate = parseFilterDate(to, "to");
       toDate.setHours(23, 59, 59, 999);
     }
 
+    if (fromDate && toDate && fromDate > toDate) {
+      throw new ValidationError("The start date must be on or before the end date.");
+    }
     return { fromDate, toDate };
   }
 

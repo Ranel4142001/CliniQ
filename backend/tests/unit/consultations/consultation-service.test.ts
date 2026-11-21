@@ -246,3 +246,21 @@ describe("ConsultationService.listConsultations scoping", () => {
     expect(list).not.toHaveBeenCalled();
   });
 });
+
+describe("ConsultationService clinical-record access", () => {
+  const service = new ConsultationService({
+    consultationRepository,
+    appointments: appointmentService,
+    meetingProvider: manualLinkProvider,
+    auditLog: fakeAuditLog(),
+  });
+
+  it("keeps consultation notes from front-desk staff", async () => {
+    const staff = { id: "staff-1", role: "STAFF" as const };
+    await expect(service.getConsultation(staff, "consult-1")).rejects.toThrow(ForbiddenError);
+    await expect(service.getConsultationByAppointment(staff, "appt-1")).rejects.toThrow(
+      ForbiddenError
+    );
+    await expect(service.listConsultations(staff, {})).rejects.toThrow(ForbiddenError);
+  });
+});

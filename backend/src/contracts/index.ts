@@ -9,6 +9,7 @@
 
 // Shared kernel
 export * from "../shared/domain/roles";
+export * from "../shared/domain/permissions";
 export * from "../shared/domain/person-name";
 export * from "../shared/application/dto/api.types";
 

@@ -144,7 +144,8 @@ export class PrescriptionService {
       const { prescriptionRepository } = this.deps;
       const prescriptionNo = await this.deps.recordNumbers.next(RECORD_PREFIXES.PRESCRIPTION, {
         isTaken: (candidate) => prescriptionRepository.isPrescriptionNoTaken(candidate, tx),
-        countIssued: (dayPrefix) => prescriptionRepository.countPrescriptionNosStartingWith(dayPrefix, tx),
+        countIssued: (dayPrefix) =>
+          prescriptionRepository.countPrescriptionNosStartingWith(dayPrefix, tx),
       });
       return this.deps.prescriptionRepository.transition(
         id,

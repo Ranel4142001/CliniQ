@@ -210,3 +210,26 @@ describe("Patient Service & Business Rules", () => {
     );
   });
 });
+
+describe("getPatientHistory clinical-record access", () => {
+  const visit = {
+    id: "appt-1",
+    status: "COMPLETED",
+    consultation: { id: "c-1", chiefComplaint: "Cough", diagnosis: "Bronchitis" },
+  };
+
+  beforeEach(() => {
+    vi.mocked(patientRepository.findById).mockResolvedValue(createdPatient);
+    vi.mocked(patientRepository.getHistory).mockResolvedValue([visit] as any);
+  });
+
+  it("shows front-desk staff the visits but not the consultation notes", async () => {
+    const history = await patientService.getPatientHistory("STAFF", "staff-1", "pt-123");
+    expect(history).toEqual([{ ...visit, consultation: null }]);
+  });
+
+  it("shows clinicians the full consultation notes", async () => {
+    const history = await patientService.getPatientHistory("CLINICIAN", "doc-1", "pt-123");
+    expect(history).toEqual([visit]);
+  });
+});

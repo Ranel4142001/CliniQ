@@ -49,6 +49,8 @@ export interface AppointmentChanges {
 
 export interface AppointmentRepositoryPort {
   findById(id: string): Promise<AppointmentRecord | null>;
+  /** True only for a profile that is a clinician and still active. */
+  isActiveClinician(profileId: string): Promise<boolean>;
   /** Non-cancelled bookings of the clinician or the patient that overlap [start, end). */
   findOverlapping(
     clinicianId: string,

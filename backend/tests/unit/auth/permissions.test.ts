@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { can } from "@backend/modules/auth/domain/services/permissions";
+import { can } from "@backend/shared/domain/permissions";
 import { ROLES } from "@backend/shared/domain/roles";
 
 describe("Permissions Matrix can() map", () => {

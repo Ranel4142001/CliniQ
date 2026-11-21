@@ -24,6 +24,7 @@ import type {
 } from "@backend/modules/patients/application/dto/patient.types";
 import { PATIENT_SELF_EDIT_FIELDS } from "@backend/modules/patients/domain/constants/patient.constants";
 import type { Role } from "@prisma/client";
+import { can } from "@backend/shared/domain/permissions";
 
 /** Compute age in full years from a Date */
 function computeAge(birthDate: Date): number {
@@ -319,7 +320,10 @@ export function createPatientService({
         metadata: { section: "history" },
       });
 
-      return patientRepository.getHistory(patientId);
+      const history = await patientRepository.getHistory(patientId);
+      // Visits stay visible for scheduling; the consultation notes are clinical records.
+      if (can(currentRole, "view_clinical_history")) return history;
+      return history.map((visit) => ({ ...visit, consultation: null }));
     },
   };
 }

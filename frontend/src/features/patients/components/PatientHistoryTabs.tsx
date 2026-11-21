@@ -9,6 +9,8 @@ import {
   usePatientHistory,
   PatientHistoryRecord,
 } from "@/features/patients/hooks/usePatientHistory";
+import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
+import { can } from "@backend/contracts";
 
 interface PatientHistoryTabsProps {
   patientId: string;
@@ -28,6 +30,9 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
   const [consPage, setConsPage] = useState(1);
   const pageSize = 10;
   const { data = [], isLoading, error, refetch } = usePatientHistory(patientId);
+  const { user } = useCurrentUser();
+  // Front-desk staff see visits only; consultation notes are clinical records.
+  const showConsultations = can(user?.role, "view_clinical_history");
 
   const paginatedAppointments = useMemo(() => {
     const start = (apptPage - 1) * pageSize;
@@ -110,20 +115,22 @@ export function PatientHistoryTabs({ patientId }: PatientHistoryTabsProps) {
         >
           <Calendar className="h-4 w-4" /> Appointments ({data.length})
         </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("consultations")}
-          className={`flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === "consultations"
-              ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <Stethoscope className="h-4 w-4" /> Consultations ({consultationsData.length})
-        </button>
+        {showConsultations && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("consultations")}
+            className={`flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === "consultations"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Stethoscope className="h-4 w-4" /> Consultations ({consultationsData.length})
+          </button>
+        )}
       </div>
 
-      {activeTab === "appointments" ? (
+      {activeTab === "appointments" || !showConsultations ? (
         <DataTable
           data={paginatedAppointments}
           columns={appointmentsColumns as unknown as DataTableColumn<Record<string, unknown>>[]}

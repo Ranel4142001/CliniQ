@@ -112,6 +112,13 @@ export const appointmentRepository = {
     });
   },
 
+  async isActiveClinician(profileId: string) {
+    const count = await prisma.profile.count({
+      where: { id: profileId, role: "CLINICIAN", isActive: true },
+    });
+    return count > 0;
+  },
+
   async findByClinicianAndDate(clinicianId: string, dayStart: Date, dayEnd: Date) {
     return prisma.appointment.findMany({
       where: {

@@ -16,7 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { SlotPicker } from "@/features/appointments/components/SlotPicker";
-import type { AppointmentListItem, AppointmentDTO } from "@backend/contracts";
+import { can, type AppointmentListItem, type AppointmentDTO } from "@backend/contracts";
 import type { Role } from "@prisma/client";
 
 interface AppointmentActionsProps {
@@ -50,6 +50,8 @@ export function AppointmentActions({
   const isPending = appointment.status === "PENDING";
   const isConfirmed = appointment.status === "CONFIRMED";
   const isStaffOrAdmin = userRole === "ADMIN" || userRole === "STAFF";
+  // The consultation workspace holds clinical notes: clinicians and admins only (never front desk).
+  const canOpenConsultation = userRole !== "PATIENT" && can(userRole, "view_clinical_history");
   // Online visits get a private chat between the patient and the clinician (admins/staff excluded).
   const canChat =
     appointment.type === "ONLINE" &&
@@ -110,8 +112,8 @@ export function AppointmentActions({
         </Link>
       )}
 
-      {isConfirmed && userRole !== "PATIENT" && (
-        <Link href={`/consultations/${appointment.id}`}>
+      {isConfirmed && canOpenConsultation && (
+        <Link href={ROUTES.CONSULTATION(appointment.id)}>
           <Button
             size="sm"
             variant="outline"

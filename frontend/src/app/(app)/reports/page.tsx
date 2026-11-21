@@ -13,7 +13,8 @@ import {
   prescriptionsReportConfig,
 } from "@/features/reports/config/report-configs";
 import { Calendar, UserCheck, Pill, ArrowLeftRight, FileText } from "lucide-react";
-import type { ReportKey } from "@backend/contracts";
+import { canViewReport, type ReportKey } from "@backend/contracts";
+import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 import type { ReportConfig } from "@/features/reports/types/report-config.types";
 
 const REPORTS: Array<{
@@ -46,9 +47,12 @@ const REPORTS: Array<{
 ];
 
 export default function ReportsPage() {
+  const { user } = useCurrentUser();
   const [activeKey, setActiveKey] = useState<ReportKey>("appointments");
 
-  const currentReport = REPORTS.find((r) => r.key === activeKey) || REPORTS[0];
+  // Same rule the API enforces: e.g. front-desk staff don't get the consultations (diagnoses) report.
+  const reports = user ? REPORTS.filter((r) => canViewReport(user.role, r.key)) : [];
+  const currentReport = reports.find((r) => r.key === activeKey) || reports[0];
 
   return (
     <div className="space-y-6">
@@ -59,7 +63,7 @@ export default function ReportsPage() {
       />
 
       <div className="flex flex-wrap items-center gap-2 border-b pb-3">
-        {REPORTS.map((r) => {
+        {reports.map((r) => {
           const Icon = r.icon;
           const isActive = r.key === activeKey;
           return (
@@ -77,14 +81,16 @@ export default function ReportsPage() {
         })}
       </div>
 
-      <div>
-        <div className="mb-3">
-          <h3 className="text-base font-semibold">{currentReport.config.title}</h3>
-          <p className="text-xs text-muted-foreground">{currentReport.config.description}</p>
-        </div>
+      {currentReport && (
+        <div>
+          <div className="mb-3">
+            <h3 className="text-base font-semibold">{currentReport.config.title}</h3>
+            <p className="text-xs text-muted-foreground">{currentReport.config.description}</p>
+          </div>
 
-        <ReportViewer key={currentReport.key} config={currentReport.config} />
-      </div>
+          <ReportViewer key={currentReport.key} config={currentReport.config} />
+        </div>
+      )}
     </div>
   );
 }

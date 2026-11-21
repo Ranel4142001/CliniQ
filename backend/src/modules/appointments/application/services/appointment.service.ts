@@ -163,6 +163,10 @@ export function createAppointmentService({
         if (patient.isArchived) throw new ValidationError("Cannot book for an archived patient.");
       }
 
+      if (!(await appointmentRepository.isActiveClinician(input.clinicianId))) {
+        throw new ValidationError("Please choose an available clinician.");
+      }
+
       // Double-booking check inside a transaction
       const created = await transactions.run(async (tx) => {
         const conflicts = await appointmentRepository.findOverlapping(

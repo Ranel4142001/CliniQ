@@ -1,5 +1,5 @@
 import { Role } from "@prisma/client";
-import { can } from "@backend/modules/auth/domain/services/permissions";
+import { can } from "@backend/shared/domain/permissions";
 import type { ProfileRepositoryPort } from "@backend/modules/auth/application/ports/outbound/profile-repository.port";
 import type {
   AuthIdentity,

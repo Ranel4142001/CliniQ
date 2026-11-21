@@ -13,12 +13,20 @@ import {
   buildPaginatedResponse,
 } from "@backend/shared/application/pagination";
 import type { Role } from "@prisma/client";
+import { can } from "@backend/shared/domain/permissions";
 import type {
   StartConsultationInput,
   UpdateConsultationInput,
   CompleteConsultationInput,
 } from "@backend/modules/consultations/application/dto/consultation.schema";
 import type { ConsultationWithRelations } from "@backend/modules/consultations/application/dto/consultation.types";
+
+/** Consultation notes are clinical records: only roles allowed to see clinical history may read them. */
+function assertCanViewClinicalRecords(role: Role): void {
+  if (!can(role, "view_clinical_history")) {
+    throw new ForbiddenError("Your role does not have access to clinical records.");
+  }
+}
 
 export interface ConsultationServiceDeps {
   consultationRepository: ConsultationRepositoryPort;
@@ -83,6 +91,7 @@ export class ConsultationService {
     user: { id: string; role: Role },
     id: string
   ): Promise<ConsultationWithRelations> {
+    assertCanViewClinicalRecords(user.role);
     const consultation = await this.deps.consultationRepository.findById(id);
     if (!consultation) {
       throw new NotFoundError("Consultation not found.");
@@ -99,6 +108,7 @@ export class ConsultationService {
     user: { id: string; role: Role },
     appointmentId: string
   ): Promise<ConsultationWithRelations | null> {
+    assertCanViewClinicalRecords(user.role);
     const consultation = await this.deps.consultationRepository.findByAppointmentId(appointmentId);
     if (!consultation) return null;
 
@@ -195,6 +205,7 @@ export class ConsultationService {
     user: { id: string; role: Role; patientId?: string | null },
     params: { page?: number; pageSize?: number; patientId?: string }
   ) {
+    assertCanViewClinicalRecords(user.role);
     const { page = 1, pageSize = 10, patientId } = params;
     const { skip, take } = getPaginationSkipTake(page, pageSize);
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ReportsService } from "@backend/modules/reports/application/services/reports.service";
 import type { ReportsQueryPort } from "@backend/modules/reports/application/ports/outbound/reports-query.port";
-import { ValidationError } from "@backend/shared/domain/errors/app-error";
+import { ForbiddenError, ValidationError } from "@backend/shared/domain/errors/app-error";
 
 const notImplemented = () => Promise.reject(new Error("not stubbed in this test"));
 
@@ -35,7 +35,7 @@ describe("ReportsService", () => {
       } as any,
     ]);
 
-    const result = await service.generateReport("appointments", {
+    const result = await service.generateReport("ADMIN", "appointments", {
       from: "2026-10-01",
       to: "2026-10-31",
       status: "CONFIRMED",
@@ -61,7 +61,7 @@ describe("ReportsService", () => {
       } as any,
     ]);
 
-    const result = await service.generateReport("consultations", {});
+    const result = await service.generateReport("ADMIN", "consultations", {});
 
     expect(result).toHaveLength(1);
     expect(result[0].chiefComplaint).toBe("Severe headache");
@@ -86,7 +86,7 @@ describe("ReportsService", () => {
       } as any,
     ]);
 
-    const result = await service.generateReport("inventory", {});
+    const result = await service.generateReport("ADMIN", "inventory", {});
 
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe("Paracetamol");
@@ -109,7 +109,7 @@ describe("ReportsService", () => {
       } as any,
     ]);
 
-    const result = await service.generateReport("movements", {});
+    const result = await service.generateReport("ADMIN", "movements", {});
 
     expect(result).toHaveLength(1);
     expect(result[0].medicineName).toBe("Paracetamol 500mg");
@@ -132,7 +132,7 @@ describe("ReportsService", () => {
       } as any,
     ]);
 
-    const result = await service.generateReport("prescriptions", {});
+    const result = await service.generateReport("ADMIN", "prescriptions", {});
 
     expect(result).toHaveLength(1);
     expect(result[0].prescriptionNo).toBe("RX-2026-0001");
@@ -141,6 +141,26 @@ describe("ReportsService", () => {
   });
 
   it("throws ValidationError for unknown report key", async () => {
-    await expect(service.generateReport("unknown-key" as any, {})).rejects.toThrow(ValidationError);
+    await expect(service.generateReport("ADMIN", "unknown-key" as any, {})).rejects.toThrow(
+      ValidationError
+    );
+  });
+
+  it("keeps the consultations report (diagnoses) from front-desk staff", async () => {
+    await expect(service.generateReport("STAFF", "consultations", {})).rejects.toThrow(
+      ForbiddenError
+    );
+  });
+
+  it("rejects a date filter that is not a real date", async () => {
+    await expect(
+      service.generateReport("ADMIN", "appointments", { from: "not-a-date" })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  it("rejects a start date after the end date", async () => {
+    await expect(
+      service.generateReport("ADMIN", "appointments", { from: "2026-11-20", to: "2026-11-01" })
+    ).rejects.toThrow(ValidationError);
   });
 });
