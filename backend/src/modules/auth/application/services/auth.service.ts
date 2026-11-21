@@ -53,7 +53,7 @@ export type AuthService = ReturnType<typeof createAuthService>;
 export function createAuthService({ authRepository, identityProvider }: AuthServiceDeps) {
   return {
     /**
-     * Resolves the CliniQ profile for a Supabase auth user, creating one on first login.
+     * Resolves the ClinicBase profile for a Supabase auth user, creating one on first login.
      * Self-provisioned profiles are always PATIENT; elevated roles are granted only by an admin.
      */
     async getOrCreateProfile(authUser: AuthIdentity): Promise<UserProfile> {

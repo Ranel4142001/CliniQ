@@ -4,7 +4,7 @@ import { authService } from "@backend/modules/auth/auth.module";
 import { UserProfile } from "@backend/modules/auth/application/dto/auth.types";
 import { memoizePerRequest } from "@backend/shared/adapters/http/request-context";
 
-/** Request-scoped: resolves the session and its CliniQ profile once per request. */
+/** Request-scoped: resolves the session and its ClinicBase profile once per request. */
 function getAuthenticatedUser(): Promise<UserProfile> {
   return memoizePerRequest("auth:profile", () => authService.getSessionProfile());
 }

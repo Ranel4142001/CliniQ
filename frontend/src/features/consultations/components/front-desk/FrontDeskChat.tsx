@@ -17,7 +17,7 @@ export const FRONT_DESK_NAME = "Clinic front desk";
 const PATIENT_HINT =
   "Ask about bookings, payments or medicine pickups. Clinic staff reply here. For medical questions, message your doctor.";
 const DESK_HINT = "Shared with all clinic staff. Say hello 👋";
-const NO_ACCOUNT_REASON = "This patient has no CliniQ account yet, so they can't receive messages.";
+const NO_ACCOUNT_REASON = "This patient has no ClinicBase account yet, so they can't receive messages.";
 
 interface FrontDeskChatProps {
   patientId: string;

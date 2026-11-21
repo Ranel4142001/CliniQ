@@ -11,7 +11,7 @@ interface AppErrorProps {
 
 export default function AppError({ error, reset }: AppErrorProps) {
   useEffect(() => {
-    console.error("CliniQ In-App Error:", error);
+    console.error("ClinicBase In-App Error:", error);
   }, [error]);
 
   return (

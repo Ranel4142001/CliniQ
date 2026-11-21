@@ -17,7 +17,7 @@ export function ReportPdfDocument({
   rows,
 }: ReportPdfDocumentProps) {
   return (
-    <PdfDocumentLayout title="CliniQ Medical Center" subtitle="Official Clinical & Management Report">
+    <PdfDocumentLayout title="ClinicBase Medical Center" subtitle="Official Clinical & Management Report">
       <View style={styles.reportHeader}>
         <Text style={styles.reportTitle}>{title}</Text>
         <Text style={styles.reportMeta}>

@@ -5,7 +5,7 @@ import { prisma } from "@backend/shared/infrastructure/persistence/prisma";
 
 const { HOST, PORT } = getEnv();
 const server = serve({ fetch: createApplication().fetch, hostname: HOST, port: PORT }, (info) => {
-  console.log(`CliniQ API listening on http://${info.address}:${info.port}`);
+  console.log(`ClinicBase API listening on http://${info.address}:${info.port}`);
 });
 
 function shutdown(signal: string) {

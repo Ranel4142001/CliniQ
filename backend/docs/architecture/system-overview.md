@@ -1,4 +1,4 @@
-# CliniQ Backend — System Overview
+# ClinicBase Backend — System Overview
 
 The backend is a standalone Node.js API (Hono) organised as a **modular monolith with
 hexagonal (ports & adapters) layering**. Each business capability is a module; inside a

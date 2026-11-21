@@ -14,7 +14,7 @@ interface ErrorProps {
 export default function RootError({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log unexpected runtime error for diagnostics
-    console.error("CliniQ Root Application Error:", error);
+    console.error("ClinicBase Root Application Error:", error);
   }, [error]);
 
   return (
@@ -54,7 +54,7 @@ export default function RootError({ error, reset }: ErrorProps) {
       </div>
 
       <p className="mt-12 text-xs text-muted-foreground">
-        CliniQ · Secure Healthcare Management System
+        ClinicBase · Secure Healthcare Management System
       </p>
     </div>
   );

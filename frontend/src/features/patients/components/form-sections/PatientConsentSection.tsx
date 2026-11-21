@@ -28,7 +28,7 @@ export function PatientConsentSection({
     <div className="space-y-3 rounded-md border p-3.5 bg-muted/20">
       <h3 className="text-sm font-semibold text-foreground">Data Privacy Consent</h3>
       <p className="text-xs text-muted-foreground leading-relaxed">
-        In accordance with the Data Privacy Act of 2012, I hereby authorize CliniQ to collect,
+        In accordance with the Data Privacy Act of 2012, I hereby authorize ClinicBase to collect,
         store, and process my personal and health information solely for medical consultation,
         clinic operations, and treatment management.
       </p>

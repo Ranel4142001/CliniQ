@@ -34,7 +34,7 @@ export default function NotFound() {
         </Button>
       </div>
 
-      <p className="mt-12 text-xs text-muted-foreground">CliniQ · Secure Healthcare Management</p>
+      <p className="mt-12 text-xs text-muted-foreground">ClinicBase · Secure Healthcare Management</p>
     </div>
   );
 }

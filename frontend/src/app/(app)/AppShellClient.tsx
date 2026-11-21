@@ -47,7 +47,7 @@ export function AppShellClient({ children }: { children: ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <ErrorState
-          title="CliniQ is temporarily unavailable"
+          title="ClinicBase is temporarily unavailable"
           message="We couldn't load your account. Please try again in a moment."
           onRetry={() => refetch()}
         />
@@ -56,7 +56,7 @@ export function AppShellClient({ children }: { children: ReactNode }) {
   }
 
   if (isLoading || sessionEnded || !user) {
-    return <LoadingState message="Loading CliniQ…" className="min-h-screen" />;
+    return <LoadingState message="Loading ClinicBase…" className="min-h-screen" />;
   }
 
   return (

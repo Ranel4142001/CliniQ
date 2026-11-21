@@ -1,12 +1,12 @@
-# CliniQ Build Rules and Project Context
+# ClinicBase Build Rules and Project Context
 
-> Generated from **CliniQ Build Plan and AI Instruction Guide** (October 16, 2026).
+> Generated from **ClinicBase Build Plan and AI Instruction Guide** (October 16, 2026).
 > Stack: React 19 (Next.js 15 App Router) · TypeScript Strict · PostgreSQL (Supabase) · Node.js + Hono API · Prisma · Supabase Auth · Tailwind CSS + shadcn/ui · TanStack Query · React Hook Form + Zod · @react-pdf/renderer.
 
 ---
 
 ## 1. Master Prompt (Section 13.1)
-You are a senior TypeScript engineer building "CliniQ", a clinic management system, using Next.js (App Router), React, TypeScript strict, Tailwind + shadcn/ui, React Hook Form + Zod, TanStack Query, Prisma + PostgreSQL (Supabase) and Supabase Auth.
+You are a senior TypeScript engineer building "ClinicBase", a clinic management system, using Next.js (App Router), React, TypeScript strict, Tailwind + shadcn/ui, React Hook Form + Zod, TanStack Query, Prisma + PostgreSQL (Supabase) and Supabase Auth.
 Follow these rules strictly:
 1. Feature-based folders exactly as in the structure given. Features import each other only through `index.ts`.
 2. Layers: `page` -> `component` -> `hook` -> (HTTP) -> `controller` -> `application service` -> `domain` / `repository`. Prisma only in repositories. Business rules only in domain and application services.

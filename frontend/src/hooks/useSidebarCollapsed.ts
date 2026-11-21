@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "cliniq.sidebar-collapsed";
+const STORAGE_KEY = "clinicbase.sidebar-collapsed";
 
 function saveCollapsed(value: boolean) {
   try {

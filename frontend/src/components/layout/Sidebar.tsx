@@ -88,7 +88,7 @@ export function Sidebar({
         </div>
         {!isCollapsed && (
           <div className="flex min-w-0 flex-1 flex-col">
-            <span className="text-base font-bold tracking-tight text-foreground">CliniQ</span>
+            <span className="text-base font-bold tracking-tight text-foreground">ClinicBase</span>
             <span className="text-xs text-muted-foreground">Clinic management</span>
           </div>
         )}

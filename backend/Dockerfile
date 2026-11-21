@@ -22,14 +22,14 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 ENV NODE_ENV=production PORT=4000
 
-RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 cliniq
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 clinicbase
 
-COPY --from=prod-deps --chown=cliniq:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=cliniq:nodejs /app/backend/dist ./dist
-COPY --from=builder --chown=cliniq:nodejs /app/backend/database ./database
-COPY --chown=cliniq:nodejs backend/package.json ./package.json
+COPY --from=prod-deps --chown=clinicbase:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=clinicbase:nodejs /app/backend/dist ./dist
+COPY --from=builder --chown=clinicbase:nodejs /app/backend/database ./database
+COPY --chown=clinicbase:nodejs backend/package.json ./package.json
 
-USER cliniq
+USER clinicbase
 EXPOSE 4000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

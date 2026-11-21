@@ -27,7 +27,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
             <Stethoscope className="h-6 w-6" />
           </div>
-          <span className="text-xl font-bold tracking-tight">CliniQ</span>
+          <span className="text-xl font-bold tracking-tight">ClinicBase</span>
         </div>
 
         <div className="relative w-full max-w-md rounded-2xl border bg-background/90 p-6 shadow-xl shadow-primary/5 backdrop-blur-sm transition-all duration-200 has-[[data-wide='true']]:max-w-3xl sm:p-8">
@@ -35,7 +35,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </div>
 
         <p className="relative mt-6 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} CliniQ · Secure Healthcare Management
+          © {new Date().getFullYear()} ClinicBase · Secure Healthcare Management
         </p>
       </main>
     </div>

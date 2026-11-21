@@ -9,7 +9,7 @@ services:
         NEXT_PUBLIC_SUPABASE_URL: ${SUPABASE_URL:?SUPABASE_URL is required}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:?SUPABASE_ANON_KEY is required}
         BACKEND_URL: http://backend:4000
-    container_name: cliniq-frontend
+    container_name: clinicbase-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -21,7 +21,7 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: cliniq-backend
+    container_name: clinicbase-backend
     restart: unless-stopped
     # Not published: only the frontend (same network) talks to the API.
     expose:
@@ -40,7 +40,7 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: cliniq-db
+    container_name: clinicbase-db
     restart: unless-stopped
     # Bound to loopback only, for local tooling (prisma migrate/seed).
     ports:

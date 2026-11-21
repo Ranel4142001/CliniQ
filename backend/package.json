@@ -1,5 +1,5 @@
 {
-  "name": "@cliniq/backend",
+  "name": "@clinicbase/backend",
   "version": "0.1.0",
   "private": true,
   "scripts": {

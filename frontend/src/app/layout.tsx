@@ -17,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "CliniQ - Clinic Management System",
+  title: "ClinicBase - Clinic Management System",
   description: "Modern, secure healthcare management platform for community clinics.",
   manifest: "/manifest.json",
 };

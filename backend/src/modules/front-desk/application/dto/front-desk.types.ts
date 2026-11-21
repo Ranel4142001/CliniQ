@@ -21,7 +21,7 @@ export interface FrontDeskThreadDTO {
 
 export interface FrontDeskChatDTO {
   messages: FrontDeskMessageDTO[];
-  /** False when the patient has no CliniQ account, so nobody could read a reply. */
+  /** False when the patient has no ClinicBase account, so nobody could read a reply. */
   canSend: boolean;
   patientName: string;
   patientNo: string;

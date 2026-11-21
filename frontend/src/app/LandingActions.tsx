@@ -26,7 +26,7 @@ export function LandingActions() {
       <Button asChild size="lg" className="gap-2">
         <Link href={ROUTES.LOGIN}>
           <LogIn className="h-4 w-4" />
-          Sign In to CliniQ
+          Sign In to ClinicBase
         </Link>
       </Button>
       <Button asChild size="lg" variant="outline" className="gap-2">

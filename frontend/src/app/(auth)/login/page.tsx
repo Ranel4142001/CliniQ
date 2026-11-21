@@ -46,7 +46,7 @@ function LoginForm() {
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Sign in to CliniQ</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Sign in to ClinicBase</h1>
         <p className="mt-1 text-sm text-muted-foreground">Enter your credentials to continue</p>
       </div>
 

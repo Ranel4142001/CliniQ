@@ -1,6 +1,6 @@
-# CliniQ Deployment Guide
+# ClinicBase Deployment Guide
 
-CliniQ runs as **two services**:
+ClinicBase runs as **two services**:
 
 | Service | What it is | Public? |
 | --- | --- | --- |

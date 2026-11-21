@@ -9,7 +9,7 @@ export default function Home() {
       </div>
 
       <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
-        Welcome to <span className="text-primary">CliniQ</span>
+        Welcome to <span className="text-primary">ClinicBase</span>
       </h1>
       <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
         Modern Clinic Management System designed for community and institutional healthcare.

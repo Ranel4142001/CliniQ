@@ -1,4 +1,4 @@
-# CliniQ — Healthcare & Clinic Management System
+# ClinicBase — Healthcare & Clinic Management System
 
 A web-based clinic management system designed for community and institutional health clinics.
 
@@ -49,10 +49,10 @@ A web-based clinic management system designed for community and institutional he
 
 ## 📁 Project Structure
 
-CliniQ is split into two applications that live in one repository (npm workspaces):
+ClinicBase is split into two applications that live in one repository (npm workspaces):
 
 ```text
-CliniQ/
+ClinicBase/
 ├── frontend/                     # Everything the user sees (Next.js)
 │   ├── public/
 │   ├── src/
@@ -88,7 +88,7 @@ from the server, so cookies stay first-party and no CORS is needed.
 
 - Backend layering and dependency rules: [backend/docs/architecture/system-overview.md](backend/docs/architecture/system-overview.md)
 - Every endpoint and who can call it: [backend/docs/api/endpoints.md](backend/docs/api/endpoints.md)
-- Engineering rules: [CLINIQ_RULES.md](CLINIQ_RULES.md)
+- Engineering rules: [CLINICBASE_RULES.md](CLINICBASE_RULES.md)
 
 ---
 

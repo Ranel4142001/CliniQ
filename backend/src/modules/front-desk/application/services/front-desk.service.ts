@@ -100,7 +100,7 @@ export function createFrontDeskService({ frontDeskRepository }: FrontDeskService
     ): Promise<FrontDeskMessageDTO> {
       const patient = await getAuthorizedPatient(viewer, patientId);
       if (patient.profileId === null) {
-        throw new ConflictError("This patient has no CliniQ account yet, so they can't receive messages.");
+        throw new ConflictError("This patient has no ClinicBase account yet, so they can't receive messages.");
       }
       return frontDeskRepository.create({
         patientId: patient.id,

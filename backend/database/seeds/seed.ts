@@ -1,6 +1,6 @@
 /**
  * prisma/seed.ts
- * Comprehensive database seed script for CliniQ.
+ * Comprehensive database seed script for ClinicBase.
  * Seeds:
  *  - 1 System Admin, 2 Clinicians, 2 Staff
  *  - 20 Fictional Patients with complete health profiles
@@ -326,7 +326,7 @@ async function createAuthUser(
 }
 
 async function main() {
-  console.log("🌱  Starting CliniQ Comprehensive Seed…");
+  console.log("🌱  Starting ClinicBase Comprehensive Seed…");
 
   const supabaseAdmin = createClient(
     requireEnv("SUPABASE_URL"),
@@ -552,7 +552,7 @@ async function main() {
     console.log("   ℹ️ Sample patient login already exists (or no online visit to link).");
   }
 
-  console.log("\n🎉 CliniQ Database Seed completed successfully!\n");
+  console.log("\n🎉 ClinicBase Database Seed completed successfully!\n");
 }
 
 main()

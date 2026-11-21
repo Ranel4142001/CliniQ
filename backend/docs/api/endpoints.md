@@ -1,4 +1,4 @@
-# CliniQ API Reference
+# ClinicBase API Reference
 
 All endpoints are served by the backend under `/api` and reached by the browser through the frontend's same-origin proxy.
 

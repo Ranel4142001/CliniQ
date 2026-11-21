@@ -12,7 +12,7 @@ export function PrescriptionPdf({ prescription }: PrescriptionPdfProps) {
   const { patient, clinician, items, prescriptionNo, issuedAt, consultation } = prescription;
 
   return (
-    <PdfDocumentLayout title="CliniQ Medical Center" subtitle="Medical Prescription & Digital Dispense Order">
+    <PdfDocumentLayout title="ClinicBase Medical Center" subtitle="Medical Prescription & Digital Dispense Order">
       <View style={styles.rxHeader}>
         <View>
           <Text style={styles.rxTitle}>MEDICAL PRESCRIPTION</Text>

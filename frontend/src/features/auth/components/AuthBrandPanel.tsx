@@ -38,7 +38,7 @@ export function AuthBrandPanel() {
           <Stethoscope className="h-6 w-6" />
         </div>
         <div>
-          <p className="text-lg font-bold tracking-tight">CliniQ</p>
+          <p className="text-lg font-bold tracking-tight">ClinicBase</p>
           <p className="text-xs font-medium uppercase tracking-widest text-white/70">
             Healthcare OS
           </p>
